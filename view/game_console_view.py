@@ -15,13 +15,14 @@ class GameConsoleView:
         try:
             input_coords = eval(string_input)
         except:
-            return None
+            print('Invalid input: ' + string_input)
+            return self.get_move()
         if not isinstance(input_coords, list) or len(input_coords) != 2:
-            print('Invalid input')
-            return None
+            print('Invalid input: ' + string_input)
+            return self.get_move()
         else:
-            row, col = input_coords
-            return row + 1, col + 1
+            row, col = tuple(input_coords)
+            return row - 1, col - 1
 
     def display_curr_player(self, player):
         print("Current player: " + PLAYER_SYMBOL[player])
