@@ -2,7 +2,10 @@ from model.player import Player
 import numpy as np
 
 class Game:
-    def __init__(self, board_size):
+    def __init__(self, board_size = 8):
+        if board_size < 3:
+            print("Invalid board size. Using default 8x8 board.")
+            board_size = 8
         self.board_size = board_size
         self.curr_player = Player.BLACK
         self.board = np.zeros((board_size, board_size), dtype=np.int)
