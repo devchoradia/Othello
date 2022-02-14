@@ -7,11 +7,10 @@ class GameConsoleView:
         self.board_console_view.display()
 
     def display_illegal_move(self, row, col):
-        print("Illegal move: ", row + 1, col + 1)
+        print("Illegal move: ", [row, col])
 
     def get_move(self):
-        print("Please input a move in the form [row, column]: ")
-        string_input = input('Enter your movement: ')
+        string_input = input('Input a move in the form [row, column]: ')
         try:
             input_coords = eval(string_input)
         except:
