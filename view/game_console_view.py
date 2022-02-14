@@ -27,7 +27,8 @@ class GameConsoleView:
         print("Current player: " + PLAYER_SYMBOL[player])
 
     def display_winner(self, player):
+        print("Game over.")
         if player == 0:
-            print("DRAW")
+            print("Draw.")
         else:
-            print("PLAYER " + PLAYER_SYMBOL[player] + "WON")
+            print("Player " + PLAYER_SYMBOL[player] + " won.")

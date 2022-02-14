@@ -4,16 +4,16 @@ import numpy as np
 class Game:
     def __init__(self, board_size):
         self.board_size = board_size
-        self.curr_player = Player.X
+        self.curr_player = Player.BLACK
         self.board = np.zeros((board_size, board_size), dtype=np.int)
         self.init_board()
 
     def init_board(self):
         center = int(self.board_size / 2)
-        self.board[center, center] = int(Player.O)
-        self.board[center, center - 1] = int(Player.X)
-        self.board[center - 1, center] = int(Player.X)
-        self.board[center - 1, center - 1] = int(Player.O) 
+        self.board[center, center] = int(Player.WHITE)
+        self.board[center, center - 1] = int(Player.BLACK)
+        self.board[center - 1, center] = int(Player.BLACK)
+        self.board[center - 1, center - 1] = int(Player.WHITE) 
 
     def make_move(self, row, col):
         self.board[row, col] = int(self.curr_player)

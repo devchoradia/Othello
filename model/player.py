@@ -1,11 +1,11 @@
 from enum import IntEnum
 
 class Player(IntEnum):
-    X = 1
-    O = 2
+    BLACK = 1
+    WHITE = 2
 
 PLAYER_SYMBOL = {
-    Player.X: 'X',
-    Player.O: 'O',
+    Player.BLACK: 'X',
+    Player.WHITE: 'O',
     0: ' '
 }
