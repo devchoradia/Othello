@@ -33,7 +33,7 @@ class Game:
                 captured = [(row + dy, col + dx)]
                 i = 2
                 while i < self.board_size:
-                    captured.append((col + i * dx, row + i * dy))
+                    captured.append((row + i * dy, col + i * dx))
                     if col + i * dx < 0 or col + i * dx >= self.board_size or row + i * dy < 0 or row + i * dy >= self.board_size:
                         break
                     if self.board[row + i * dy, col + i * dx] == 0:
