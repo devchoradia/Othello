@@ -86,13 +86,17 @@ class Game:
         return False
 
     def is_game_terminated(self):
-        return self.has_player_won() or self.is_board_full()
+        return self.has_player_captured_all() or self.is_board_full()
 
-    def has_player_won(self):
-        # TODO
-        return False
+    def has_player_captured_all(self):
+        for row in self.board:
+            for tile in row:
+                if tile != 0 and tile != int(self.curr_player):
+                    return False
+        return True
 
     def get_winner(self):
+        # TODO: return other player if board is full and they captured more
         if self.has_player_won():
             return self.curr_player
         else:
