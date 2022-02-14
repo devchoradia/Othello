@@ -13,6 +13,16 @@ class GameController:
             self.view.display_curr_player(self.model.curr_player)
 
             row, col = self.view.get_move()
+            is_legal = model.is_legal_move(row, col)
+            while not is_legal:
+                self.view.display_illegal_move(row, col)
+                is_legal = model.is_legal_move(self.view.get_move())
+            
+            model.make_move(row, col)
+            game_terminated = model.is_game_terminated()
+            if game_terminated:
+                model.switch_player_turn()
+            
             # check legality
             # while not legal, display illegal move and re-get move
 
