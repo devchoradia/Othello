@@ -7,7 +7,7 @@ class GameConsoleView:
         self.board_console_view.display()
 
     def display_illegal_move(self, row, col):
-        print("Illegal move: ", row, col)
+        print("Illegal move: ", row + 1, col + 1)
 
     def get_move(self):
         print("Please input a move in the form [row, column]: ")

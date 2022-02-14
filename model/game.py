@@ -22,14 +22,32 @@ class Game:
         self.curr_player = Player(len(Player) + 1 - self.curr_player)
 
     def is_legal_move(self, row, col):
-        # TODO
         if row < 0 or row >= self.board_size:
             return False
         if col < 0 or col >= self.board_size:
             return False
         if self.board[row, col] != 0:
             return False
-        return True
+        
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
+                if dx == 0 and dy == 0:
+                    continue
+                if col + dx < 0 or col + dx >= self.board_size or row + dy < 0 or row + dy >= self.board_size:
+                    continue
+                neighbor = self.board[row + dy, col + dx]
+                if neighbor == 0 or neighbor == int(self.curr_player):
+                    continue
+                i = 2
+                while i < self.board_size:
+                    if col + i * dx < 0 or col + i * dx >= self.board_size or row + i * dy < 0 or row + i * dy >= self.board_size:
+                        break
+                    if self.board[row + i * dy, col + i * dx] == 0:
+                        break
+                    if self.board[row + i * dy, col + i * dx] == int(self.curr_player):
+                        return True;            
+                    i+=1
+        return False
 
     def is_game_terminated(self):
         return self.has_player_won() or self.is_board_full()
