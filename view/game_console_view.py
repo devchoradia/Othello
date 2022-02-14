@@ -25,3 +25,9 @@ class GameConsoleView:
 
     def display_curr_player(self, player):
         print("Current player: " + PLAYER_SYMBOL[player])
+
+    def display_winner(self, player):
+        if player == 0:
+            print("DRAW")
+        else:
+            print("PLAYER " + PLAYER_SYMBOL[player] + "WON")

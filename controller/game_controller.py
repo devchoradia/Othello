@@ -26,3 +26,5 @@ class GameController:
             game_terminated = self.model.is_game_terminated()
             if not game_terminated:
                 self.model.switch_player_turn()
+        self.view.display_board()
+        self.view.display_winner(self.model.get_winner())

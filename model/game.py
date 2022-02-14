@@ -97,10 +97,10 @@ class Game:
 
     def get_winner(self):
         # TODO: check if this works
-        if self.has_player_won():
+        if self.has_player_captured_all():
             return self.curr_player
         else:
-            return get_player_with_max_tiles
+            return self.get_player_with_max_tiles()
 
     def get_player_with_max_tiles(self):
         max_tile_count = 0
