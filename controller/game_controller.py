@@ -9,6 +9,7 @@ class GameController:
     def run_game(self):
         game_terminated = False
         while not game_terminated:
+            # TODO: check if player has valid turn
             self.view.display_board()
             self.view.display_curr_player(self.model.curr_player)
 

@@ -17,6 +17,35 @@ class Game:
 
     def make_move(self, row, col):
         self.board[row, col] = int(self.curr_player)
+        self.update_tiles(row, col)
+
+    def update_tiles(self, row, col):
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
+                if dx == 0 and dy == 0:
+                    continue
+                if col + dx < 0 or col + dx >= self.board_size or row + dy < 0 or row + dy >= self.board_size:
+                    continue
+                neighbor = self.board[row + dy, col + dx]
+                if neighbor == 0 or neighbor == int(self.curr_player):
+                    continue
+
+                captured = [(row + dy, col + dx)]
+                i = 2
+                while i < self.board_size:
+                    captured.append((col + i * dx, row + i * dy))
+                    if col + i * dx < 0 or col + i * dx >= self.board_size or row + i * dy < 0 or row + i * dy >= self.board_size:
+                        break
+                    if self.board[row + i * dy, col + i * dx] == 0:
+                        break
+                    if self.board[row + i * dy, col + i * dx] == int(self.curr_player):
+                          self.capture_tiles(captured)       
+                    i += 1
+        return False
+    
+    def capture_tiles(self, captured_positions):
+        for row, col in captured_positions:
+            self.board[row, col] = int(self.curr_player)
     
     def switch_player_turn(self):
         self.curr_player = Player(len(Player) + 1 - self.curr_player)
@@ -47,6 +76,13 @@ class Game:
                     if self.board[row + i * dy, col + i * dx] == int(self.curr_player):
                         return True;            
                     i+=1
+        return False
+
+    def has_valid_move(self):
+        for row_idx, row in enumerate(self.board):
+            for col_idx, tile in enumerate(row):
+                if tile == 0 and self.is_legal_move(row_idx, col_idx):
+                    return True
         return False
 
     def is_game_terminated(self):
