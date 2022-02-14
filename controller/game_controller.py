@@ -23,9 +23,3 @@ class GameController:
             game_terminated = self.model.is_game_terminated()
             if not game_terminated:
                 self.model.switch_player_turn()
-            
-            # check legality
-            # while not legal, display illegal move and re-get move
-
-            # make move in model
-            # check game termination / switch player turn

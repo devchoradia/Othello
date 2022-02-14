@@ -26,8 +26,3 @@ class GameConsoleView:
 
     def display_curr_player(self, player):
         print("Current player: " + PLAYER_SYMBOL[player])
-
-
-
-# abstract methods: $abstract_method
-# get_move, #display_player, display_illegal_moves
