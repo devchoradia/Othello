@@ -96,11 +96,22 @@ class Game:
         return True
 
     def get_winner(self):
-        # TODO: return other player if board is full and they captured more
+        # TODO: check if this works
         if self.has_player_won():
             return self.curr_player
         else:
-            return 0
+            return get_player_with_max_tiles
+
+    def get_player_with_max_tiles(self):
+        max_tile_count = 0
+        player_with_max_tile_count = 0
+        for i in range(len(Player)):
+            count = (self.board == 3).sum()
+            if count > max_tile_count:
+                player_with_max_tile_count = i
+            if count == max_tile_count:
+                player_with_max_tile_count = 0 # DRAW
+        return player_with_max_tile_count
 
     def is_board_full(self):
         return not np.any(self.board == 0)
