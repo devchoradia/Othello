@@ -108,8 +108,8 @@ class Game:
     def get_player_with_max_tiles(self):
         max_tile_count = 0
         player_with_max_tile_count = 0
-        for i in range(len(Player)):
-            count = (self.board == 3).sum()
+        for i in Player:
+            count = (self.board == int(i)).sum()
             if count > max_tile_count:
                 player_with_max_tile_count = i
             if count == max_tile_count:
