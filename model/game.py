@@ -11,6 +11,7 @@ class Game:
         self.board = np.zeros((board_size, board_size), dtype=np.int)
         self.init_board()
 
+    # Places the initial four tiles
     def init_board(self):
         center = int(self.board_size / 2)
         self.board[center, center] = int(Player.WHITE)
@@ -18,10 +19,12 @@ class Game:
         self.board[center - 1, center] = int(Player.BLACK)
         self.board[center - 1, center - 1] = int(Player.WHITE) 
 
+    # Performs the given move for the current player, and updates the resulting captured tiles
     def make_move(self, row, col):
         self.board[row, col] = int(self.curr_player)
         self.update_tiles(row, col)
 
+    # Finds captured tiles based on the player's move and updates them
     def update_tiles(self, row, col):
         for dx in range(-1, 2):
             for dy in range(-1, 2):
@@ -46,13 +49,16 @@ class Game:
                     i += 1
         return False
     
+    # Takes a list of tile positions that are captured, and updates those tiles
     def capture_tiles(self, captured_positions):
         for row, col in captured_positions:
             self.board[row, col] = int(self.curr_player)
     
+    # Switches the player turn
     def switch_player_turn(self):
         self.curr_player = Player(len(Player) + 1 - self.curr_player)
 
+    # Determines whether the given move is legal/valid
     def is_legal_move(self, row, col):
         if row < 0 or row >= self.board_size:
             return False
@@ -81,6 +87,7 @@ class Game:
                     i+=1
         return False
 
+    # Determines whether the current player can move
     def has_valid_move(self):
         for row_idx, row in enumerate(self.board):
             for col_idx, tile in enumerate(row):
@@ -88,9 +95,11 @@ class Game:
                     return True
         return False
 
+    # Returns whether the game is over as a result of the current player's move
     def is_game_terminated(self):
         return self.has_player_captured_all() or self.is_board_full()
 
+    # Returns whether the current player has captured all of their opponents tiles
     def has_player_captured_all(self):
         for row in self.board:
             for tile in row:
@@ -98,13 +107,14 @@ class Game:
                     return False
         return True
 
+    # Returns the winning player on the board
     def get_winner(self):
-        # TODO: check if this works
         if self.has_player_captured_all():
             return self.curr_player
         else:
             return self.get_player_with_max_tiles()
 
+    # Returns the player with more tiles on the board, or 0 if it is a draw
     def get_player_with_max_tiles(self):
         max_tile_count = 0
         player_with_max_tile_count = 0
@@ -116,12 +126,8 @@ class Game:
                 player_with_max_tile_count = 0 # DRAW
         return player_with_max_tile_count
 
+    # Determines whether the board is full
     def is_board_full(self):
         return not np.any(self.board == 0)
-        # for row in self.board:
-        #     for tile in row:
-        #         if tile != Player.NONE:
-        #             return False
-        # return true
     
     
