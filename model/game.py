@@ -69,23 +69,29 @@ class Game:
         
         for dx in range(-1, 2):
             for dy in range(-1, 2):
-                if dx == 0 and dy == 0:
-                    continue
-                if col + dx < 0 or col + dx >= self.board_size or row + dy < 0 or row + dy >= self.board_size:
-                    continue
-                neighbor = self.board[row + dy, col + dx]
-                if neighbor == 0 or neighbor == int(self.curr_player):
+                isInvalidDirection = dx == 0 and dy == 0
+                if isInvalidDirection or not self.is_capturable(row + dy, col + dx):
                     continue
                 i = 2
                 while i < self.board_size:
-                    if col + i * dx < 0 or col + i * dx >= self.board_size or row + i * dy < 0 or row + i * dy >= self.board_size:
+                    newCol = col + i * dx
+                    newRow = row + i * dy
+                    hasReachedEndOfBoard = newCol < 0 or newCol >= self.board_size or newRow < 0 or newRow >= self.board_size
+                    if hasReachedEndOfBoard or self.board[newRow, newCol] == 0:
                         break
-                    if self.board[row + i * dy, col + i * dx] == 0:
-                        break
-                    if self.board[row + i * dy, col + i * dx] == int(self.curr_player):
+                    if self.board[newRow, newCol] == int(self.curr_player):
                         return True;            
                     i+=1
         return False
+
+    # Determine whether the tile at the given location is the current player's opponent
+    def is_capturable(self, row, col):
+        # If the location is out of bounds, it isnot capturable
+        if col < 0 or col >= self.board_size or row < 0 or row >= self.board_size:
+            return False
+        # The tile is capturable iff it is an opponentplayer
+        tile = self.board[row, col]
+        return tile != 0 and tile != int(self.curr_player)
 
     # Determines whether the current player can move
     def has_valid_move(self):
