@@ -1,4 +1,5 @@
 from model.player import PLAYER_SYMBOL
+
 class GameConsoleView:
     def __init__(self, board_console_view):
         self.board_console_view = board_console_view
