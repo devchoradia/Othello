@@ -5,7 +5,7 @@ from view.game_console_view import GameConsoleView
 from view.game_view import GameView
 from controller.game_controller import GameController
 
-game = Game(board_size = 4)
+game = Game(board_size = 8)
 
 #board_view = BoardConsoleView(game.board)
 #game_view = GameConsoleView(board_view)

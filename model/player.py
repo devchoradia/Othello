@@ -9,3 +9,9 @@ PLAYER_SYMBOL = {
     Player.WHITE: 'O',
     0: ' '
 }
+
+PLAYER_COLOR = {
+    Player.BLACK: 'black',
+    Player.WHITE: 'white',
+    0: ' '
+}
