@@ -2,7 +2,7 @@ from model.player import PLAYER_COLOR
 import tkinter as tk
 from abc import ABC, abstractmethod
 
-# Not implementing this yet
+# Renders the board
 class BoardView(ABC):
     def __init__(self, board):
         self.board = board
@@ -11,12 +11,14 @@ class BoardView(ABC):
         root = tk.Tk()
         board_size = len(self.board)
         for row in range(board_size):
-            root.rowconfigure(row+1)#, weight=1)
-            root.columnconfigure(row+1)#, weight=1)
+            root.rowconfigure(row+1)
+            root.columnconfigure(row+1)
             for col in range(board_size):
+                player = self.board[row][col]
+                tile_color = PLAYER_COLOR[player]
+                relief = None if player == 0 else tk.RAISED
                 frame = tk.Frame(relief=tk.RAISED, borderwidth=1, bg='green')
                 frame.grid(row=row, column=col,padx=0, pady=0, ipadx=0, ipady=0)
-                print(frame.grid_info())
-                label = tk.Label(frame, width=5, height=3, text='    ',bg='green')
-                label.pack(padx=0, pady=0, expand=True)
+                label = tk.Label(frame, relief=relief, borderwidth=1, width=5, height=3, text='    ',bg=tile_color)
+                label.pack(padx=5, pady=5, expand=True)
         root.mainloop()

@@ -13,5 +13,5 @@ PLAYER_SYMBOL = {
 PLAYER_COLOR = {
     Player.BLACK: 'black',
     Player.WHITE: 'white',
-    0: ' '
+    0: 'green'
 }
