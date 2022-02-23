@@ -6,19 +6,26 @@ class GameController:
         self.model = model
         self.view = view
     
+    def start_game(self):
+        self.view.display_board()
+        self.view.board_view.root.after(1000, self.run_game)
+        self.view.board_view.root.mainloop()
+
     # Run the game
     def run_game(self):
+        print("running game")
         game_terminated = False
         # Continue requesting and performing players' movements until the game is over
         while not game_terminated:
             # If the current player has no valid move, switch turns and move on
             if not self.model.has_valid_move():
+                print("no valid move")
                 self.model.switch_player_turn()
                 continue
             # Display the board and current player
             self.view.display_board()
             self.view.display_curr_player(self.model.curr_player)
-
+            print("getting move")
             # Request a move from the player
             row, col = self.view.get_move()
             # Check legality of move
@@ -39,4 +46,4 @@ class GameController:
         # Display the final state of the board and the winner
         self.view.display_board()
         self.view.display_winner(self.model.get_winner())
-        
+        exit()

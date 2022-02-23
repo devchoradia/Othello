@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from model.player import PLAYER_SYMBOL
 
 # Not implementing this yet
 class GameView(ABC):
@@ -12,20 +13,18 @@ class GameView(ABC):
         print("Illegal move: ", row, col)
 
     def get_move(self):
-        print("Please input a move in the form [row, column]: ")
-        string_input = input('Enter your movement: ')
-        try:
-            input_coords = eval(string_input)
-        except:
-            return None
-        if not isinstance(input_coords, list) or len(input_coords) != 2:
-            print('Invalid input')
-            return None
+        print("getting move")
+        return self.board_view.get_move()
+
+    def display_curr_player(self, player):
+        print("Current player: " + PLAYER_SYMBOL[player])
+
+    def display_winner(self, player):
+        print("Game over.")
+        if player == 0:
+            print("Draw.")
         else:
-            row, col = input_coords
-            return row + 1, col + 1
-
-
+            print("Player " + PLAYER_SYMBOL[player] + " won.")
 
 # abstract methods: $abstract_method
 # get_move, #display_player, display_illegal_moves
