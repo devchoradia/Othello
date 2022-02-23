@@ -6,6 +6,9 @@ class GameView(ABC):
     def __init__(self, board_view):
         self.board_view = board_view
 
+    def mainloop(self):
+        self.board_view.mainloop()
+
     def display_board(self):
         self.board_view.display()
 
@@ -13,7 +16,6 @@ class GameView(ABC):
         print("Illegal move: ", row, col)
 
     def get_move(self):
-        print("getting move")
         return self.board_view.get_move()
 
     def display_curr_player(self, player):

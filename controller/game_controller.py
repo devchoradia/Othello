@@ -7,9 +7,8 @@ class GameController:
         self.view = view
     
     def start_game(self):
-        self.view.display_board()
         self.view.board_view.root.after(1000, self.run_game)
-        self.view.board_view.root.mainloop()
+        self.view.mainloop()
 
     # Run the game
     def run_game(self):
