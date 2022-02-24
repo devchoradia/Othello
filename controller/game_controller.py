@@ -42,4 +42,3 @@ class GameController:
         # Display the final state of the board and the winner
         self.view.display_board()
         self.view.display_winner(self.model.get_winner())
-        exit()

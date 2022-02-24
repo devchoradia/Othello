@@ -37,9 +37,13 @@ class GameView(ABC):
         label.grid(row=len(self.board), columnspan=len(self.board), sticky= tk.W+tk.E+tk.N+tk.S)
 
     def display_winner(self, player):
-        print("Game over.")
+        result_string = f"{PLAYER_COLOR[player].upper()} WINS"
         if player == 0:
-            print("Draw.")
-        else:
-            print("Player " + PLAYER_SYMBOL[player] + " won.")
+            result_string = "DRAW"
+        self.add_board()
+        label = tk.Label(relief=tk.RAISED, borderwidth=1, width=5, height=2, font=("Arial", 25), text=result_string,bg="green", fg="black")
+        label.grid(row=len(self.board), columnspan=len(self.board), sticky= tk.W+tk.E+tk.N+tk.S)
+    
+    def close_game(self):
+        self.root.destroy()
 

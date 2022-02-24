@@ -59,7 +59,9 @@ class Game:
         self.curr_player = Player(len(Player) + 1 - self.curr_player)
 
     # Determines whether the given move is legal/valid
-    def is_legal_move(self, row, col):
+    def is_legal_move(self, row, col, player=None):
+        if player is None:
+            player = self.curr_player
         if row < 0 or row >= self.board_size:
             return False
         if col < 0 or col >= self.board_size:
@@ -70,7 +72,7 @@ class Game:
         for dx in range(-1, 2):
             for dy in range(-1, 2):
                 isInvalidDirection = dx == 0 and dy == 0
-                if isInvalidDirection or not self.is_capturable(row + dy, col + dx):
+                if isInvalidDirection or not self.is_capturable(row + dy, col + dx, player):
                     continue
                 i = 2
                 while i < self.board_size:
@@ -79,31 +81,39 @@ class Game:
                     hasReachedEndOfBoard = newCol < 0 or newCol >= self.board_size or newRow < 0 or newRow >= self.board_size
                     if hasReachedEndOfBoard or self.board[newRow, newCol] == 0:
                         break
-                    if self.board[newRow, newCol] == int(self.curr_player):
+                    if self.board[newRow, newCol] == int(player):
                         return True;            
                     i+=1
         return False
 
     # Determine whether the tile at the given location is the current player's opponent
-    def is_capturable(self, row, col):
+    def is_capturable(self, row, col, player=None):
+        if player is None:
+            player = self.curr_player
         # If the location is out of bounds, it isnot capturable
         if col < 0 or col >= self.board_size or row < 0 or row >= self.board_size:
             return False
         # The tile is capturable iff it is an opponentplayer
         tile = self.board[row, col]
-        return tile != 0 and tile != int(self.curr_player)
+        return tile != 0 and tile != int(player)
 
     # Determines whether the current player can move
-    def has_valid_move(self):
+    def has_valid_move(self, player=None):
+        if player is None:
+            player = self.curr_player
         for row_idx, row in enumerate(self.board):
             for col_idx, tile in enumerate(row):
-                if tile == 0 and self.is_legal_move(row_idx, col_idx):
+                if tile == 0 and self.is_legal_move(row_idx, col_idx, player):
                     return True
         return False
 
     # Returns whether the game is over as a result of the current player's move
     def is_game_terminated(self):
-        return self.has_player_captured_all() or self.is_board_full()
+        has_valid_move = False
+        for player in Player:
+            if self.has_valid_move(player):
+                has_valid_move = True
+        return self.has_player_captured_all() or self.is_board_full() or not has_valid_move
 
     # Returns whether the current player has captured all of their opponents tiles
     def has_player_captured_all(self):
