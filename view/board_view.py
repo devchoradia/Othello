@@ -6,45 +6,35 @@ import time
 
 # Renders the board
 class BoardView(ABC):
-    def __init__(self, board):
+    def __init__(self, board, root=None):
         self.board = board
-        self.root = tk.Tk()
+        self.root = root if root is not None else tk.Tk()
         self.move_clicked = tk.Variable()
-        self.tiles = []
+        self.tile_buttons = []
 
     def mainloop(self):
          self.root.mainloop()
 
-    def display(self, valid_moves = None):
+    def display(self, illegal_move = None):
         board_size = len(self.board)
-        all_moves_clickable = valid_moves == None
-        if all_moves_clickable:
-            valid_moves = []
-        i = 0
         for row in range(board_size):
-            self.root.rowconfigure(row+1)
-            self.root.columnconfigure(row+1)
             for col in range(board_size):
                 player = self.board[row][col]
-                is_valid_move = all_moves_clickable or (row, col) in valid_moves
                 tile_color = PLAYER_COLOR[player]
-                disabled = not all_moves_clickable and (row, col) not in valid_moves
-                button_state = tk.NORMAL if disabled else tk.ACTIVE
+                if illegal_move == (row, col):
+                    tile_color = "red"
                 tile_relief = None if player == 0 else tk.RAISED
                 pad_x = 0 if player == 0 else 5
                 ipad_x = 5 if player == 0 else 0
                 frame = tk.Frame(relief=tk.RAISED, borderwidth=1, bg='green')
                 frame.grid(row=row, column=col,padx=0, pady=0, ipadx=0, ipady=0, sticky= tk.W+tk.E+tk.N+tk.S)
                 tile = tk.Label(frame, relief=tile_relief, borderwidth=1, width=5, height=3, text='    ',bg=tile_color)
-                tile.bind("<Button-1>", lambda x, r=row, c=col, clickable=is_valid_move: self.on_click_tile(row=r, col=c, is_valid_move=clickable))
+                tile.bind("<Button-1>", lambda x, r=row, c=col: self.on_click_tile(row=r, col=c))
                 tile.pack(padx=pad_x, ipadx=ipad_x, pady=pad_x, ipady=ipad_x, expand=True)
-                self.tiles.append(tile)
-                i += 1
-        self.root.update()
+                self.tile_buttons.append(tile)
 
-    def on_click_tile(self, row, col, is_valid_move=True):
-        if is_valid_move:
-            self.move_clicked.set((row, col))
+    def on_click_tile(self, row, col):
+        self.move_clicked.set((row, col))
     
     def show_legal_moves(self, valid_moves):
         self.display(self, valid_moves)
@@ -52,5 +42,5 @@ class BoardView(ABC):
     def get_move(self):
         self.move_clicked = tk.Variable()
         initial_value = self.move_clicked.get()
-        self.tiles[0].wait_variable(self.move_clicked)
+        self.tile_buttons[0].wait_variable(self.move_clicked)
         return self.move_clicked.get()

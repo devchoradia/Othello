@@ -7,9 +7,6 @@ from controller.game_controller import GameController
 
 game = Game(board_size = 8)
 
-#board_view = BoardConsoleView(game.board)
-#game_view = GameConsoleView(board_view)
-board_view = BoardView(game.board)
-game_view = GameView(board_view)
+game_view = GameView(game.board)
 controller = GameController(game, game_view)
 controller.start_game()

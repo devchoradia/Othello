@@ -107,4 +107,3 @@ class DatabaseClient:
         finally:
             conn.close()
         return login_result, (username, ELORating)
-    

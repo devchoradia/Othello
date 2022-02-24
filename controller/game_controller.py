@@ -20,8 +20,8 @@ class GameController:
                 self.model.switch_player_turn()
                 continue
             # Display the board and current player
-            self.view.display_board()
-            self.view.display_curr_player(self.model.curr_player)
+            self.view.display_board(current_player = self.model.curr_player)
+            
             # Request a move from the player
             row, col = self.view.get_move()
             # Check legality of move

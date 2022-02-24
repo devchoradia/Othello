@@ -1,28 +1,40 @@
 from abc import ABC, abstractmethod
-from model.player import PLAYER_SYMBOL
+from model.player import PLAYER_COLOR
+from view.board_view import BoardView
+import tkinter as tk
 
 # Not implementing this yet
 class GameView(ABC):
-    def __init__(self, board_view):
-        self.board_view = board_view
+    def __init__(self, board):
+        self.root = tk.Tk()
+        self.board = board
+        self.board_view = BoardView(board, self.root)
 
     def mainloop(self):
-        self.board_view.mainloop()
+        self.root.mainloop()
 
     def display_login(self):
         pass
 
-    def display_board(self):
+    def add_board(self):
         self.board_view.display()
 
+    def display_board(self, current_player = None):
+        self.add_board()
+        if current_player is not None:
+            self.add_current_player(current_player)
+        self.root.update()
+
     def display_illegal_move(self, row, col):
-        print("Illegal move: ", row, col)
+        self.board_view.display(illegal_move=(row, col))
+        self.root.update()
 
     def get_move(self):
         return self.board_view.get_move()
 
-    def display_curr_player(self, player):
-        print("Current player: " + PLAYER_SYMBOL[player])
+    def add_current_player(self, player):
+        label = tk.Label(relief=tk.RAISED, borderwidth=1, width=5, height=2, font=("Arial", 25), text=f"Player move: {PLAYER_COLOR[player]}",bg="green", fg="black")
+        label.grid(row=len(self.board), columnspan=len(self.board), sticky= tk.W+tk.E+tk.N+tk.S)
 
     def display_winner(self, player):
         print("Game over.")
@@ -31,5 +43,3 @@ class GameView(ABC):
         else:
             print("Player " + PLAYER_SYMBOL[player] + " won.")
 
-# abstract methods: $abstract_method
-# get_move, #display_player, display_illegal_moves
