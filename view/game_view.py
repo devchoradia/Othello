@@ -9,6 +9,9 @@ class GameView(ABC):
     def mainloop(self):
         self.board_view.mainloop()
 
+    def display_login(self):
+        pass
+
     def display_board(self):
         self.board_view.display()
 
