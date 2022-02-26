@@ -1,8 +1,9 @@
 # Reversi-Team2
 
 ## Requirements
-`pip install mysql-connector-python`
+* `pip install mysql-connector-python`
 or manually download here: https://dev.mysql.com/downloads/connector/python/
+* I'm using python 3.9.10
 
 ## Setup environment
 1. `virtualenv --python={path to python executable here} env`
