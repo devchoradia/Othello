@@ -2,7 +2,7 @@
 
 ## Requirements
 `pip install mysql-connector-python`
-Or manually download here: https://dev.mysql.com/downloads/connector/python/
+or manually download here: https://dev.mysql.com/downloads/connector/python/
 
 ## Setup environment
 1. `virtualenv --python={path to python executable here} env`
