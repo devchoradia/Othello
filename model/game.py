@@ -119,7 +119,7 @@ class Game:
     def has_player_captured_all(self):
         for row in self.board:
             for tile in row:
-                if tile != 0 and tile != int(self.curr_player):
+                if tile != int(self.curr_player):
                     return False
         return True
 
@@ -138,6 +138,7 @@ class Game:
             count = (self.board == int(i)).sum()
             if count > max_tile_count:
                 player_with_max_tile_count = i
+                max_tile_count = count
             if count == max_tile_count:
                 player_with_max_tile_count = 0 # DRAW
         return player_with_max_tile_count
