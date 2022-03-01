@@ -107,3 +107,28 @@ class DatabaseClient:
         finally:
             conn.close()
         return login_result, (username, ELORating)
+
+    def get_leaderboard(self, count=10):
+        conn = self.make_connection()
+        query = f"SELECT username, ELORating FROM users ORDER BY ELORating LIMIT {count};"
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchall()
+        finally:
+            conn.close()
+        return result
+
+    def update_rating(self, rating, username):
+        conn = self.make_connection()
+        statement = """
+            UPDATE users set ELORating = %s where username = %s;
+        """
+        args = (rating, username)
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(statement, args)
+                result = cursor.fetchall()
+        finally:
+            conn.close()
+        return result

@@ -5,8 +5,10 @@ from view.game_console_view import GameConsoleView
 from view.game_view import GameView
 from controller.game_controller import GameController
 
-game = Game(board_size = 4)
+from view.leaderboard_view import LeaderboardView
+from controller.app_controller import AppController
+from server.database_client import DatabaseClient
 
-game_view = GameView(game.board)
-controller = GameController(game, game_view)
-controller.start_game()
+client = DatabaseClient()
+app = AppController(client)
+app.init_app()

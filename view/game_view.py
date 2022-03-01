@@ -3,14 +3,15 @@ from model.player import PLAYER_COLOR
 from view.board_view import BoardView
 import tkinter as tk
 
-# Not implementing this yet
 class GameView(ABC):
-    def __init__(self, board):
+    def __init__(self, board, on_close):
         self.root = tk.Tk()
         self.board = board
         self.board_view = BoardView(board, self.root)
+        self.on_close = on_close
 
     def mainloop(self):
+        self.root.protocol("WM_DELETE_WINDOW", self.close_game)
         self.root.mainloop()
 
     def add_board(self):
@@ -43,4 +44,5 @@ class GameView(ABC):
     
     def close_game(self):
         self.root.destroy()
+        self.on_close()
 
