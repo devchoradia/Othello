@@ -6,11 +6,12 @@ import time
 
 # Renders the board
 class BoardView(ABC):
-    def __init__(self, board, root=None):
+    def __init__(self, board, root=None, board_color=PLAYER_COLOR[0]):
         self.board = board
         self.root = root if root is not None else tk.Tk()
         self.move_clicked = tk.Variable()
         self.tile_buttons = []
+        self.board_color = board_color
 
     def mainloop(self):
          self.root.mainloop()
@@ -20,7 +21,7 @@ class BoardView(ABC):
         for row in range(board_size):
             for col in range(board_size):
                 player = self.board[row][col]
-                tile_color = PLAYER_COLOR[player]
+                tile_color = self.get_tile_color(player)
                 if illegal_move == (row, col):
                     tile_color = "red"
                 tile_relief = None if player == 0 else tk.RAISED
@@ -44,3 +45,6 @@ class BoardView(ABC):
         initial_value = self.move_clicked.get()
         self.tile_buttons[0].wait_variable(self.move_clicked)
         return self.move_clicked.get()
+    
+    def get_tile_color(self, player):
+        return self.board_color if player == 0 else PLAYER_COLOR[player]
