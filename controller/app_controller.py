@@ -48,14 +48,14 @@ class AppController:
         leaderboard.display()
     
     def display_settings(self):
-        settings = SettingsView(self.on_close, self.on_change_board_color, self.on_change_board_size, color=self.board_color, size=self.board_size)
+        settings = SettingsView(on_close=self.on_close, update_color=self.on_change_board_color, update_size=self.on_change_board_size, color=self.board_color, size=self.board_size)
         settings.display()
 
     def on_change_board_size(self, size):
         self.board_size = size
 
     def on_change_board_color(self, color):
-        self.board_colort = color
+        self.board_color = color
 
     def on_close(self):
         if self.current_view != Views.LOGIN:

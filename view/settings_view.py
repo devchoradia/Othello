@@ -29,7 +29,7 @@ class SettingsView(ABC):
         l2.grid(row=1, column=0, sticky=tk.W, pady=2)
 
         # Create an instance of Menu in the frame
-        board_color_menu = ttk.OptionMenu(self.root, self.board_color, "green", "blue", "orange", "yellow", "purple", "pink")
+        board_color_menu = ttk.OptionMenu(self.root, self.board_color, "green", "blue", "cyan", "yellow", "magenta")
         board_color_menu.grid(row=1, column=1)
 
         # entry widgets, used to take entry from user
