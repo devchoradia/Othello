@@ -2,6 +2,7 @@ from model.game import Game
 from model.views import Views
 from view.home_view import HomeView
 from view.game_view import GameView
+from view.settings_view import SettingsView
 from view.leaderboard_view import LeaderboardView
 from controller.game_controller import GameController
 from server.database_client import DatabaseClient
@@ -25,6 +26,7 @@ class AppController:
         home = HomeView(on_select_page=self.on_select_page)
         home.display()
 
+
     def on_select_page(self, view):
         self.current_view = view
         if view == Views.LOGIN:
@@ -44,7 +46,8 @@ class AppController:
         leaderboard.display()
     
     def display_settings(self):
-        pass
+        settings = SettingsView(on_select_page=self.on_select_page)
+        settings.display()
 
     def on_close(self):
         if self.current_view != Views.LOGIN:
