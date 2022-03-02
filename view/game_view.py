@@ -4,10 +4,10 @@ from view.board_view import BoardView
 import tkinter as tk
 
 class GameView(ABC):
-    def __init__(self, board, on_close):
+    def __init__(self, board, on_close, board_color):
         self.root = tk.Tk()
         self.board = board
-        self.board_view = BoardView(board, self.root)
+        self.board_view = BoardView(board, self.root, board_color)
         self.on_close = on_close
 
     def mainloop(self):

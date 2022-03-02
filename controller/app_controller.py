@@ -6,19 +6,21 @@ from view.settings_view import SettingsView
 from view.leaderboard_view import LeaderboardView
 from controller.game_controller import GameController
 from server.database_client import DatabaseClient
+from model.player import PLAYER_COLOR
 
 class AppController:
     def __init__(self, database_client: DatabaseClient):
         self.board_size = 4
         self.database_client = database_client
         self.current_view = Views.HOME#Views.LOGIN
+        self.board_color = PLAYER_COLOR[0]
     
     def init_app(self):
         self.on_select_page(self.current_view)
 
     def start_game(self):
         game = Game(board_size = self.board_size)
-        game_view = GameView(game.board, on_close=self.on_close)
+        game_view = GameView(game.board, on_close=self.on_close, board_color = self.board_color)
         controller = GameController(game, game_view)
         controller.start_game()
 
@@ -46,8 +48,14 @@ class AppController:
         leaderboard.display()
     
     def display_settings(self):
-        settings = SettingsView(on_select_page=self.on_select_page)
+        settings = SettingsView(self.on_close, self.on_change_board_color, self.on_change_board_size, color=self.board_color, size=self.board_size)
         settings.display()
+
+    def on_change_board_size(self, size):
+        self.board_size = size
+
+    def on_change_board_color(self, color):
+        self.board_colort = color
 
     def on_close(self):
         if self.current_view != Views.LOGIN:
