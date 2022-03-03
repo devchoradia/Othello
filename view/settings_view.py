@@ -5,11 +5,11 @@ from model.player import PLAYER_COLOR
 
 
 class SettingsView(ABC):
-    def __init__(self, on_close, update_color, update_size, color=PLAYER_COLOR[0], size=4):
-        self.root = tk.Tk()
-        self.on_close = on_close
+    def __init__(self, root, update_color, update_size, on_home, color=PLAYER_COLOR[0], size=4):
+        self.root = root
         self.update_color = update_color
         self.update_size = update_size
+        self.on_home = on_home
         self.board_color = tk.StringVar()
         self.board_color.set(color)
         self.board_size = tk.IntVar()
@@ -18,7 +18,6 @@ class SettingsView(ABC):
         self.saved.set(False)
 
     def display(self):
-        self.root.geometry("800x400")
 
         # label widget
         l1 = tk.Label(self.root, text="Board Size:")
@@ -41,16 +40,24 @@ class SettingsView(ABC):
         # Save button
         save = tk.Button(self.root, text="Save", command=lambda: self.save())
         save.grid(row=2, columnspan=2, padx=2, pady=2)
-        self.root.protocol("WM_DELETE_WINDOW", self.close)
-        self.root.mainloop()
 
+        home_button = tk.Button(self.root, text="Home", borderwidth=1, height=2, \
+            command=self.close)
+        home_button.grid(row=3, columnspan=3, rowspan=2)
+
+        self.widgets=[home_button, l1, l2, board_color_menu, board_size_menu, save]
+        
     def save(self):
         self.saved.set(True)
         self.close()
 
     def close(self):
-        self.root.destroy()
+        self.destroy_widgets()
         if(self.saved.get()):
             self.update_color(self.board_color.get())
             self.update_size(self.board_size.get())
-        self.on_close()
+        self.on_home()
+
+    def destroy_widgets(self):
+        for widget in self.widgets:
+            widget.destroy()
