@@ -63,5 +63,5 @@ class login:
 
             myButton1.place(x=x-35, y=y)
 
-        bttn(100, 375, 'L O G I N', 'white', '#994422')
+        bttn(100, 375, 'LOGIN', 'white', '#994422')
         root.mainloop()
