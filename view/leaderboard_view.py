@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 import threading
 import time
 
+COLUMNS = ["Rank", "Player", "Rating"]
 COLUMN_WIDTHS = [5, 7, 7]
 ROW_HEIGHT = 2
 
@@ -31,7 +32,7 @@ class LeaderboardView(ABC):
     
     def add_navigator(self):
         home_button = tk.Button(self.root, text="Home", borderwidth=1, height=ROW_HEIGHT, bg="white", fg="black", \
-            command=self.close)
+            command=self.close, highlightbackground="white")
         home_button.grid(row=len(self.players) + 2, columnspan=len(COLUMN_WIDTHS), sticky= tk.W+tk.E+tk.N+tk.S)
         self.widgets.append(home_button)
         
@@ -41,24 +42,12 @@ class LeaderboardView(ABC):
         self.widgets.append(label)
 
     def add_column_labels(self):
-        # Rank
-        frame = tk.Frame(relief=tk.RAISED, borderwidth=1, bg='gray')
-        frame.grid(row=1, column=0, sticky= tk.W+tk.E+tk.N+tk.S)
-        tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[0], height=ROW_HEIGHT, text="Rank",bg="gray")
-        tile.pack(expand=True)
-        self.widgets.append(frame)
-        # Username
-        frame = tk.Frame(relief=tk.RAISED, borderwidth=1, bg='gray')
-        frame.grid(row=1, column=1, sticky= tk.W+tk.E+tk.N+tk.S)
-        tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[1], height=ROW_HEIGHT, text="Player",bg="gray")
-        tile.pack(expand=True)
-        self.widgets.append(frame)
-        # ELORating
-        frame = tk.Frame(relief=tk.RAISED, borderwidth=1, bg='gray')
-        frame.grid(row=1, column=2, sticky= tk.W+tk.E+tk.N+tk.S)
-        tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[2], height=ROW_HEIGHT, text="Rating",bg="gray")
-        tile.pack(expand=True)
-        self.widgets.append(frame)
+        for index, column in enumerate(COLUMNS):
+            frame = tk.Frame(relief=tk.RAISED, borderwidth=1, bg='gray')
+            frame.grid(row=1, column=index, sticky= tk.W+tk.E+tk.N+tk.S)
+            tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[0], height=ROW_HEIGHT, text=column,bg="gray")
+            tile.pack(expand=True)
+            self.widgets.append(frame)
 
     def close(self):
         for widget in self.widgets:

@@ -24,7 +24,7 @@ class GameView(ABC):
 
     def add_navigator(self):
         home_button = tk.Button(self.root, text="Home", borderwidth=1, height=2, bg=self.board_color, fg="black", \
-            command=self.close_game)
+            command=self.close_game, highlightbackground="white")
         home_button.grid(row=len(self.board) + 1, columnspan=len(self.board), sticky= tk.W+tk.E+tk.N+tk.S)
         self.widgets.append(home_button)
 
