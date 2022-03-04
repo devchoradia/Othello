@@ -1,398 +1,76 @@
+from tkinter import *
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from login import Ui_Dialog
+class register:
+    def __init__(self):
 
-class Ui_MainWindow(object):
+        root = Tk()
+        root.geometry('350x500')
+        root.title(' REGISTER ')
+        root.resizable(0, 0)
 
+        j = 0
+        k = 10
+        for i in range(100):
+            c = str(222222 + k)
+            Frame(root, width=10, height=500, bg="#" + c).place(x=j, y=0)
+            j = j + 10
+            k += 1
 
-    def openWindow(self):
-        self.window = QtWidgets.QMainWindow()
-        self.ui = Ui_Dialog()
-        self.ui.setupUi(self.window)
-        if self.checkBox.isChecked() and self.plainTextEdit_4.text() == self.plainTextEdit_5.text():
-            MainWindow.hide()
-            self.window.show()
-
-
-
-
-        # MainWindow.hide()
-        # self.window.show()
-
+        t = ('Consolas', 13)
 
 
 
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1200, 800)
-        MainWindow.setAcceptDrops(True)
-        MainWindow.setStyleSheet("background-color: rgb(255, 255, 255);")
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, -10, 391, 800))
-        self.label.setAutoFillBackground(False)
-        self.label.setStyleSheet("background-color: rgb(105, 105, 105);")
-        self.label.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label.setLineWidth(2)
-        self.label.setText("")
-        self.label.setObjectName("label")
-        self.register_2 = QtWidgets.QLabel(self.centralwidget)
-        self.register_2.setGeometry(QtCore.QRect(500, 80, 141, 41))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(36)
-        font.setBold(True)
-        font.setWeight(75)
-        self.register_2.setFont(font)
-        self.register_2.setTabletTracking(False)
-        self.register_2.setObjectName("register_2")
-        self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(500, 120, 201, 16))
-        font = QtGui.QFont()
-        font.setFamily("Trebuchet MS")
-        self.label_2.setFont(font)
-        self.label_2.setObjectName("label_2")
-        self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(510, 170, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(18)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_3.setFont(font)
-        self.label_3.setStyleSheet("")
-        self.label_3.setObjectName("label_3")
-        self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setGeometry(QtCore.QRect(840, 170, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(18)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_4.setFont(font)
-        self.label_4.setObjectName("label_4")
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.plainTextEdit.setGeometry(QtCore.QRect(510, 200, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Helvetica Neue")
-        font.setPointSize(14)
-        self.plainTextEdit.setFont(font)
-        self.plainTextEdit.setObjectName("plainTextEdit")
-        self.plainTextEdit_2 = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.plainTextEdit_2.setGeometry(QtCore.QRect(840, 200, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Helvetica Neue")
-        font.setPointSize(14)
-        self.plainTextEdit_2.setFont(font)
-        self.plainTextEdit_2.setObjectName("plainTextEdit_2")
-        self.label_5 = QtWidgets.QLabel(self.centralwidget)
-        self.label_5.setGeometry(QtCore.QRect(510, 260, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(18)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_5.setFont(font)
-        self.label_5.setObjectName("label_5")
-        self.plainTextEdit_3 = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.plainTextEdit_3.setGeometry(QtCore.QRect(510, 290, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Helvetica Neue")
-        font.setPointSize(14)
-        self.plainTextEdit_3.setFont(font)
-        self.plainTextEdit_3.setObjectName("plainTextEdit_3")
-
-        self.plainTextEdit_4 = QtWidgets.QLineEdit(self.centralwidget)
-        self.plainTextEdit_4.setGeometry(QtCore.QRect(510, 390, 200, 21))
-
-        self.plainTextEdit_4.setEchoMode(QtWidgets.QLineEdit.Password)
-
-        font = QtGui.QFont()
-        font.setFamily("Helvetica Neue")
-        font.setPointSize(14)
-        self.plainTextEdit_4.setFont(font)
-        self.plainTextEdit_4.setObjectName("plainTextEdit_4")
-        self.label_6 = QtWidgets.QLabel(self.centralwidget)
-        self.label_6.setGeometry(QtCore.QRect(510, 360, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(18)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_6.setFont(font)
-        self.label_6.setObjectName("label_6")
-
-        self.plainTextEdit_5 = QtWidgets.QLineEdit(self.centralwidget)
-        self.plainTextEdit_5.setGeometry(QtCore.QRect(840, 390, 200, 21))
-        self.plainTextEdit_5.setObjectName("plainTextEdit_5")
-        self.plainTextEdit_5.setEchoMode(QtWidgets.QLineEdit.Password)
-
-        self.label_7 = QtWidgets.QLabel(self.centralwidget)
-        self.label_7.setGeometry(QtCore.QRect(840, 360, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(18)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_7.setFont(font)
-        self.label_7.setObjectName("label_7")
-        self.label_8 = QtWidgets.QLabel(self.centralwidget)
-        self.label_8.setGeometry(QtCore.QRect(510, 440, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(18)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_8.setFont(font)
-        self.label_8.setObjectName("label_8")
-        self.comboBox = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox.setGeometry(QtCore.QRect(510, 470, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Helvetica Neue")
-        font.setPointSize(12)
-        self.comboBox.setFont(font)
-        self.comboBox.setAcceptDrops(True)
-        self.comboBox.setEditable(True)
-        self.comboBox.setMaxVisibleItems(5)
-        self.comboBox.setMaxCount(10)
-        self.comboBox.setInsertPolicy(QtWidgets.QComboBox.InsertAtBottom)
-        self.comboBox.setMinimumContentsLength(3)
-        self.comboBox.setPlaceholderText("")
-        self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.label_9 = QtWidgets.QLabel(self.centralwidget)
-        self.label_9.setGeometry(QtCore.QRect(840, 440, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(18)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_9.setFont(font)
-        self.label_9.setObjectName("label_9")
-        self.plainTextEdit_6 = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.plainTextEdit_6.setGeometry(QtCore.QRect(840, 470, 200, 21))
-        font = QtGui.QFont()
-        font.setFamily("Helvetica Neue")
-        font.setPointSize(14)
-        self.plainTextEdit_6.setFont(font)
-        self.plainTextEdit_6.setObjectName("plainTextEdit_6")
-        self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
-        self.checkBox.setEnabled(True)
-        self.checkBox.setGeometry(QtCore.QRect(510, 650, 231, 21))
-        font = QtGui.QFont()
-        font.setFamily("Trebuchet MS")
-        font.setPointSize(14)
-        font.setItalic(True)
-        self.checkBox.setFont(font)
-        self.checkBox.setObjectName("checkBox")
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(510, 690, 151, 61))
-
-        self.pushButton.clicked.connect(self.openWindow)
-
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(18)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton.setFont(font)
-        self.pushButton.setStyleSheet("@\n"
-                                      "background-color: rgb(255, 255, 255);\n"
-                                      "@")
-        self.pushButton.setObjectName("pushButton")
-        self.label_10 = QtWidgets.QLabel(self.centralwidget)
-        self.label_10.setGeometry(QtCore.QRect(40, 70, 41, 41))
-        self.label_10.setAutoFillBackground(False)
-        self.label_10.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_10.setFrameShape(QtWidgets.QFrame.VLine)
-        self.label_10.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_10.setLineWidth(2)
-        self.label_10.setText("")
-        self.label_10.setObjectName("label_10")
-        self.label_11 = QtWidgets.QLabel(self.centralwidget)
-        self.label_11.setGeometry(QtCore.QRect(80, 70, 41, 41))
-        self.label_11.setAutoFillBackground(False)
-        self.label_11.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_11.setFrameShape(QtWidgets.QFrame.HLine)
-        self.label_11.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_11.setLineWidth(2)
-        self.label_11.setText("")
-        self.label_11.setObjectName("label_11")
-        self.label_12 = QtWidgets.QLabel(self.centralwidget)
-        self.label_12.setGeometry(QtCore.QRect(120, 150, 41, 41))
-        self.label_12.setAutoFillBackground(False)
-        self.label_12.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_12.setFrameShape(QtWidgets.QFrame.VLine)
-        self.label_12.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_12.setLineWidth(2)
-        self.label_12.setText("")
-        self.label_12.setObjectName("label_12")
-        self.label_13 = QtWidgets.QLabel(self.centralwidget)
-        self.label_13.setGeometry(QtCore.QRect(40, 150, 41, 41))
-        self.label_13.setAutoFillBackground(False)
-        self.label_13.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_13.setFrameShape(QtWidgets.QFrame.VLine)
-        self.label_13.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_13.setLineWidth(2)
-        self.label_13.setText("")
-        self.label_13.setObjectName("label_13")
-        self.label_14 = QtWidgets.QLabel(self.centralwidget)
-        self.label_14.setGeometry(QtCore.QRect(120, 70, 41, 41))
-        self.label_14.setAutoFillBackground(False)
-        self.label_14.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_14.setFrameShape(QtWidgets.QFrame.VLine)
-        self.label_14.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_14.setLineWidth(2)
-        self.label_14.setText("")
-        self.label_14.setObjectName("label_14")
-        self.label_15 = QtWidgets.QLabel(self.centralwidget)
-        self.label_15.setGeometry(QtCore.QRect(80, 110, 41, 41))
-        self.label_15.setAutoFillBackground(False)
-        self.label_15.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_15.setFrameShape(QtWidgets.QFrame.VLine)
-        self.label_15.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_15.setLineWidth(2)
-        self.label_15.setText("")
-        self.label_15.setObjectName("label_15")
-        self.label_16 = QtWidgets.QLabel(self.centralwidget)
-        self.label_16.setGeometry(QtCore.QRect(120, 110, 41, 41))
-        self.label_16.setAutoFillBackground(False)
-        self.label_16.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_16.setFrameShape(QtWidgets.QFrame.HLine)
-        self.label_16.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_16.setLineWidth(2)
-        self.label_16.setText("")
-        self.label_16.setObjectName("label_16")
-        self.label_17 = QtWidgets.QLabel(self.centralwidget)
-        self.label_17.setGeometry(QtCore.QRect(80, 150, 41, 41))
-        self.label_17.setAutoFillBackground(False)
-        self.label_17.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_17.setFrameShape(QtWidgets.QFrame.HLine)
-        self.label_17.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_17.setLineWidth(2)
-        self.label_17.setText("")
-        self.label_17.setObjectName("label_17")
-        self.label_18 = QtWidgets.QLabel(self.centralwidget)
-        self.label_18.setGeometry(QtCore.QRect(40, 110, 41, 41))
-        self.label_18.setAutoFillBackground(False)
-        self.label_18.setStyleSheet("background-color: rgb(74, 136, 150);\n"
-                                    "\n"
-                                    "\n"
-                                    "")
-        self.label_18.setFrameShape(QtWidgets.QFrame.HLine)
-        self.label_18.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_18.setLineWidth(2)
-        self.label_18.setText("")
-        self.label_18.setObjectName("label_18")
-        self.label_19 = QtWidgets.QLabel(self.centralwidget)
-        self.label_19.setGeometry(QtCore.QRect(190, 100, 131, 41))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(28)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_19.setFont(font)
-        self.label_19.setStyleSheet("background-color: rgb(105, 105, 105);")
-        self.label_19.setObjectName("label_19")
+        Frame(root, width=250, height=400, bg='white').place(x=50, y=50)
 
 
-        self.label_21 = QtWidgets.QLabel(self.centralwidget)
-        self.label_21.setGeometry(QtCore.QRect(40, 320, 261, 61))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(28)
-        font.setBold(True)
-        font.setItalic(True)
-        font.setWeight(75)
-        self.label_21.setFont(font)
-        self.label_21.setStyleSheet("background-color: rgb(105, 105, 105);")
-        self.label_21.setObjectName("label_21")
-        self.label_22 = QtWidgets.QLabel(self.centralwidget)
-        self.label_22.setGeometry(QtCore.QRect(70, 370, 271, 41))
-        font = QtGui.QFont()
-        font.setFamily("Trebuchet MS")
-        font.setPointSize(18)
-        font.setItalic(True)
-        self.label_22.setFont(font)
-        self.label_22.setStyleSheet("background-color: rgb(105, 105, 105);")
-        self.label_22.setObjectName("label_22")
-        self.label_23 = QtWidgets.QLabel(self.centralwidget)
-        self.label_23.setGeometry(QtCore.QRect(1190, -30, 21, 971))
-        self.label_23.setAutoFillBackground(False)
-        self.label_23.setStyleSheet("background-color: rgb(105, 105, 105);")
-        self.label_23.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.label_23.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.label_23.setLineWidth(2)
-        self.label_23.setText("")
-        self.label_23.setObjectName("label_23")
+        l4 = Label(root, text='username', bg='white', font='Helvetica 15 bold')
+        l4.place(x = 80, y = 120)
+
+        e4 = Entry(root, width=20, border=0)
+        e4.config(font= t)
+        e4.place(x=80, y=150)
+
+        l1 = Label(root, text='email-id', bg='white', font='Helvetica 15 bold')
+        l1.place(x=80, y=200)
+
+        e1 = Entry(root, width=20, border=0)
+        e1.config(font= t)
+        e1.place(x=80, y=230)
+
+        e2 = Entry(root, width=20, border=0, show='*')
+        e2.config(font=t)
+        e2.place(x=80, y=310)
+
+        l2 = Label(root, text='Password', bg='white', font = 'Helvetica 15 bold')
+        l2.place(x=80, y=280)
 
 
-        MainWindow.setCentralWidget(self.centralwidget)
-
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Register"))
-        self.register_2.setText(_translate("MainWindow", "Register"))
-        self.label_2.setText(_translate("MainWindow", "Join our worldwide network"))
-        self.label_3.setText(_translate("MainWindow", "First Name"))
-        self.label_4.setText(_translate("MainWindow", "Last Name"))
-        self.label_5.setText(_translate("MainWindow", "ReversiID"))
-        self.label_6.setText(_translate("MainWindow", "Create PIN"))
-        self.label_7.setText(_translate("MainWindow", "Confirm PIN"))
-        self.label_8.setText(_translate("MainWindow", "Select Security Question"))
-        self.comboBox.setCurrentText(_translate("MainWindow", "What is your pet\'s name?"))
-        self.comboBox.setItemText(0, _translate("MainWindow", "What is your pet\'s name?"))
-        self.comboBox.setItemText(1, _translate("MainWindow", "What is your mother\'s maiden name?"))
-        self.comboBox.setItemText(2, _translate("MainWindow", "What is your favourite fruit?"))
-        self.comboBox.setItemText(3, _translate("MainWindow", "What is your car\'s number?"))
-        self.comboBox.setItemText(4, _translate("MainWindow", "What is your birthplace?"))
-        self.label_9.setText(_translate("MainWindow", "Answer"))
-        self.checkBox.setText(_translate("MainWindow", "I agree to the Terms & Conditions"))
-        self.pushButton.setText(_translate("MainWindow", "Create Account"))
-        self.label_19.setText(_translate("MainWindow", "Reversi"))
-        self.label_21.setText(_translate("MainWindow", "Play Othello  "))
-        self.label_22.setText(_translate("MainWindow", "Number 1 game"))
+        Frame(root, width=180, height=2, bg='#141414').place(x=80, y=332)
+        Frame(root, width=180, height=2, bg='#141414').place(x=80, y=252)
 
 
-if __name__ == "__main__":
-    import sys
+        def bttn(x, y, text, ecolor, lcolor):
+            def on_entera(e):
+                myButton1['background'] = ecolor  
+                myButton1['foreground'] = lcolor  
 
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+            def on_leavea(e):
+                myButton1['background'] = lcolor
+                myButton1['foreground'] = ecolor
+
+            myButton1 = Button(root, text=text,width=20,height=2,fg=ecolor, bg=lcolor,activeforeground=lcolor,activebackground=ecolor,)
+
+            myButton1.bind("<Enter>", on_entera)
+            myButton1.bind("<Leave>", on_leavea)
+
+            myButton1.place(x=x-35, y=y)
+
+        bttn(100, 375, 'REGISTER', 'white', '#994422')
+
+        b2 = Button(root, text = "Already't registered ? Click here to login", bg='white', fg = 'blue', font = 'Helvetica 10')
+        b2.place(x = 68, y = 422)
+
+
+        root.mainloop()
+
+
