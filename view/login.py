@@ -64,4 +64,11 @@ class login:
             myButton1.place(x=x-35, y=y)
 
         bttn(100, 375, 'LOGIN', 'white', '#994422')
+        
+        
+        b2 = Button(root, text = "Haven't registered here? Click here", bg='white', fg = 'blue', font = 'Helvetica 10')
+        b2.place(x = 68, y = 422)
+
+        
+        
         root.mainloop()
