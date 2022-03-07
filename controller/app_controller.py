@@ -25,7 +25,7 @@ class AppController:
         game = Game(board_size = self.board_size)
         game_view = GameView(root=self.root, board=game.board, on_home=self.on_home, board_color = self.board_color)
         controller = GameController(game, game_view)
-        controller.start_game()
+        controller.run_game()
 
     def display_home(self):
         home = HomeView(on_select_page=self.on_select_page, root=self.root)
