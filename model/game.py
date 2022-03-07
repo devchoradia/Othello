@@ -139,7 +139,7 @@ class Game:
             if count > max_tile_count:
                 player_with_max_tile_count = i
                 max_tile_count = count
-            if count == max_tile_count:
+            elif count == max_tile_count:
                 player_with_max_tile_count = 0 # DRAW
         return player_with_max_tile_count
 
