@@ -22,7 +22,6 @@ class Register(AbstractPageView):
             c = str(222222 + k)
             f1 = Frame(self.root, width=10, height=500, bg="#" + c)
             f1.place(x=j, y=0)
-            self.widgets.append(f1)
             j = j + 10
             k += 1
 
@@ -58,19 +57,15 @@ class Register(AbstractPageView):
         l2 = Label(self.root, text='Password', font = 'Helvetica 15 bold', fg="gray", bg="white", highlightbackground="white")
         l2.place(x=80, y=280)
 
-        self.widgets.extend([f2, l4, e4, e2, l2])
-
         f3 = Frame(self.root, width=180, height=2, bg='#141414')
         f3.place(x=80, y=332)
         f4 = Frame(self.root, width=180, height=2, bg='#141414')
         f4.place(x=80, y=252)
-        self.widgets.extend([f3, f4])
         
         self.bttn(100, 375, 'Register', 'gray', '#994422', self.click_register)
 
         b2 = Button(self.root, text = "Log in", bg='white', fg = 'blue', font = 'Helvetica 10', command=self.on_login, highlightbackground="white")
         b2.place(x = 68, y = 422)
-        self.widgets.append(b2)
     
     def close(self):
         self.destroy_widgets()
@@ -90,7 +85,6 @@ class Register(AbstractPageView):
         if self.error is not None:
             self.error.destroy()
         self.error = l
-        self.widgets.append(l)
 
     def bttn(self, x, y, text, ecolor, lcolor, on_click=None):
         def on_entera(e):
@@ -107,5 +101,4 @@ class Register(AbstractPageView):
         myButton1.bind("<Leave>", on_leavea)
 
         myButton1.place(x=x-35, y=y)
-        self.widgets.append(myButton1)
 

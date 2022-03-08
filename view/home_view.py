@@ -19,7 +19,6 @@ class HomeView(AbstractPageView):
             button = tk.Button(frame, text=VIEW_TITLES[column], borderwidth=1, width=40, height=ROW_HEIGHT, command=lambda col=column: self.on_click(col))
             button.pack(padx=5, pady=5)
         frame.pack()
-        self.widgets.append(frame)
 
     def on_click(self, view):
         self.destroy_widgets()

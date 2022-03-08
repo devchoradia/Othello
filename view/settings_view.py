@@ -43,15 +43,12 @@ class SettingsView(AbstractPageView):
             option = tk.OptionMenu(options_frame, initial_values[index], *SETTING_OPTIONS[index])
             option.config(bg="white", fg="black")
             option.pack(ipadx=1, ipady=1, expand=True)
-            # Add widgets
-            self.widgets.extend([label_frame, options_frame])
 
     def add_save(self, row):
         frame = tk.Frame(padx=5, pady=5,relief=tk.RAISED, borderwidth=1, bg='white')
         frame.grid(row=row, columnspan=self.columnspan, sticky=STICKY)
         save = tk.Button(frame, text="Save", command=self.save, background="white", bg="white", highlightbackground="white")
         save.pack()
-        self.widgets.append(frame)
 
     def add_column_labels(self, row):
         for index, column in enumerate(COLUMNS):
@@ -59,7 +56,6 @@ class SettingsView(AbstractPageView):
             frame.grid(row=row, column=index, sticky=STICKY)
             tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[0], height=ROW_HEIGHT, text=column,bg="gray")
             tile.pack(expand=True)
-            self.widgets.append(frame)
 
     def save(self):
         self.saved.set(True)

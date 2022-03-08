@@ -18,7 +18,6 @@ class GameView(AbstractPageView):
     def display_current_player(self, player):
         label = tk.Label(relief=tk.RAISED, borderwidth=1, width=5, height=2, font=("Arial", 25), text=f"Player move: {PLAYER_COLOR[player]}",bg=self.board_color, fg="black")
         label.grid(row=len(self.board), columnspan=len(self.board), sticky=STICKY)
-        self.widgets.append(label)
 
     def display_board(self):
         self.board_view.display()
@@ -35,7 +34,6 @@ class GameView(AbstractPageView):
             result_string = "DRAW"
         label = tk.Label(relief=tk.RAISED, borderwidth=1, width=5, height=2, font=("Arial", 25), text=result_string,bg=self.board_color, fg="black")
         label.grid(row=len(self.board), columnspan=len(self.board), sticky= STICKY)
-        self.widgets.append(label)
     
     def close(self):
         self.board_view.destroy_widgets()

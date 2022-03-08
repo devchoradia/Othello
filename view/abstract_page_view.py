@@ -11,7 +11,6 @@ class AbstractPageView(ABC):
     '''
     def __init__(self, root, page_view, columnspan=None, on_home=None):
         self.root = root
-        self.widgets = []
         self.title = VIEW_TITLES[page_view]
         self.columnspan = columnspan
         self.on_home = on_home
@@ -34,7 +33,8 @@ class AbstractPageView(ABC):
         '''
         Destroy all widgets in the page
         '''
-        for widget in self.widgets:
+        widgets = self.root.winfo_children()
+        for widget in widgets:
             widget.destroy()
 
     def add_title(self, row=0, frame=None):
@@ -48,7 +48,6 @@ class AbstractPageView(ABC):
             label.pack(expand=True)
         else:
             label.grid(row=row, columnspan=self.columnspan, sticky=STICKY)
-        self.widgets.append(label)
 
     def add_navigator(self, row, bg="white"):
         home_button = tk.Button(self.root, text=VIEW_TITLES[Views.HOME], borderwidth=1, height=ROW_HEIGHT, \
@@ -57,4 +56,3 @@ class AbstractPageView(ABC):
             home_button.pack(expand=True)
         else:
             home_button.grid(row=row, columnspan=self.columnspan, sticky=STICKY)
-        self.widgets.append(home_button)

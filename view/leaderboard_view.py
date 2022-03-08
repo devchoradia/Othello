@@ -26,7 +26,6 @@ class LeaderboardView(AbstractPageView):
                 frame.grid(row=row+2, column=col, sticky=STICKY)
                 tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[col], height=ROW_HEIGHT, text=column_values[col],bg="white", fg="black")
                 tile.pack(ipadx=1, ipady=1, expand=True)
-                self.widgets.append(frame)
         self.add_navigator(len(self.players)+2)
 
     def add_column_labels(self):
@@ -35,9 +34,7 @@ class LeaderboardView(AbstractPageView):
             frame.grid(row=1, column=index, sticky=STICKY)
             tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[0], height=ROW_HEIGHT, text=column,bg="gray")
             tile.pack(expand=True)
-            self.widgets.append(frame)
 
     def close(self):
-        for widget in self.widgets:
-            widget.destroy()
+        self.destroy_widgets()
         self.on_home()
