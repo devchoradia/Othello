@@ -1,11 +1,12 @@
 from view.abstract_page_view import AbstractPageView, STICKY
 from model.player import PLAYER_COLOR
+from model.views import Views
 from view.board_view import BoardView
 import tkinter as tk
 
 class GameView(AbstractPageView):
     def __init__(self, root, board, board_color, on_home):
-        super().__init__(root, "Game", len(board), on_home)
+        super().__init__(root, Views.GAME, len(board), on_home)
         self.board = board
         self.board_view = BoardView(board, root, board_color)
         self.board_color = board_color

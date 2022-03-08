@@ -4,8 +4,9 @@ from view.home_view import HomeView
 from view.game_view import GameView
 from view.settings_view import SettingsView
 from view.leaderboard_view import LeaderboardView
+from view.login import Login
 from controller.game_controller import GameController
-from server.database_client import DatabaseClient
+from server.database_client import DatabaseClient, LOGIN_RESULT
 from model.player import PLAYER_COLOR
 import tkinter as tk
 
@@ -13,7 +14,7 @@ class AppController:
     def __init__(self, database_client: DatabaseClient):
         self.board_size = 4
         self.database_client = database_client
-        self.current_view = Views.HOME#Views.LOGIN
+        self.current_view = Views.LOGIN
         self.board_color = PLAYER_COLOR[0]
     
     def init_app(self):
@@ -30,6 +31,10 @@ class AppController:
     def display_home(self):
         home = HomeView(on_select_page=self.on_select_page, root=self.root)
         home.display()
+
+    def display_login(self):
+        login = Login(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER), on_home=self.on_home)
+        login.display()
 
     def on_select_page(self, view):
         self.current_view = view
@@ -62,6 +67,13 @@ class AppController:
 
     def on_home(self):
         self.on_select_page(Views.HOME)
+
+    def on_login(self, username, password):
+        result, (username, rating) = self.database_client.login(username, password)
+        if result == LOGIN_RESULT.SUCCESS:
+            self.username = username
+            self.rating = rating
+        return result
 
     def on_win(self):
         pass

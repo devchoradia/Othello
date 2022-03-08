@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import tkinter as tk
+from model.views import Views, VIEW_TITLES
 
 STICKY = tk.W+tk.E+tk.N+tk.S
 ROW_HEIGHT = 2
@@ -8,10 +9,10 @@ class AbstractPageView(ABC):
     '''
     Abstract class for a page view
     '''
-    def __init__(self, root, title, columnspan, on_home):
+    def __init__(self, root, page_view, columnspan=None, on_home=None):
         self.root = root
         self.widgets = []
-        self.title = title
+        self.title = VIEW_TITLES[page_view]
         self.columnspan = columnspan
         self.on_home = on_home
 

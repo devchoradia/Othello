@@ -1,8 +1,8 @@
 import tkinter as tk
 from view.abstract_page_view import AbstractPageView, STICKY
 from model.player import PLAYER_COLOR
+from model.views import Views
 
-TITLE = "Settings"
 COLUMNS = ["Setting", "Value"]
 COLUMN_WIDTHS = [7, 7]
 ROW_HEIGHT = 2
@@ -11,7 +11,7 @@ SETTING_OPTIONS = [[4, 6, 8, 10], ["green", "blue", "cyan", "yellow", "magenta"]
 
 class SettingsView(AbstractPageView):
     def __init__(self, root, update_color, update_size, on_home, color=PLAYER_COLOR[0], size=4):
-        super().__init__(root, TITLE, len(COLUMNS), on_home)
+        super().__init__(root, Views.SETTINGS, len(COLUMNS), on_home)
         self.update_color = update_color
         self.update_size = update_size
         self.board_color = tk.StringVar()

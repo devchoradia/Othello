@@ -2,6 +2,7 @@ from model.player import PLAYER_COLOR
 import tkinter as tk
 from view.abstract_page_view import AbstractPageView, STICKY
 import threading
+from model.views import Views
 import time
 
 COLUMNS = ["Rank", "Player", "Rating"]
@@ -11,7 +12,7 @@ ROW_HEIGHT = 2
 # Renders the leaderboard
 class LeaderboardView(AbstractPageView):
     def __init__(self, root, players, on_home):
-        super().__init__(root, "Leaderboard", len(COLUMN_WIDTHS), on_home)
+        super().__init__(root, Views.LEADERBOARD, len(COLUMN_WIDTHS), on_home)
         self.players = players
         self.closed = tk.Variable()
 

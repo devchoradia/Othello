@@ -7,7 +7,7 @@ ROWS = [Views.GAME, Views.LEADERBOARD, Views.SETTINGS]
 # Renders the home page
 class HomeView(AbstractPageView):
     def __init__(self, on_select_page, root):
-        super().__init__(root, None, None, None)
+        super().__init__(root, Views.HOME, None, None)
         self.on_select_page = on_select_page
         self.closed = tk.Variable()
 

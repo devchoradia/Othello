@@ -1,74 +1,96 @@
 from tkinter import *
+from view.abstract_page_view import AbstractPageView
+from model.views import Views
+from server.database_client import LOGIN_RESULT, LOGIN_RESULT_MESSAGE
 
-class login:
-    def __init__(self):
-
-        root = Tk()
-        root.geometry('350x500')
-        root.title(' LOGIN ')
-        root.resizable(0, 0)
+class Login(AbstractPageView):
+    def __init__(self, root, on_login, on_register, on_home):
+        super().__init__(root, Views.LOGIN)
+        self.on_login = on_login
+        self.on_home = on_home
+        self.on_register = on_register
+        self.username = StringVar()
+        self.password = StringVar()
+    
+    def display(self):
+        self.root.geometry('350x500')
+        self.root.title(' LOGIN ')
 
         j = 0
         k = 10
         for i in range(100):
             c = str(222222 + k)
-            Frame(root, width=10, height=500, bg="#" + c).place(x=j, y=0)
+            frame1 = Frame(self.root, width=10, height=500, bg="#" + c)
+            frame1.place(x=j, y=0)
             j = j + 10
             k += 1
+            self.widgets.append(frame1)
+        frame2 = Frame(self.root, width=250, height=400, bg='white')
+        frame2.place(x=50, y=50)
+        self.widgets.append(frame2)
 
-
-
-
-        Frame(root, width=250, height=400, bg='white').place(x=50, y=50)
-
-
-
-
-
-        l1 = Label(root, text='Username', bg='white', font='Helvetica 15 bold')
+        l1 = Label(self.root, text='Username', bg='white', font='Helvetica 15 bold')
         t = ('Consolas', 13)
         l1.place(x=80, y=200)
 
-        e1 = Entry(root, width=20, border=0)
+        e1 = Entry(self.root, width=20, border=0, textvariable=self.username)
         e1.config(font= t)
         e1.place(x=80, y=230)
 
-        e2 = Entry(root, width=20, border=0, show='*')
+        e2 = Entry(self.root, width=20, border=0, show='*', textvariable=self.password)
         e2.config(font=t)
         e2.place(x=80, y=310)
 
-        l2 = Label(root, text='Password', bg='white', font = 'Helvetica 15 bold')
+        l2 = Label(self.root, text='Password', bg='white', font = 'Helvetica 15 bold')
         l2.place(x=80, y=280)
 
-
-        Frame(root, width=180, height=2, bg='#141414').place(x=80, y=332)
-        Frame(root, width=180, height=2, bg='#141414').place(x=80, y=252)
+        self.widgets.extend([l1, e1, e2, l2])
 
 
+        f3 = Frame(self.root, width=180, height=2, bg='#141414')
+        f3.place(x=80, y=332)
+        f4 = Frame(self.root, width=180, height=2, bg='#141414')
+        f4.place(x=80, y=252)
+        self.widgets.extend([f3, f4])
 
-
-        def bttn(x, y, text, ecolor, lcolor):
-            def on_entera(e):
-                myButton1['background'] = ecolor  
-                myButton1['foreground'] = lcolor  
-
-            def on_leavea(e):
-                myButton1['background'] = lcolor
-                myButton1['foreground'] = ecolor
-
-            myButton1 = Button(root, text=text,width=20,height=2,fg=ecolor, bg=lcolor,activeforeground=lcolor,activebackground=ecolor,)
-
-            myButton1.bind("<Enter>", on_entera)
-            myButton1.bind("<Leave>", on_leavea)
-
-            myButton1.place(x=x-35, y=y)
-
-        bttn(100, 375, 'LOGIN', 'white', '#994422')
+        self.bttn(100, 375, 'LOGIN', 'white', '#994422', self.click_login)
         
         
-        b2 = Button(root, text = "Haven't registered here? Click here", bg='white', fg = 'blue', font = 'Helvetica 10')
+        b2 = Button(self.root, text = "Register Account", bg='white', fg = 'blue', font = 'Helvetica 10')
         b2.place(x = 68, y = 422)
+        self.widgets.append(b2)
 
-        
-        
-        root.mainloop()
+    def bttn(self, x, y, text, ecolor, lcolor, on_click=None):
+        def on_entera(e):
+            myButton1['background'] = ecolor  
+            myButton1['foreground'] = lcolor  
+
+        def on_leavea(e):
+            myButton1['background'] = lcolor
+            myButton1['foreground'] = ecolor
+
+        myButton1 = Button(self.root, text=text,width=20,height=2,fg=ecolor, bg=lcolor,activeforeground=lcolor,activebackground=ecolor, command=on_click)
+
+        myButton1.bind("<Enter>", on_entera)
+        myButton1.bind("<Leave>", on_leavea)
+        self.widgets.append(myButton1)
+
+        myButton1.place(x=x-35, y=y)
+
+    def close(self):
+        self.destroy_widgets()
+        self.root.geometry("")
+
+    def click_login(self):
+        result = self.on_login(self.username.get(), self.password.get())
+        if result == LOGIN_RESULT.SUCCESS:
+            self.close()
+            self.on_home()
+        else:
+            self.display_error(result)
+    
+    def display_error(self, result):
+        l = Label(self.root, text=LOGIN_RESULT_MESSAGE[result], bg='white', fg='red', font = 'Helvetica 15 bold')
+        l.place(x=80, y=332)
+        self.widgets.append(l)
+
