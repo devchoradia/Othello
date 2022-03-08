@@ -4,9 +4,10 @@ from view.home_view import HomeView
 from view.game_view import GameView
 from view.settings_view import SettingsView
 from view.leaderboard_view import LeaderboardView
+from view.register import Register
 from view.login import Login
 from controller.game_controller import GameController
-from server.database_client import DatabaseClient, LOGIN_RESULT
+from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT
 from model.player import PLAYER_COLOR
 import tkinter as tk
 
@@ -36,6 +37,10 @@ class AppController:
         login = Login(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER), on_home=self.on_home)
         login.display()
 
+    def display_register(self):
+        register = Register(self.root, self.on_register, lambda: self.on_select_page(Views.LOGIN), self.on_home)
+        register.display()
+
     def on_select_page(self, view):
         self.current_view = view
         if view == Views.LOGIN:
@@ -46,6 +51,8 @@ class AppController:
             self.display_settings()
         elif view == Views.LEADERBOARD:
             self.display_leaderboard()
+        elif view == Views.REGISTER:
+            self.display_register()
         else:
             self.display_home()
         
@@ -70,6 +77,13 @@ class AppController:
 
     def on_login(self, username, password):
         result, (username, rating) = self.database_client.login(username, password)
+        if result == LOGIN_RESULT.SUCCESS:
+            self.username = username
+            self.rating = rating
+        return result
+
+    def on_register(self, username, password):
+        result, (username, rating) = self.database_client.register_user(username, password)
         if result == LOGIN_RESULT.SUCCESS:
             self.username = username
             self.rating = rating

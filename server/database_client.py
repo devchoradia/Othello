@@ -17,12 +17,14 @@ LOGIN_RESULT_MESSAGE = {
 class REGISTER_RESULT(Enum):
     SUCCESS = 1
     USER_EXISTS = 2
-    UNKNOWN_ERROR = 3
+    INVALID_INPUT = 3
+    UNKNOWN_ERROR = 4
 
 
 REGISTER_RESULT_MESSAGE = {
     REGISTER_RESULT.SUCCESS: "Success registering account",
     REGISTER_RESULT.USER_EXISTS: "This username already exists",
+    REGISTER_RESULT.INVALID_INPUT: "Invalid username or password input",
     REGISTER_RESULT.UNKNOWN_ERROR: "An unknown error occurred"
 }
 
@@ -53,12 +55,15 @@ class DatabaseClient:
         return conn
 
     def register_user(self, username, password):
+        user_info = (username, 0)
+        if not username or not password:
+            return REGISTER_RESULT.INVALID_INPUT, user_info
         insert = """
             INSERT into users (username, password) VALUES(%s, %s);
         """
         register_result = REGISTER_RESULT.UNKNOWN_ERROR
         if self.does_user_exist(username):
-            return REGISTER_RESULT.USER_EXISTS
+            return REGISTER_RESULT.USER_EXISTS, user_info
         conn = self.make_connection()
         args = (username, password)
         try: 
@@ -70,7 +75,7 @@ class DatabaseClient:
             print(e)
         finally:
             conn.close()
-        return register_result
+        return register_result, user_info
     
     def does_user_exist(self, username):
         conn = self.make_connection()
