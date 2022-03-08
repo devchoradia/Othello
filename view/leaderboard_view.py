@@ -6,7 +6,7 @@ from model.views import Views
 import time
 
 COLUMNS = ["Rank", "Player", "Rating"]
-COLUMN_WIDTHS = [5, 7, 7]
+COLUMN_WIDTHS = [5, 12, 10]
 ROW_HEIGHT = 2
 
 # Renders the leaderboard
@@ -21,7 +21,7 @@ class LeaderboardView(AbstractPageView):
         self.add_column_labels()
         for row, player in enumerate(self.players):
             for col in range(3):
-                column_values = [str(col+1), player[0], str(player[1])]
+                column_values = [str(row+1), player[0], str(player[1])]
                 frame = tk.Frame(padx=5, pady=5,relief=tk.RAISED, borderwidth=1, bg='white')
                 frame.grid(row=row+2, column=col, sticky=STICKY)
                 tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[col], height=ROW_HEIGHT, text=column_values[col],bg="white", fg="black")

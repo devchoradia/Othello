@@ -40,6 +40,7 @@ class Register(AbstractPageView):
         e4 = Entry(self.root, width=20, border=0, textvariable=self.username, fg="black", bg="white", highlightbackground="white")
         e4.config(font= t)
         e4.place(x=80, y=230)
+        e4.bind('<Return>', lambda x: self.click_register())
 
         # We'll add this once we add emails
         # l1 = Label(self.root, text='email-id', bg='white', font='Helvetica 15 bold')
@@ -52,6 +53,7 @@ class Register(AbstractPageView):
         e2 = Entry(self.root, width=20, border=0, show='*', textvariable=self.password, fg="black", bg="white", highlightbackground="white")
         e2.config(font=t)
         e2.place(x=80, y=310)
+        e2.bind('<Return>', lambda x: self.click_register())
 
         l2 = Label(self.root, text='Password', font = 'Helvetica 15 bold', fg="gray", bg="white", highlightbackground="white")
         l2.place(x=80, y=280)

@@ -115,7 +115,7 @@ class DatabaseClient:
 
     def get_leaderboard(self, count=10):
         conn = self.make_connection()
-        query = f"SELECT username, ELORating FROM users ORDER BY ELORating LIMIT {count};"
+        query = f"SELECT username, ELORating FROM users ORDER BY ELORating DESC LIMIT {count};"
         try:
             with conn.cursor() as cursor:
                 cursor.execute(query)

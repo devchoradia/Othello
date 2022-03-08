@@ -18,17 +18,30 @@ class AbstractPageView(ABC):
 
     @abstractmethod
     def display(self):
+        '''
+        Display the page view
+        '''
         pass
 
     @abstractmethod
     def close(self):
+        '''
+        Destroy widgets and close the page
+        '''
         pass
 
     def destroy_widgets(self):
+        '''
+        Destroy all widgets in the page
+        '''
         for widget in self.widgets:
             widget.destroy()
 
     def add_title(self, row=0, frame=None):
+        '''
+        Adds the title of the page to the view and the window 
+        '''
+        self.root.title(self.title)
         label = tk.Label(relief=tk.RAISED, borderwidth=1, width=20, height=ROW_HEIGHT, font=("Arial", 25), text=self.title ,bg="white", fg="black")
         if frame is not None:
             label = tk.Label(frame, relief=tk.RAISED, borderwidth=1, width=40, height=ROW_HEIGHT, font=("Arial", 25), text="Home",bg="white", fg="black")
@@ -38,7 +51,7 @@ class AbstractPageView(ABC):
         self.widgets.append(label)
 
     def add_navigator(self, row, bg="white"):
-        home_button = tk.Button(self.root, text="Home", borderwidth=1, height=ROW_HEIGHT, \
+        home_button = tk.Button(self.root, text=VIEW_TITLES[Views.HOME], borderwidth=1, height=ROW_HEIGHT, \
             command=self.close, bg=bg, highlightbackground="white")
         if self.columnspan is None:
             home_button.pack(expand=True)
