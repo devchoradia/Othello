@@ -5,6 +5,8 @@ import time
 from view.abstract_page_view import STICKY
 
 ILLEGAL_MOVE_COLOR = "red"
+ROW_KEY = "tile"
+MIN_TILE_LENGTH = 50
 
 # Renders the board
 class BoardView:
@@ -23,6 +25,8 @@ class BoardView:
         self.widgets = []
         for row in range(board_size):
             widgets = []
+            self.root.rowconfigure(row, weight=1, uniform=ROW_KEY, minsize=MIN_TILE_LENGTH)
+            self.root.columnconfigure(row, weight=1, uniform=ROW_KEY, minsize=MIN_TILE_LENGTH)
             for col in range(board_size):
                 frame = self.add_tile(row, col)
                 widgets.append(frame)
@@ -31,22 +35,24 @@ class BoardView:
     def add_tile(self, row, col, is_illegal=False):
         player = self.board[row][col]
         tile_color = self.get_tile_color(player, is_illegal)
+
+        # Create tile frame
         frame_color = ILLEGAL_MOVE_COLOR if is_illegal else self.board_color
+        frame = tk.Frame(self.root, relief=tk.RAISED, borderwidth=2, bg=frame_color)
+        frame.grid(row=row, column=col,padx=0, pady=0, ipadx=0, ipady=0, sticky=STICKY)
+
+        # Add tile
         tile_relief = tk.RAISED
-        pad_x = 5
+        pad_x = 10
         ipad_x = 0
         if player == 0:
+            ipad_x = pad_x
             pad_x = 0
-            ipad_x = 5
             tile_relief = None
-        tile_relief = None if player == 0 else tk.RAISED
-        pad_x = 0 if player == 0 else 5
-        ipad_x = 5 if player == 0 else 0
-        frame = tk.Frame(relief=tk.RAISED, borderwidth=1, bg=frame_color)
-        frame.grid(row=row, column=col,padx=0, pady=0, ipadx=0, ipady=0, sticky=STICKY)
-        tile = tk.Label(frame, relief=tile_relief, borderwidth=1, width=5, height=3, text='    ',bg=tile_color)
+
+        tile = tk.Label(frame, relief=tile_relief, borderwidth=1, text='    ',bg=tile_color)
         tile.bind("<Button-1>", lambda x, r=row, c=col: self.on_click_tile(row=r, col=c))
-        tile.pack(padx=pad_x, ipadx=ipad_x, pady=pad_x, ipady=ipad_x, expand=True)
+        tile.pack(padx=pad_x, ipadx=ipad_x, pady=pad_x, ipady=ipad_x, expand=True, fill=tk.BOTH)
         return frame
 
     def display_illegal_move(self, row, col):
@@ -78,6 +84,6 @@ class BoardView:
         return ILLEGAL_MOVE_COLOR if is_illegal else self.board_color
 
     def clear_frame(self):
-        for row in self.widgets:
-            for widget in row:
-                widget.destroy()
+        widgets = self.root.winfo_children()
+        for widget in widgets:
+            widget.destroy()

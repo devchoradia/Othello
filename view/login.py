@@ -71,10 +71,8 @@ class AccountInfoView(AbstractPageView):
         # Frame for login/register buttons
         self.add_buttons()
 
-    def make_frame(self, relx=0.5, rely=0.5, width=None, height=None, parent=None):
-        if parent is None:
-            parent = self.main_frame
-        frame = Frame(parent, width=width, height=height, bg="white", highlightbackground="white")
+    def make_frame(self, relx=0.5, rely=0.5, width=None, height=None):
+        frame = Frame(self.main_frame, width=width, height=height, bg="white", highlightbackground="white")
         frame.pack()
         frame.place(anchor='center', relx=relx, rely=rely)
         return frame
