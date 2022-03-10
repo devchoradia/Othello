@@ -36,7 +36,7 @@ class GameView(AbstractPageView):
         label.grid(row=len(self.board), columnspan=len(self.board), sticky= STICKY)
     
     def close(self):
-        self.board_view.destroy_widgets()
-        self.destroy_widgets()
+        self.board_view.clear_frame()
+        super().close()
         self.on_home()
 

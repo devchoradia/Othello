@@ -27,12 +27,6 @@ class AbstractPageView(ABC):
         '''
         Destroy widgets and close the page
         '''
-        pass
-
-    def destroy_widgets(self):
-        '''
-        Destroy all widgets in the page
-        '''
         widgets = self.root.winfo_children()
         for widget in widgets:
             widget.destroy()
@@ -44,12 +38,15 @@ class AbstractPageView(ABC):
         self.root.title(self.title)
         label = tk.Label(relief=tk.RAISED, borderwidth=1, width=20, height=ROW_HEIGHT, font=("Arial", 25), text=self.title ,bg="white", fg="black")
         if frame is not None:
-            label = tk.Label(frame, relief=tk.RAISED, borderwidth=1, width=40, height=ROW_HEIGHT, font=("Arial", 25), text="Home",bg="white", fg="black")
+            label = tk.Label(frame, relief=tk.RAISED, borderwidth=1, width=30, height=ROW_HEIGHT, font=("Arial", 25), text="Home",bg="white", fg="black")
             label.pack(expand=True)
         else:
             label.grid(row=row, columnspan=self.columnspan, sticky=STICKY)
 
     def add_navigator(self, row, bg="white"):
+        '''
+        Adds the navigator (home button) to the bottom of the page
+        '''
         home_button = tk.Button(self.root, text=VIEW_TITLES[Views.HOME], borderwidth=1, height=ROW_HEIGHT, \
             command=self.close, bg=bg, highlightbackground="white")
         if self.columnspan is None:

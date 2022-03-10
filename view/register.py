@@ -68,7 +68,7 @@ class Register(AbstractPageView):
         b2.place(x = 68, y = 422)
     
     def close(self):
-        self.destroy_widgets()
+        super().close()
         self.root.geometry("")
 
     def click_register(self):

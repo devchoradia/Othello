@@ -19,7 +19,7 @@ class BoardView:
     def display(self):
         self.illegal_move = None
         board_size = len(self.board)
-        self.destroy_widgets()
+        self.clear_frame()
         self.widgets = []
         for row in range(board_size):
             widgets = []
@@ -77,7 +77,7 @@ class BoardView:
             return PLAYER_COLOR[player]
         return ILLEGAL_MOVE_COLOR if is_illegal else self.board_color
 
-    def destroy_widgets(self):
+    def clear_frame(self):
         for row in self.widgets:
             for widget in row:
                 widget.destroy()

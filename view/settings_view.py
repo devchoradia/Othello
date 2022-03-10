@@ -4,7 +4,7 @@ from model.player import PLAYER_COLOR
 from model.views import Views
 
 COLUMNS = ["Setting", "Value"]
-COLUMN_WIDTHS = [7, 7]
+COLUMN_WIDTHS = [15, 15]
 ROW_HEIGHT = 2
 SETTINGS = ["Board Size", "Board color"]
 SETTING_OPTIONS = [[4, 6, 8, 10], ["green", "blue", "cyan", "yellow", "magenta"]]
@@ -62,7 +62,7 @@ class SettingsView(AbstractPageView):
         self.close()
 
     def close(self):
-        self.destroy_widgets()
+        super().close()
         if(self.saved.get()):
             self.update_color(self.board_color.get())
             self.update_size(self.board_size.get())

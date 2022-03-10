@@ -36,5 +36,5 @@ class LeaderboardView(AbstractPageView):
             tile.pack(expand=True)
 
     def close(self):
-        self.destroy_widgets()
+        super().close()
         self.on_home()
