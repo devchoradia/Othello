@@ -21,7 +21,7 @@ class GameView(AbstractPageView):
 
     def display_current_player(self, player):
         self.root.rowconfigure(len(self.board), weight=1, uniform=ROW_KEY,  minsize=MIN_TILE_LENGTH)
-        label = tk.Label(relief=tk.RAISED, borderwidth=2, font=("Arial", 20), text=f"Player move: {PLAYER_COLOR[player]}",bg=self.board_color, fg="black")
+        label = tk.Label(relief=tk.RAISED, borderwidth=2, font=("Arial", 16), text=f"Player move: {PLAYER_COLOR[player]}",bg=self.board_color, fg="black")
         label.grid(row=len(self.board), columnspan=len(self.board), sticky=STICKY)
         self.add_navigator()
 
@@ -38,7 +38,7 @@ class GameView(AbstractPageView):
         result_string = f"{PLAYER_COLOR[player].upper()} WINS"
         if player == 0:
             result_string = "DRAW"
-        label = tk.Label(relief=tk.RAISED, borderwidth=2, width=5, height=2, font=("Arial", 25), text=result_string,bg=self.board_color, fg="black")
+        label = tk.Label(relief=tk.RAISED, borderwidth=2, width=5, height=2, font=("Arial", 20), text=result_string,bg=self.board_color, fg="black")
         label.grid(row=len(self.board), columnspan=len(self.board), sticky= STICKY)
         self.add_navigator()
 
