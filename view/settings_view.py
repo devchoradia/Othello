@@ -4,7 +4,7 @@ from model.player import PLAYER_COLOR
 from model.views import Views
 
 COLUMNS = ["Setting", "Value"]
-COLUMN_WIDTHS = [7, 7]
+COLUMN_WIDTHS = [15, 15]
 ROW_HEIGHT = 2
 SETTINGS = ["Board Size", "Board color"]
 SETTING_OPTIONS = [[4, 6, 8, 10], ["green", "blue", "cyan", "yellow", "magenta"]]
@@ -22,37 +22,47 @@ class SettingsView(AbstractPageView):
         self.saved.set(False)
 
     def display(self):
-        self.add_title() # row 0
+        # Create the main frame
+        self.main_frame = tk.Frame(self.root, bg='white')
+        self.main_frame.pack(expand=True, fill=tk.BOTH)
+
+        # Configure rows and columns
+        for row in range(len(SETTINGS)+4):
+            self.main_frame.rowconfigure(row, weight=1, minsize=50)
+        for col in range(len(COLUMNS)):
+            self.main_frame.columnconfigure(col, weight=1)
+
+        self.add_title(frame=self.main_frame, use_grid=True) # row 0
         self.add_column_labels(1) # row 1
         self.add_settings(2) # beginning at row 2
         self.add_save(4) # row 4
-        self.add_navigator(5) # row 5
+        self.add_navigator(5, frame=self.main_frame, use_grid=True) # row 5
 
     def add_settings(self, start_row):
         initial_values = [self.board_size, self.board_color]
         for index, setting in enumerate(SETTINGS):
             row = start_row + index
             # Setting name
-            label_frame = tk.Frame(padx=5, pady=5,relief=tk.RAISED, borderwidth=1, bg='white')
+            label_frame = tk.Frame(self.main_frame, padx=5, pady=5,relief=tk.RAISED, borderwidth=1, bg='white')
             label_frame.grid(row=row, column=0, sticky=STICKY)
             tile = tk.Label(label_frame, borderwidth=1, width=COLUMN_WIDTHS[0], height=ROW_HEIGHT, text=setting,bg="white", fg="black")
             tile.pack(ipadx=1, ipady=1, expand=True)
             # Setting value
-            options_frame = tk.Frame(padx=5, pady=5,relief=tk.RAISED, borderwidth=1, bg='white')
+            options_frame = tk.Frame(self.main_frame, padx=5, pady=5,relief=tk.RAISED, borderwidth=1, bg='white')
             options_frame.grid(row=row, column=1, sticky=STICKY)
             option = tk.OptionMenu(options_frame, initial_values[index], *SETTING_OPTIONS[index])
             option.config(bg="white", fg="black")
             option.pack(ipadx=1, ipady=1, expand=True)
 
     def add_save(self, row):
-        frame = tk.Frame(padx=5, pady=5,relief=tk.RAISED, borderwidth=1, bg='white')
+        frame = tk.Frame(self.main_frame, padx=5, pady=5,relief=tk.RAISED, borderwidth=2, bg='white')
         frame.grid(row=row, columnspan=self.columnspan, sticky=STICKY)
         save = tk.Button(frame, text="Save", command=self.save, background="white", bg="white", highlightbackground="white")
-        save.pack()
+        save.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     def add_column_labels(self, row):
         for index, column in enumerate(COLUMNS):
-            frame = tk.Frame(relief=tk.RAISED, borderwidth=1, bg='gray')
+            frame = tk.Frame(self.main_frame, relief=tk.RAISED, borderwidth=1, bg='gray')
             frame.grid(row=row, column=index, sticky=STICKY)
             tile = tk.Label(frame, borderwidth=1, width=COLUMN_WIDTHS[0], height=ROW_HEIGHT, text=column,bg="gray")
             tile.pack(expand=True)
@@ -62,7 +72,7 @@ class SettingsView(AbstractPageView):
         self.close()
 
     def close(self):
-        self.destroy_widgets()
+        super().close()
         if(self.saved.get()):
             self.update_color(self.board_color.get())
             self.update_size(self.board_size.get())

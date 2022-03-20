@@ -5,9 +5,9 @@ from view.game_view import GameView
 from view.settings_view import SettingsView
 from view.leaderboard_view import LeaderboardView
 from view.register import Register
-from view.login import Login
+from view.login import AccountInfoView
 from controller.game_controller import GameController
-from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT
+from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT, REGISTER_RESULT_MESSAGE
 from model.player import PLAYER_COLOR
 import tkinter as tk
 
@@ -20,6 +20,7 @@ class AppController:
     
     def init_app(self):
         self.root = tk.Tk()
+        self.root['background'] = '#cfbd9b'
         self.root.after(1000, lambda: self.on_select_page(self.current_view))
         self.root.mainloop()
 
@@ -34,11 +35,12 @@ class AppController:
         home.display()
 
     def display_login(self):
-        login = Login(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER), on_home=self.on_home)
+        login = AccountInfoView(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER), on_home=self.on_home)
         login.display()
 
     def display_register(self):
-        register = Register(self.root, self.on_register, lambda: self.on_select_page(Views.LOGIN), self.on_home)
+        register = AccountInfoView(self.root, self.on_register, lambda: self.on_select_page(Views.LOGIN), self.on_home, view=Views.REGISTER, \
+            submit_results=REGISTER_RESULT, result_messages=REGISTER_RESULT_MESSAGE, submit_label="REGISTER", switch_view_label="Log in")
         register.display()
 
     def on_select_page(self, view):

@@ -1,90 +1,142 @@
 from tkinter import *
-from view.abstract_page_view import AbstractPageView
+from view.abstract_page_view import AbstractPageView, ROW_HEIGHT
 from model.views import Views
-from server.database_client import LOGIN_RESULT, LOGIN_RESULT_MESSAGE
+from server.database_client import LOGIN_RESULT, LOGIN_RESULT_MESSAGE, REGISTER_RESULT, REGISTER_RESULT_MESSAGE
+import math
+from abc import abstractmethod
+from PIL import Image, ImageTk
 
-class Login(AbstractPageView):
-    def __init__(self, root, on_login, on_register, on_home):
-        super().__init__(root, Views.LOGIN)
-        self.on_login = on_login
+LOGO_LENGTH = 130
+
+class AccountInfoView(AbstractPageView):
+    '''
+    Renders a page where a user inputs their username and password
+    '''
+    def __init__(self, root, on_submit, on_switch_view, on_home, view=Views.LOGIN, \
+        submit_results = LOGIN_RESULT, result_messages = LOGIN_RESULT_MESSAGE, \
+        submit_label="LOGIN", switch_view_label="Register account"):
+        super().__init__(root, view, on_home=on_home)
+        self.on_submit = on_submit
         self.on_home = on_home
-        self.on_register = on_register
+        self.on_switch_view = on_switch_view
         self.username = StringVar()
         self.password = StringVar()
         self.error = None
+        self.submit_results = submit_results
+        self.result_messages = result_messages
+        self.submit_label = submit_label
+        self.switch_view_label = switch_view_label
+        logo = Image.open("logo.png").resize((LOGO_LENGTH, LOGO_LENGTH), Image.ANTIALIAS)
+        self.logo = ImageTk.PhotoImage(logo)
+
     
     def display(self):
         self.root.geometry('350x500')
-        j = 0
-        k = 10
-        for i in range(100):
-            c = str(222222 + k)
-            f1 = Frame(self.root, width=10, height=500, bg="#" + c)
-            f1.place(x=j, y=0)
-            j = j + 10
-            k += 1
-        f2 = Frame(self.root, width=250, height=400, bg='white')
-        f2.place(x=50, y=50)
+        main_frame = Frame(self.root, width=250, height=420, bg='white')
+        self.main_frame = main_frame
+        font = ('Consolas', 13)
+        self.add_title()
+        main_frame.place(anchor='center', relx=0.5, rely=0.5)
 
-        l1 = Label(self.root, text='Username', fg='gray', bg='white', font='Helvetica 15 bold')
-        t = ('Consolas', 13)
-        l1.place(x=80, y=200)
+        self.add_logo()
 
-        e1 = Entry(self.root, width=20, border=0, textvariable=self.username, fg="black", bg="white", highlightbackground="white")
-        e1.config(font= t)
-        e1.place(x=80, y=230)
-        e1.bind('<Return>', lambda x: self.click_login())
+        entry_frame = self.make_frame(0.5, 0.6)
 
-        e2 = Entry(self.root, width=20, border=0, show='*', textvariable=self.password, fg="black", bg="white", highlightbackground="white")
-        e2.config(font=t)
-        e2.place(x=80, y=310)
+        # Username label
+        self.add_label('Username', entry_frame=entry_frame)
+
+        # Username entry
+        username_entry = Entry(entry_frame, width=20, border=0, textvariable=self.username, insertbackground="black", fg="black", bg="white", highlightbackground="white")
+        username_entry.config(font=font)
+        username_entry.pack()
+        username_entry.focus()
+        username_entry.bind('<Return>', lambda x: self.click_login())
+
+        # Border
+        f3 = Frame(entry_frame, width=180, height=2, bg='#141414')
+        f3.pack()
+
+        # Password label
+        self.add_label('Password', (10,0), entry_frame)
+
+        e2 = Entry(entry_frame, width=20, border=0, show='*', textvariable=self.password, insertbackground="black", fg="black", bg="white", highlightbackground="white")
+        e2.config(font=font)
+        e2.pack()
         e2.bind('<Return>', lambda x: self.click_login())
 
-        l2 = Label(self.root, text='Password', fg='gray', bg='white', font = 'Helvetica 15 bold')
-        l2.place(x=80, y=280)
+        # Border
+        f4 = Frame(entry_frame, width=180, height=2, bg='#141414')
+        f4.pack()
 
-        f3 = Frame(self.root, width=180, height=2, bg='#141414')
-        f3.place(x=80, y=332)
-        f4 = Frame(self.root, width=180, height=2, bg='#141414')
-        f4.place(x=80, y=252)
+        # Frame for login/register buttons
+        self.add_buttons()
 
-        self.bttn(100, 375, 'LOGIN', 'gray', '#994422', self.click_login)
-        
-        
-        b2 = Button(self.root, text = "Register Account", bg='white', fg = 'blue', font = 'Helvetica 10', borderwidth=1, highlightbackground="white", command=self.on_register)
-        b2.place(x = 68, y = 422)
+    def make_frame(self, relx=0.5, rely=0.5, width=None, height=None):
+        frame = Frame(self.main_frame, width=width, height=height, bg="white", highlightbackground="white")
+        frame.pack()
+        frame.place(anchor='center', relx=relx, rely=rely)
+        return frame
 
-    def bttn(self, x, y, text, ecolor, lcolor, on_click=None):
-        def on_entera(e):
-            myButton1['background'] = ecolor  
-            myButton1['foreground'] = lcolor  
+    def add_buttons(self):
+        e_color = 'gray'
+        l_color = '#994422'
+        button_frame = Frame(self.main_frame, bg="white")
+        button_frame.pack()
+        button_frame.place(anchor='center', relx=0.5, rely=0.89)
 
-        def on_leavea(e):
-            myButton1['background'] = lcolor
-            myButton1['foreground'] = ecolor
+        submit_button = Button(button_frame, text=self.submit_label,width=20,height=2,fg=e_color, bg=l_color,activeforeground=l_color,activebackground=e_color, highlightbackground="white", command=self.click_login)
 
-        myButton1 = Button(self.root, text=text,width=20,height=2,fg=ecolor, bg=lcolor,activeforeground=lcolor,activebackground=ecolor, highlightbackground="white", command=on_click)
+        def on_hover(e):
+            submit_button['background'] = e_color  
+            submit_button['foreground'] = l_color  
 
-        myButton1.bind("<Enter>", on_entera)
-        myButton1.bind("<Leave>", on_leavea)
+        def on_leave(e):
+            submit_button['background'] = l_color
+            submit_button['foreground'] = e_color
 
-        myButton1.place(x=x-35, y=y)
+        submit_button.bind("<Enter>", on_hover)
+        submit_button.bind("<Leave>", on_leave)
+
+        submit_button.pack()
+
+        switch_view_button = Button(button_frame, text=self.switch_view_label, bg='white', fg = 'blue', font = 'Helvetica 10', borderwidth=3, highlightbackground="white", command=self.switch_view)
+        switch_view_button.pack(side=TOP, pady=5)
+
+    def add_label(self, label, pady=None, entry_frame=None):
+        l1 = Label(entry_frame, text=label, fg='gray', bg='white', font='Helvetica 15 bold')
+        l1.pack(anchor='w', pady=pady)
+
+    def add_title(self):
+        title_frame = Frame(self.main_frame, bg="white")
+        title_frame.pack()
+        title_frame.place(anchor='n', relx=0.5)
+        label = Label(title_frame, relief=RAISED, borderwidth=1, width=self.main_frame.cget("width"), height=ROW_HEIGHT, font=("Arial", 25), text=self.title, bg="white", fg="black")
+        label.pack(expand=True)
+    
+    def add_logo(self):
+        img_frame = self.make_frame(0.5, 0.3, LOGO_LENGTH, LOGO_LENGTH)
+        label = Label(img_frame, image = self.logo, bg="white")
+        label.pack()
 
     def close(self):
-        self.destroy_widgets()
+        super().close()
         self.root.geometry("")
 
+    def switch_view(self):
+        self.close()
+        self.on_switch_view()
+
     def click_login(self):
-        result = self.on_login(self.username.get(), self.password.get())
-        if result == LOGIN_RESULT.SUCCESS:
+        result = self.on_submit(self.username.get(), self.password.get())
+        if result == self.submit_results.SUCCESS:
             self.close()
             self.on_home()
         else:
             self.display_error(result)
     
     def display_error(self, result):
-        l = Label(self.root, text=LOGIN_RESULT_MESSAGE[result], bg='white', fg='red', font = 'Helvetica 12')
-        l.place(x=80, y=342)
+        l = Label(self.root, text=self.result_messages[result], bg='white', fg='red', font = 'Helvetica 11')
+        l.place(x=79, y=348)
         if self.error is not None:
             self.error.destroy()
         self.error = l
