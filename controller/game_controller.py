@@ -1,7 +1,7 @@
 from model.game import Game
 from view.game_view import GameView
 from model.ai.minimax_ai import MinimaxAI
-from model.game_mode import GameMode
+from model.settings import GameMode
 from model.player import Player, AI_PLAYER, HUMAN_PLAYER
 import time
 

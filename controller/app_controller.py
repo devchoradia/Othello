@@ -1,6 +1,5 @@
 from model.game import Game
 from model.views import Views
-from model.game_mode import GameMode
 from view.home_view import HomeView
 from view.game_view import GameView
 from view.settings_view import SettingsView
@@ -10,14 +9,13 @@ from view.login import AccountInfoView
 from controller.game_controller import GameController
 from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT, REGISTER_RESULT_MESSAGE
 from model.player import PLAYER_COLOR
+from model.settings import Settings, Setting
 import tkinter as tk
 
 class AppController:
     def __init__(self, database_client: DatabaseClient):
-        self.board_size = 4
         self.database_client = database_client
         self.current_view = Views.LOGIN
-        self.board_color = PLAYER_COLOR[0]
     
     def init_app(self):
         self.root = tk.Tk()
@@ -25,9 +23,9 @@ class AppController:
         self.root.after(1000, lambda: self.on_select_page(self.current_view))
         self.root.mainloop()
 
-    def start_game(self, game_mode=GameMode.LOCAL):
-        game = Game(board_size = self.board_size)
-        controller = GameController(game, root=self.root, game_mode=game_mode, on_home=self.on_home, board_color=self.board_color)
+    def start_game(self):
+        game = Game(board_size = Settings().get_board_size())
+        controller = GameController(game, root=self.root, game_mode=Settings().get_game_mode(), on_home=self.on_home, board_color=Settings().get_board_color())
         controller.run_game()
 
     def display_home(self):
@@ -43,12 +41,12 @@ class AppController:
             submit_results=REGISTER_RESULT, result_messages=REGISTER_RESULT_MESSAGE, submit_label="REGISTER", switch_view_label="Log in")
         register.display()
 
-    def on_select_page(self, view, game_mode=None):
+    def on_select_page(self, view):
         self.current_view = view
         if view == Views.LOGIN:
             self.display_login()
         elif view == Views.GAME:
-            self.start_game(game_mode)
+            self.start_game()
         elif view == Views.SETTINGS:
             self.display_settings()
         elif view == Views.LEADERBOARD:
@@ -64,15 +62,8 @@ class AppController:
         leaderboard.display()
     
     def display_settings(self):
-        settings = SettingsView(root=self.root, update_color=self.on_change_board_color, \
-            update_size=self.on_change_board_size, color=self.board_color, size=self.board_size, on_home=self.on_home)
+        settings = SettingsView(root=self.root, on_home=self.on_home)
         settings.display()
-
-    def on_change_board_size(self, size):
-        self.board_size = size
-
-    def on_change_board_color(self, color):
-        self.board_color = color
 
     def on_home(self):
         self.on_select_page(Views.HOME)
