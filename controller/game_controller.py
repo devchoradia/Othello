@@ -1,5 +1,7 @@
 from model.game import Game
 from view.game_view import GameView
+from model.ai.minimax_ai import MinimaxAI
+from model.player import Player
 
 class GameController:
     def __init__(self, model: Game, view: GameView):
@@ -8,6 +10,8 @@ class GameController:
 
     # Run the game
     def run_game(self):
+        ai = MinimaxAI()
+
         game_terminated = False
         self.view.display()
         # Continue requesting and performing players' movements until the game is over
@@ -19,8 +23,14 @@ class GameController:
             # Display the board and current player
             self.view.display_board()
             self.view.display_current_player(self.model.curr_player)
-            # Request a move from the player
-            row, col = self.view.get_move()
+
+            # todo: delete this
+            if self.model.curr_player == Player.BLACK:  
+                # Request a move from the player
+                row, col = self.view.get_move()
+            else:
+                row, col = ai.decision(self.model.board)
+
             # Check legality of move
             is_legal = self.model.is_legal_move(row, col)
             # If illegal move, display it and re-request a move
