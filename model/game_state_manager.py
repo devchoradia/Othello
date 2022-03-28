@@ -1,13 +1,6 @@
 from model.game import Game
 import copy
 
-'''
-Facade Design Pattern
-
-Simplifies the Game interface, hiding the implementation of the model from the user (e.g. minimax ai).
-This class allows users to work with the board without having to worry about the state-dependent
-details of the model class.
-'''
 class GameStateManager:
     @staticmethod
     def make_move(board, player, row, col):
