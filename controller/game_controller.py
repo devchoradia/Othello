@@ -1,17 +1,18 @@
 from model.game import Game
 from view.game_view import GameView
 from model.ai.minimax_ai import MinimaxAI
-from model.player import Player
+from model.game_mode import GameMode
+from model.player import Player, AI_PLAYER, HUMAN_PLAYER
+import time
 
 class GameController:
-    def __init__(self, model: Game, view: GameView):
+    def __init__(self, model: Game, view: GameView, game_mode: GameMode = GameMode.LOCAL):
         self.model = model
         self.view = view
+        self.game_mode = game_mode
 
     # Run the game
     def run_game(self):
-        ai = MinimaxAI()
-
         game_terminated = False
         self.view.display()
         # Continue requesting and performing players' movements until the game is over
@@ -23,14 +24,8 @@ class GameController:
             # Display the board and current player
             self.view.display_board()
             self.view.display_current_player(self.model.curr_player)
-
-            # todo: delete this
-            if self.model.curr_player == Player.BLACK:  
-                # Request a move from the player
-                row, col = self.view.get_move()
-            else:
-                row, col = ai.decision(self.model.board)
-
+            # Get the next move
+            row, col = self.get_move()
             # Check legality of move
             is_legal = self.model.is_legal_move(row, col)
             # If illegal move, display it and re-request a move
@@ -49,3 +44,10 @@ class GameController:
         # Display the final state of the board and the winner
         self.view.display_board()
         self.view.display_winner(self.model.get_winner())
+
+    # Get the move from the current player
+    def get_move(self):
+        if self.game_mode == GameMode.AI and self.model.curr_player == AI_PLAYER:  
+            return MinimaxAI().decision(self.model.board)
+        else:
+            return self.view.get_move()

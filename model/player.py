@@ -15,3 +15,6 @@ PLAYER_COLOR = {
     Player.WHITE: 'white',
     0: 'green'
 }
+
+AI_PLAYER = Player.WHITE
+HUMAN_PLAYER = Player.BLACK
