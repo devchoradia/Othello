@@ -2,14 +2,17 @@ from model.player import Player
 import numpy as np
 
 class Game:
-    def __init__(self, board_size = 8):
+    def __init__(self, board_size = 8, board=None, curr_player=Player.BLACK):
         if board_size < 3:
             print("Invalid board size. Using default 8x8 board.")
             board_size = 8
         self.board_size = board_size
-        self.curr_player = Player.BLACK
-        self.board = np.zeros((board_size, board_size), dtype=np.int)
-        self.init_board()
+        self.curr_player = curr_player
+        if board is None:
+            self.board = np.zeros((board_size, board_size), dtype=np.int)
+            self.init_board()
+        else:
+            self.board = board
 
     # Places the initial four tiles
     def init_board(self):
@@ -106,6 +109,17 @@ class Game:
                 if tile == 0 and self.is_legal_move(row_idx, col_idx, player):
                     return True
         return False
+
+    # Get all valid moves for the given player
+    def get_valid_moves(self, player=None):
+        if player is None:
+            player = self.curr_player
+        valid_moves = []
+        for row_idx, row in enumerate(self.board):
+            for col_idx, tile in enumerate(row):
+                if tile == 0 and self.is_legal_move(row_idx, col_idx, player):
+                    valid_moves.append((row_idx, col_idx))
+        return valid_moves
 
     # Returns whether the game is over as a result of the current player's move
     def is_game_terminated(self):
