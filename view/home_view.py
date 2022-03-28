@@ -1,8 +1,34 @@
 import tkinter as tk
 from view.abstract_page_view import AbstractPageView, ROW_HEIGHT
 from model.views import Views, VIEW_TITLES
+from model.game_mode import GameMode
+from enum import Enum
 
-ROWS = [Views.GAME, Views.LEADERBOARD, Views.SETTINGS]
+class Options(Enum):
+    LOCAL_GAME = 1
+    AI_GAME = 2
+    LEADERBOARD = 3
+    SETTINGS = 4
+
+OptionLabels = {
+    Options.AI_GAME: "Player a computer",
+    Options.LOCAL_GAME: "Player locally",
+    Options.LEADERBOARD: VIEW_TITLES[Views.LEADERBOARD],
+    Options.SETTINGS: VIEW_TITLES[Views.SETTINGS]
+}
+
+OptionViews = {
+    Options.LOCAL_GAME: Views.GAME,
+    Options.AI_GAME: Views.GAME,
+    Options.LEADERBOARD: Views.LEADERBOARD,
+    Options.SETTINGS: Views.SETTINGS
+}
+
+OptionGameModes = {
+    Options.LOCAL_GAME: GameMode.LOCAL,
+    Options.AI_GAME: GameMode.AI
+}
+
 
 # Renders the home page
 class HomeView(AbstractPageView):
@@ -17,14 +43,18 @@ class HomeView(AbstractPageView):
         frame.configure(background="white")
         frame.pack(fill=tk.BOTH, ipadx=50, ipady=50)
         self.add_title(frame=frame)
-        for row, column in enumerate(ROWS):
-            padyt = 10 if row != 0 else 20
-            button = tk.Button(frame, text=VIEW_TITLES[column], borderwidth=1, width=20, height=ROW_HEIGHT, command=lambda col=column: self.on_click(col))
+        for idx, option in enumerate(Options):
+            padyt = 10 if idx != 0 else 20
+            button = tk.Button(frame, text=OptionLabels[option], borderwidth=1, width=20, height=ROW_HEIGHT, command=lambda opt=option: self.on_click(opt))
             button.pack(padx=5, pady=(padyt, 5))
 
-    def on_click(self, view):
+    def on_click(self, option):
         super().close()
-        self.on_select_page(view)
+        view = OptionViews[option]
+        if view == Views.GAME:
+            self.on_select_page(view, game_mode=OptionGameModes[option])
+        else:
+            self.on_select_page(view)
 
     def close(self):
         super().close()

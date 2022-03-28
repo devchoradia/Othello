@@ -1,5 +1,6 @@
 from model.game import Game
 from model.views import Views
+from model.game_mode import GameMode
 from view.home_view import HomeView
 from view.game_view import GameView
 from view.settings_view import SettingsView
@@ -24,10 +25,9 @@ class AppController:
         self.root.after(1000, lambda: self.on_select_page(self.current_view))
         self.root.mainloop()
 
-    def start_game(self):
+    def start_game(self, game_mode=GameMode.LOCAL):
         game = Game(board_size = self.board_size)
-        game_view = GameView(root=self.root, board=game.board, on_home=self.on_home, board_color = self.board_color)
-        controller = GameController(game, game_view)
+        controller = GameController(game, root=self.root, game_mode=game_mode, on_home=self.on_home, board_color=self.board_color)
         controller.run_game()
 
     def display_home(self):
@@ -43,12 +43,12 @@ class AppController:
             submit_results=REGISTER_RESULT, result_messages=REGISTER_RESULT_MESSAGE, submit_label="REGISTER", switch_view_label="Log in")
         register.display()
 
-    def on_select_page(self, view):
+    def on_select_page(self, view, game_mode=None):
         self.current_view = view
         if view == Views.LOGIN:
             self.display_login()
         elif view == Views.GAME:
-            self.start_game()
+            self.start_game(game_mode)
         elif view == Views.SETTINGS:
             self.display_settings()
         elif view == Views.LEADERBOARD:
