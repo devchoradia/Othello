@@ -27,8 +27,7 @@ class AppController:
 
     def start_game(self, game_mode=GameMode.LOCAL):
         game = Game(board_size = self.board_size)
-        game_view = GameView(root=self.root, board=game.board, on_home=self.on_home, board_color = self.board_color)
-        controller = GameController(game, game_view, game_mode=game_mode)
+        controller = GameController(game, root=self.root, game_mode=game_mode, on_home=self.on_home, board_color=self.board_color)
         controller.run_game()
 
     def display_home(self):

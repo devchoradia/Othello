@@ -18,7 +18,7 @@ class MinimaxAI:
         board_size = len(state)
         model = Game(board_size=board_size, board=state.copy(), curr_player=AI_PLAYER)
         if depth == 0:
-            return self.get_utility_value(state, AI_PLAYER), best_move
+            return self.get_utility_value(state), best_move
         best_value = float('-inf')
         moves = model.get_valid_moves(player=AI_PLAYER)
         for move in moves:
@@ -33,7 +33,7 @@ class MinimaxAI:
                 return best_value, best_move
             alpha = max(alpha, best_value)
         if len(moves) == 0:
-            return self.get_utility_value(state, AI_PLAYER), best_move
+            return self.get_utility_value(state), best_move
         return best_value, best_move
 
     def min_value(self, state, alpha, beta, depth=6):
@@ -45,7 +45,7 @@ class MinimaxAI:
         min_move = None
         model = Game(board_size=board_size, board=state.copy(), curr_player=HUMAN_PLAYER)
         if depth == 0:
-            return self.get_utility_value(state, HUMAN_PLAYER)
+            return self.get_utility_value(state)
         moves = model.get_valid_moves(player=HUMAN_PLAYER)
         for move in moves:
             model = Game(board_size=board_size, board=state.copy(), curr_player=HUMAN_PLAYER)
@@ -59,7 +59,7 @@ class MinimaxAI:
                 return min_value
             beta = min(beta, min_value)
         if len(moves) == 0:
-            return self.get_utility_value(state, HUMAN_PLAYER)
+            return self.get_utility_value(state)
         return min_value
 
     def is_uncapturable(self, board, player, row, col, direction):
@@ -109,12 +109,10 @@ class MinimaxAI:
                         opponent_score += 999
         return computer_score, opponent_score
 
-    def get_utility_value(self, state, player):
+    def get_utility_value(self, state):
         '''
         Returns the utility value of the given state
         '''
         computer_score, opponent_score, = self.heuristic(state)
-        if int(player) == int(HUMAN_PLAYER):
-            return opponent_score - computer_score
         return computer_score - opponent_score
     

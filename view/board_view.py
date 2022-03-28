@@ -10,13 +10,13 @@ MIN_TILE_LENGTH = 50
 
 # Renders the board
 class BoardView:
-    def __init__(self, board, root, board_color=PLAYER_COLOR[0]):
+    def __init__(self, board, root, on_click_move, board_color=PLAYER_COLOR[0]):
         self.board = board
         self.root = root
-        self.move_clicked = tk.Variable()
         self.board_color = board_color
         self.widgets = []
         self.illegal_move = None
+        self.on_click_move = on_click_move
 
     def display(self):
         self.illegal_move = None
@@ -51,7 +51,7 @@ class BoardView:
             tile_relief = None
 
         tile = tk.Label(frame, relief=tile_relief, borderwidth=1, text='    ',bg=tile_color)
-        tile.bind("<Button-1>", lambda x, r=row, c=col: self.on_click_tile(row=r, col=c))
+        tile.bind("<Button-1>", lambda x, r=row, c=col: self.on_click_move(r, c))
         tile.pack(padx=pad_x, ipadx=ipad_x, pady=pad_x, ipady=ipad_x, expand=True, fill=tk.BOTH)
         return frame
 
@@ -65,18 +65,9 @@ class BoardView:
             frame = self.add_tile(old_row, old_col)
             self.widgets[old_row][old_col] = frame
         self.illegal_move = (row, col)
-
-    def on_click_tile(self, row, col):
-        self.move_clicked.set((row, col))
     
     def show_legal_moves(self, valid_moves):
         self.display(self, valid_moves)
-
-    def get_move(self):
-        self.move_clicked = tk.Variable()
-        initial_value = self.move_clicked.get()
-        self.widgets[0][0].wait_variable(self.move_clicked)
-        return self.move_clicked.get()
     
     def get_tile_color(self, player, is_illegal):
         if player != 0:
