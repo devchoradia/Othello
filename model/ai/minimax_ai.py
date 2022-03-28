@@ -5,7 +5,7 @@ import numpy as np
 
 class MinimaxAI(AbstractMinimaxAI):
     def __init__(self,):
-        super().__init__(6)
+        super().__init__(4)
 
     def is_uncapturable(self, board, player, row, col, direction):
         '''

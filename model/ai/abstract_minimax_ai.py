@@ -1,6 +1,6 @@
 from model.player import Player, AI_PLAYER, HUMAN_PLAYER
+from model.game_state_manager import GameStateManager
 from abc import ABC, abstractmethod
-from model.game import Game
 import numpy as np
 
 '''
@@ -31,24 +31,19 @@ class AbstractMinimaxAI(ABC):
         '''
         best_move = None
         board_size = len(state)
-        model = Game(board_size=board_size, board=state.copy(), curr_player=AI_PLAYER)
-        if depth == 0:
+        moves = GameStateManager.get_valid_moves(state, player=AI_PLAYER)
+        if depth == 0 or len(moves) == 0:
             return self.get_utility_value(state), best_move
         best_value = float('-inf')
-        moves = model.get_valid_moves(player=AI_PLAYER)
-        for move in moves:
-            model = Game(board_size=board_size, board=state.copy(), curr_player=AI_PLAYER)
-            row, col = move
-            new_state = model.make_move(row, col)
-            a = self.min_value(model.board, alpha, beta, depth=depth-1)
-            if a == max(best_value, a):
+        for row, col in moves:
+            board = GameStateManager.make_move(state, AI_PLAYER, row, col)
+            min_value = self.min_value(board, alpha, beta, depth=depth-1)
+            best_value = max(best_value, min_value)
+            if best_value == min_value:
                 best_move = (row, col)
-            best_value = max(best_value, a)
             if best_value >= beta:
                 return best_value, best_move
             alpha = max(alpha, best_value)
-        if len(moves) == 0:
-            return self.get_utility_value(state), best_move
         return best_value, best_move
 
     def min_value(self, state, alpha, beta, depth):
@@ -57,24 +52,16 @@ class AbstractMinimaxAI(ABC):
         '''
         min_value = float('inf')
         board_size = len(state)
-        min_move = None
-        model = Game(board_size=board_size, board=state.copy(), curr_player=HUMAN_PLAYER)
-        if depth == 0:
+        moves = GameStateManager.get_valid_moves(state, player=HUMAN_PLAYER)
+        if depth == 0 or len(moves) == 0:
             return self.get_utility_value(state)
-        moves = model.get_valid_moves(player=HUMAN_PLAYER)
-        for move in moves:
-            model = Game(board_size=board_size, board=state.copy(), curr_player=HUMAN_PLAYER)
-            row, col = move
-            new_state = model.make_move(row, col)
-            max_value, max_move = self.max_value(model.board, alpha, beta, depth-1)
-            if max_value == min(min_value, max_value):
-                min_move = (row, col)
-            min_value = max(min_value, max_value)
+        for row, col in moves:
+            board = GameStateManager.make_move(state, HUMAN_PLAYER, row, col)
+            max_value, max_move = self.max_value(board, alpha, beta, depth-1)
+            min_value = min(min_value, max_value)
             if min_value <= alpha:
                 return min_value
             beta = min(beta, min_value)
-        if len(moves) == 0:
-            return self.get_utility_value(state)
         return min_value
 
     @abstractmethod

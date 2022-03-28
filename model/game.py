@@ -160,5 +160,6 @@ class Game:
     # Determines whether the board is full
     def is_board_full(self):
         return not np.any(self.board == 0)
+
     
     
