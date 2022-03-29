@@ -10,7 +10,6 @@ AbstractMinimaxAI defines the skeleton of the minimax algorithm, but leaves the 
 
 Different levels of the AI might implement different heuristics and calculate different depths of gameplay.
 '''
-
 class AbstractMinimaxAI(ABC):
     '''
     Abstract class a minimax ai player

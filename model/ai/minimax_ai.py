@@ -7,9 +7,12 @@ class MinimaxAI(AbstractMinimaxAI):
     def __init__(self,):
         super().__init__(4)
 
-    def is_uncapturable(self, board, player, row, col, direction):
+    def is_uncapturable(self, board, player, row, col, d):
         '''
-        Determines whether the location on the given board is uncapturable
+        Determines whether the player's tile at the given location is uncapturable.
+        A tile is "uncapturable" if it is either:
+            - a corner tile
+            - an edge tile where the remaining tiles along that edge, in at least one direction, are the same color.
         '''
         board_size = len(board)
         corner_tiles = [(0, 0), (0, board_size - 1), (board_size - 1, 0), (board_size - 1, board_size - 1)]
@@ -17,21 +20,21 @@ class MinimaxAI(AbstractMinimaxAI):
         if (row, col) in corner_tiles:
             return True
         elif col == board_size - 1 or col == 0:
-            if direction == 0 or direction == -1:
+            if d == 0 or d == -1:
                 if board[row - 1, col] == int(player):
                     is_uncapturable = self.is_uncapturable(board, int(player), row - 1, col, -1)
-                    if is_uncapturable == True:
+                    if is_uncapturable:
                         return is_uncapturable
-            if direction == 0 or direction == 1:
+            if d == 0 or d == 1:
                 if board[row + 1, col] == int(player):
                     return self.is_uncapturable(board, int(player), row + 1, col, 1)
         elif row == board_size - 1 or row == 0:
-            if direction == 0 or direction == -1:
+            if d == 0 or d == -1:
                 if board[row, col - 1] == int(player):
                     is_uncapturable = self.is_uncapturable(board, int(player), row, col - 1, -1)
-                    if is_uncapturable == True:
+                    if is_uncapturable:
                         return is_uncapturable
-            if direction == 0 or direction == 1:
+            if d == 0 or d == 1:
                 if board[row, col + 1] == int(player):
                     return self.is_uncapturable(board, int(player), row, col + 1, 0)
         return False

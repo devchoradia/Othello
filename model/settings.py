@@ -66,6 +66,9 @@ class SettingsBaseClass:
     def get_game_mode(self):
         return self.state[Setting.GAME_MODE]
 
+'''
+Thread-safe singleton settings class
+'''
 class Settings(SettingsBaseClass):
     _instance = None
     _lock = threading.Lock()
