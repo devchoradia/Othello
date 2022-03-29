@@ -1,8 +1,10 @@
 from model.player import Player
 import numpy as np
+from model.observer import Observable
 
-class Game:
+class Game(Observable):
     def __init__(self, board_size = 8, board=None, curr_player=Player.BLACK):
+        super().__init__()
         if board_size < 3:
             print("Invalid board size. Using default 8x8 board.")
             board_size = 8
@@ -26,6 +28,7 @@ class Game:
     def make_move(self, row, col):
         self.board[row, col] = int(self.curr_player)
         self.update_tiles(row, col)
+        self.notify_observers()
 
     # Finds captured tiles based on the player's move and updates them
     def update_tiles(self, row, col):
@@ -60,6 +63,7 @@ class Game:
     # Switches the player turn
     def switch_player_turn(self):
         self.curr_player = Player(len(Player) + 1 - self.curr_player)
+        self.notify_observers()
 
     # Determines whether the given move is legal/valid
     def is_legal_move(self, row, col, player=None):

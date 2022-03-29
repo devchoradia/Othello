@@ -3,20 +3,22 @@ import tkinter as tk
 import threading
 import time
 from view.abstract_page_view import STICKY
+from model.observer import Observable
 
 ILLEGAL_MOVE_COLOR = "red"
 ROW_KEY = "tile"
 MIN_TILE_LENGTH = 50
 
 # Renders the board
-class BoardView:
-    def __init__(self, board, root, on_click_move, board_color=PLAYER_COLOR[0]):
+class BoardView(Observable):
+    def __init__(self, board, root, board_color=PLAYER_COLOR[0]):
+        super().__init__()
         self.board = board
         self.root = root
         self.board_color = board_color
         self.widgets = []
         self.illegal_move = None
-        self.on_click_move = on_click_move
+        self.requested_move = tk.Variable()
 
     def display(self):
         self.illegal_move = None
@@ -54,6 +56,13 @@ class BoardView:
         tile.bind("<Button-1>", lambda x, r=row, c=col: self.on_click_move(r, c))
         tile.pack(padx=pad_x, ipadx=ipad_x, pady=pad_x, ipady=ipad_x, expand=True, fill=tk.BOTH)
         return frame
+
+    def on_click_move(self, row, col):
+        self.requested_move.set((row, col))
+        self.notify_observers()
+
+    def get_requested_move(self):
+        return self.requested_move.get()
 
     def display_illegal_move(self, row, col):
         self.widgets[row][col].destroy()
