@@ -37,9 +37,27 @@ INITIAL_STATE = {
     Setting.GAME_MODE: GameMode.LOCAL
 }
 
-class SettingsBaseClass:
-    def __init__(self, state):
-        self.state = state
+'''
+Thread-safe singleton settings class.
+This makes sure only one settings class is instantiated so that a single state can be shared/accessed among different components,
+and is only altered by one instance.
+'''
+class Settings:
+    _instance = None
+    _lock = threading.Lock()
+    state = {
+        Setting.BOARD_SIZE: 4,
+        Setting.BOARD_COLOR: PLAYER_COLOR[0],
+        Setting.GAME_MODE: GameMode.LOCAL
+    }
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls, *args, **kwargs)
+                    print("h")
+        return cls._instance
     
     def get_setting_label(self, setting: Setting):
         return SETTING_LABELS[setting]
@@ -68,21 +86,3 @@ class SettingsBaseClass:
 
     def get_game_mode(self):
         return self.state[Setting.GAME_MODE]
-
-'''
-Thread-safe singleton settings class.
-This makes sure only one settings class is instantiated so that a single state can be shared/accessed among different components.
-'''
-class Settings(SettingsBaseClass):
-    _instance = None
-    _lock = threading.Lock()
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
-
-    def __init__(cls):
-        super().__init__(INITIAL_STATE)
