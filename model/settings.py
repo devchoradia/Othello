@@ -31,12 +31,15 @@ SETTING_OPTIONS = {
     Setting.GAME_MODE: [GameMode.LOCAL, GameMode.AI]
 }
 
+INITIAL_STATE = {
+    Setting.BOARD_SIZE: 4,
+    Setting.BOARD_COLOR: PLAYER_COLOR[0],
+    Setting.GAME_MODE: GameMode.LOCAL
+}
+
 class SettingsBaseClass:
-    state = {
-        Setting.BOARD_SIZE: 4,
-        Setting.BOARD_COLOR: PLAYER_COLOR[0],
-        Setting.GAME_MODE: GameMode.LOCAL
-    }
+    def __init__(self, state):
+        self.state = state
     
     def get_setting_label(self, setting: Setting):
         return SETTING_LABELS[setting]
@@ -67,7 +70,8 @@ class SettingsBaseClass:
         return self.state[Setting.GAME_MODE]
 
 '''
-Thread-safe singleton settings class
+Thread-safe singleton settings class.
+This makes sure only one settings class is instantiated so that a single state can be shared/accessed among different components.
 '''
 class Settings(SettingsBaseClass):
     _instance = None
@@ -79,3 +83,6 @@ class Settings(SettingsBaseClass):
                 if cls._instance is None:
                     cls._instance = super().__new__(cls, *args, **kwargs)
         return cls._instance
+
+    def __init__(cls):
+        super().__init__(INITIAL_STATE)
