@@ -1,4 +1,4 @@
-from model.player import Player, AI_PLAYER, HUMAN_PLAYER
+from model.player.player import Player, AI_PLAYER, HUMAN_PLAYER
 from model.game import Game
 from model.ai.abstract_minimax_ai import AbstractMinimaxAI
 import numpy as np

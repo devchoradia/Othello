@@ -1,6 +1,6 @@
 import tkinter as tk
 from view.abstract_page_view import AbstractPageView, STICKY
-from model.player import PLAYER_COLOR
+from model.player.player import PLAYER_COLOR
 from model.views import Views
 from model.settings import Settings, Setting, GameMode
 

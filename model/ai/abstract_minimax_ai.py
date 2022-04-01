@@ -1,4 +1,4 @@
-from model.player import Player, AI_PLAYER, HUMAN_PLAYER
+from model.player.player import Player, AI_PLAYER, HUMAN_PLAYER
 from model.game_state_manager import GameStateManager
 from abc import ABC, abstractmethod
 import numpy as np

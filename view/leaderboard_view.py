@@ -1,4 +1,4 @@
-from model.player import PLAYER_COLOR
+from model.player.player import PLAYER_COLOR
 import tkinter as tk
 from view.abstract_page_view import AbstractPageView, STICKY
 import threading

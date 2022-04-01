@@ -1,5 +1,5 @@
 from view.abstract_page_view import AbstractPageView, STICKY
-from model.player import PLAYER_COLOR
+from model.player.player import PLAYER_COLOR
 from model.views import Views
 from view.board_view import BoardView, ROW_KEY, MIN_TILE_LENGTH
 import tkinter as tk

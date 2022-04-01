@@ -8,8 +8,12 @@ from view.register import Register
 from view.login import AccountInfoView
 from controller.game_controller import GameController
 from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT, REGISTER_RESULT_MESSAGE
-from model.player import PLAYER_COLOR
-from model.settings import Settings, Setting
+from model.player.player import Player
+from model.player.AIPlayer import AIPlayer
+from model.player.LocalPlayer import LocalPlayer
+from model.player.RemotePlayer import RemotePlayer
+from model.settings import Settings, Setting, GameMode
+from model.ai.minimax_ai import MinimaxAI
 import tkinter as tk
 
 class AppController:
@@ -26,7 +30,15 @@ class AppController:
     def start_game(self):
         game = Game(board_size = Settings().get_board_size())
         view = GameView(root=self.root, board=game.board, on_home=self.on_home, board_color = Settings().get_board_color())
-        controller = GameController(game, view, game_mode=Settings().get_game_mode())
+        game_mode = Settings().get_game_mode()
+        players = [LocalPlayer(view)]
+        if game_mode == GameMode.LOCAL:
+            players.append(LocalPlayer(view, player_color=Player.WHITE))
+        elif game_mode == GameMode.AI:
+            players.append(AIPlayer(ai=MinimaxAI(), view=view))
+        else:
+            raise ValueError("Received invalid game mode: " + str(game_mode))
+        controller = GameController(game, view, players=players)
         controller.run_game()
 
     def display_home(self):

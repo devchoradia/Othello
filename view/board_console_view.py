@@ -1,4 +1,4 @@
-from model.player import PLAYER_SYMBOL
+from model.player.player import PLAYER_SYMBOL
 
 TILE_WIDTH = 4
 EMPTY_TILE = ' ' * TILE_WIDTH

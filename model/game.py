@@ -1,4 +1,4 @@
-from model.player import Player
+from model.player.player import Player
 import numpy as np
 from model.observer import Observable
 
@@ -26,6 +26,9 @@ class Game(Observable):
 
     # Performs the given move for the current player, and updates the resulting captured tiles
     def make_move(self, row, col):
+        '''
+        Once the board is updated, notify the observers
+        '''
         self.board[row, col] = int(self.curr_player)
         self.update_tiles(row, col)
         self.notify_observers()
@@ -62,6 +65,9 @@ class Game(Observable):
     
     # Switches the player turn
     def switch_player_turn(self):
+        '''
+        Once the current player is updated, notify the observers
+        '''
         self.curr_player = Player(len(Player) + 1 - self.curr_player)
         self.notify_observers()
 

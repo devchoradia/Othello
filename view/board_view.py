@@ -1,16 +1,15 @@
-from model.player import PLAYER_COLOR
+from model.player.player import PLAYER_COLOR
 import tkinter as tk
 import threading
 import time
 from view.abstract_page_view import STICKY
-from model.observer import Observable
 
 ILLEGAL_MOVE_COLOR = "red"
 ROW_KEY = "tile"
 MIN_TILE_LENGTH = 50
 
 # Renders the board
-class BoardView(Observable):
+class BoardView():
     def __init__(self, board, root, board_color=PLAYER_COLOR[0]):
         super().__init__()
         self.board = board
@@ -19,6 +18,7 @@ class BoardView(Observable):
         self.widgets = []
         self.illegal_move = None
         self.requested_move = tk.Variable()
+        self.move_handler = None
 
     def display(self):
         self.illegal_move = None
@@ -33,6 +33,12 @@ class BoardView(Observable):
                 frame = self.add_tile(row, col)
                 widgets.append(frame)
             self.widgets.append(widgets)
+    
+    def set_move_handler(self, move_handler):
+        self.move_handler = move_handler
+
+    def remove_move_handler(self):
+        self.move_handler = None
 
     def add_tile(self, row, col, is_illegal=False):
         player = self.board[row][col]
@@ -58,8 +64,12 @@ class BoardView(Observable):
         return frame
 
     def on_click_move(self, row, col):
+        '''
+        Whenever a click is moved, we notify the observers
+        '''
         self.requested_move.set((row, col))
-        self.notify_observers()
+        if self.move_handler != None:
+            self.move_handler()
 
     def get_requested_move(self):
         return self.requested_move.get()

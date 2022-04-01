@@ -1,5 +1,5 @@
 import threading
-from model.player import PLAYER_COLOR
+from model.player.player import PLAYER_COLOR
 from enum import IntEnum, Enum
 
 class GameMode(Enum):
