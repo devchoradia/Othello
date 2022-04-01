@@ -2,7 +2,8 @@ import tkinter as tk
 from view.abstract_page_view import AbstractPageView, STICKY
 from model.player.player import PLAYER_COLOR
 from model.views import Views
-from model.settings import Settings, Setting, GameMode
+from model.settings import Settings, Setting
+from model.game_mode import GameMode
 
 COLUMNS = ["Setting", "Value"]
 COLUMN_WIDTHS = [15, 15]
@@ -77,6 +78,6 @@ class SettingsView(AbstractPageView):
     def close(self):
         super().close()
         if(self.saved.get()):
-            for setting, value in self.setting_inputs.items():
-                Settings().update_setting(setting, value.get())
+            settings = {k: v.get() for k, v in self.setting_inputs.items()}
+            Settings().update_settings(settings)
         self.on_home()

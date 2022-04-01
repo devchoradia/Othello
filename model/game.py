@@ -31,7 +31,6 @@ class Game(Observable):
         '''
         self.board[row, col] = int(self.curr_player)
         self.update_tiles(row, col)
-        self.notify_observers()
 
     # Finds captured tiles based on the player's move and updates them
     def update_tiles(self, row, col):

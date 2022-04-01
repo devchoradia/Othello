@@ -48,14 +48,16 @@ class GameController(Observer):
         self.model.make_move(row, col)
         # End game if the game is over as a result. Otherwise, switch turns
         game_terminated = self.model.is_game_terminated()
+        # Switch player turns
+        self.model.switch_player_turn()
         if not game_terminated:
-            # Switch player turns
-            self.model.switch_player_turn()
             # If the other player has no turn, switch back
             if not self.model.has_valid_move():
                 self.model.switch_player_turn()
             # Request the move from the current player
             self.players[self.model.curr_player].request_move()
+        else:
+            self.end_game()
 
     # Displays the game using the GameView
     def update_view(self):

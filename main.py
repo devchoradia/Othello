@@ -10,5 +10,6 @@ from controller.app_controller import AppController
 from server.database_client import DatabaseClient
 
 client = DatabaseClient()
+client.get_game_state(" ")
 app = AppController(client)
 app.init_app()

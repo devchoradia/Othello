@@ -1,5 +1,18 @@
 from mysql.connector import connect, Error
 from enum import Enum
+import json
+from json import JSONEncoder
+from model.player.player import Player
+from model.game_mode import GameMode
+import numpy
+
+# https://pynative.com/python-serialize-numpy-ndarray-into-json/
+# To store game state to database
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
 
 class LOGIN_RESULT(Enum):
     SUCCESS = 1
@@ -34,7 +47,7 @@ class DatabaseClient:
         self.username = "team2"
         self.password = "password123!"
         self.database = "reversi"
-        self.set_up_database()
+        # self.set_up_database()
 
     def set_up_database(self):
         skip_database_config = input("Proceed with local database configuration? [Y/N]: ")
@@ -137,3 +150,87 @@ class DatabaseClient:
         finally:
             conn.close()
         return result
+
+    def update_game_state(self, board, current_player, username):
+        conn = self.make_connection()
+        statement = """
+            UPDATE users set gameState = %s, currentPlayer = %s where username = %s;
+        """
+        numpyData = {"board": board}
+        encodedBoard = json.dumps(numpyData, cls=NumpyArrayEncoder)
+        args = (encodedBoard, int(current_player), username)
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(statement, args)
+                conn.commit()
+        finally:
+            conn.close()
+
+    def remove_game_state(self, username):
+        conn = self.make_connection()
+        statement = """
+            UPDATE users set gameState = NULL, currentPlayer = NULL where username = %s;
+        """
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(statement, (username,))
+                conn.commit()
+        finally:
+            conn.close()
+
+    def get_game_state(self, username):
+        conn = self.make_connection()
+        statement = """
+            SELECT gameState, currentPlayer from users WHERE username = %s;
+        """
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(statement, (username,))
+                result = cursor.fetchall()
+                if len(result) == 0:
+                    print("Found no row with username " + username)
+                    return None, None
+                state, player_int = result[0]
+                if None in result[0] and any(i is not None for i in result[0]):
+                    print("Found interrupted state with missing value in database")
+                    print(result[0])
+                    return None, None
+                if None in result[0]:
+                    return None, None
+                decodedState = json.loads(state)
+                board = numpy.asarray(decodedState["board"])
+                player = Player(player_int)
+                return board, player
+        finally:
+            conn.close()
+
+    def get_settings(self, username):
+        conn = self.make_connection()
+        statement = """
+            SELECT boardSize, boardColor, gameMode from users WHERE username = %s;
+        """
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(statement, (username,))
+                result = cursor.fetchall()
+                if len(result) == 0:
+                    print("Found no row with username " + username)
+                    return None, None, None
+                board_size, board_color, game_mode = result[0]
+                game_mode = GameMode.fromstring(game_mode)
+                return board_size, board_color, game_mode
+        finally:
+            conn.close()
+
+    def update_settings(self, board_size, board_color, game_mode, username):
+        conn = self.make_connection()
+        statement = """
+            UPDATE users set boardSize = %s, boardColor = %s, gameMode = %s where username = %s;
+        """
+        args = (board_size, board_color, str(game_mode), username)
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(statement, args)
+                conn.commit()
+        finally:
+            conn.close()

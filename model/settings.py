@@ -1,18 +1,9 @@
 import threading
 from model.player.player import PLAYER_COLOR
 from enum import IntEnum, Enum
-
-class GameMode(Enum):
-    def __str__(self):
-        return str(self.value)
-
-    @classmethod
-    def fromstring(cls, str):
-        return getattr(cls, str.upper(), None)
-
-    LOCAL = "local"
-    AI = "AI"
-    REMOTE = "remote"
+from model.session import Session
+from server.database_client import DatabaseClient
+from model.game_mode import GameMode
 
 class Setting(IntEnum):
     BOARD_SIZE = 0
@@ -42,10 +33,15 @@ class Settings:
 
     def __init__(self):      
         if(self._initialized): return
+        board_size = 4
+        board_color = PLAYER_COLOR[0]
+        game_mode = GameMode.LOCAL
+        if Session().is_logged_in():
+            board_size, board_color, game_mode = DatabaseClient().get_settings(Session().get_username())
         self.state = {
-            Setting.BOARD_SIZE: 4,
-            Setting.BOARD_COLOR: PLAYER_COLOR[0],
-            Setting.GAME_MODE: GameMode.LOCAL
+            Setting.BOARD_SIZE: board_size,
+            Setting.BOARD_COLOR: board_color,
+            Setting.GAME_MODE: game_mode
         }
         self._initialized = True
 
@@ -66,15 +62,19 @@ class Settings:
     def get_setting(self, setting: Setting):
         return self.state[setting]
 
-    def update_setting(self, setting: Setting, value):
-        if setting == Setting.GAME_MODE and type(value) is str:
-            value = GameMode.fromstring(value)
-        if value not in SETTING_OPTIONS[setting]:
-            print("Attempted to set " + SETTING_LABELS[setting] + " as " + str(value))
-            return
-        self.state.update({
-            setting: value
-        })
+    def update_settings(self, settings):
+        board_size = settings[Setting.BOARD_SIZE]
+        board_color = settings[Setting.BOARD_COLOR]
+        game_mode = settings[Setting.GAME_MODE]
+        if type(game_mode) is str:
+            game_mode = GameMode.fromstring(game_mode)
+        self.state = {
+            Setting.BOARD_SIZE: board_size,
+            Setting.BOARD_COLOR: board_color,
+            Setting.GAME_MODE: game_mode
+        }
+        if Session().is_logged_in():
+            DatabaseClient().update_settings(board_size, board_color, game_mode, Session().get_username())
 
     def get_board_size(self):
         return self.state[Setting.BOARD_SIZE]

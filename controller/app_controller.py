@@ -12,12 +12,16 @@ from model.player.player import Player
 from model.player.AIPlayer import AIPlayer
 from model.player.LocalPlayer import LocalPlayer
 from model.player.RemotePlayer import RemotePlayer
-from model.settings import Settings, Setting, GameMode
+from model.settings import Settings, Setting
+from model.game_mode import GameMode
 from model.ai.minimax_ai import MinimaxAI
+from model.observer import Observer
+from model.session import Session
 import tkinter as tk
 
-class AppController:
+class AppController(Observer):
     def __init__(self, database_client: DatabaseClient):
+        super().__init__([])
         self.database_client = database_client
         self.current_view = Views.LOGIN
     
@@ -29,6 +33,13 @@ class AppController:
 
     def start_game(self):
         game = Game(board_size = Settings().get_board_size())
+        # Resume previous game if it was interrupted
+        if Session().is_logged_in():
+            board, current_player = self.database_client.get_game_state(Session().get_username())
+            if all(item is not None for item in (board, current_player)) and Settings().get_board_size() == len(board):
+                game = Game(board_size=len(board), board=board, curr_player=current_player)
+        self.game = game
+        game.add_observer(self)
         view = GameView(root=self.root, board=game.board, on_home=self.on_home, board_color = Settings().get_board_color())
         game_mode = Settings().get_game_mode()
         players = [LocalPlayer(view)]
@@ -84,16 +95,23 @@ class AppController:
     def on_login(self, username, password):
         result, (username, rating) = self.database_client.login(username, password)
         if result == LOGIN_RESULT.SUCCESS:
-            self.username = username
-            self.rating = rating
+            Session().log_in(username, rating)
         return result
 
     def on_register(self, username, password):
         result, (username, rating) = self.database_client.register_user(username, password)
         if result == LOGIN_RESULT.SUCCESS:
-            self.username = username
-            self.rating = rating
+            Session().log_in(username, rating)
         return result
+
+    def update(self, subject):
+        # Don't save game state if user is playing remotely
+        if not Session().is_logged_in() or Settings().get_game_mode() == GameMode.REMOTE:
+            return
+        if subject == self.game and self.game.is_game_terminated():
+            self.database_client.remove_game_state(Session().get_username())
+        elif subject == self.game:
+            self.database_client.update_game_state(subject.board, subject.curr_player, Session().get_username())
 
     def on_win(self):
         pass
