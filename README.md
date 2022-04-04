@@ -14,7 +14,7 @@ or manually download here: https://dev.mysql.com/downloads/connector/python/
 4. `pip install -r requirements.txt`
 
 ## Database Info
-* Online database was set on a virtual machine IP: 144.202.8.233
+* Online database was set on a virtual machine IP: 144.202.8.233 PORT: 3306
 * username: team2
 * password: password123
 * database: reversi
