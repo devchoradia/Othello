@@ -30,18 +30,18 @@ REGISTER_RESULT_MESSAGE = {
 
 class DatabaseClient:
     def __init__(self):
-        self.host = "localhost"
+        self.host = "144.202.8.233"
         self.username = "team2"
-        self.password = "password123!"
+        self.password = "password123"
         self.database = "reversi"
         self.set_up_database()
 
     def set_up_database(self):
         skip_database_config = input("Proceed with local database configuration? [Y/N]: ")
         if (skip_database_config != "N" and skip_database_config != "n"):
-            self.host = input("Enter local database host: ")
-            self.username = input("Enter username: ")
-            self.password = input("Enter password: ")
+            self.host = "localhost"
+            self.username = "team2"
+            self.password = "password123!"
 
     def make_connection(self):
         try:
