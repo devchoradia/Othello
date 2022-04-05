@@ -121,7 +121,7 @@ class AccountInfoView(PageView):
     
     def display_error(self, result):
         l = Label(self, text=self.result_messages[result], bg='white', fg='red', font = 'Helvetica 14')
-        l.place(relx=0.5, rely=0.68, anchor=CENTER)
+        l.place(relx=0.5, rely=0.73, anchor=CENTER)
         if self.error is not None:
             self.error.destroy()
         self.error = l
