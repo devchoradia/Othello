@@ -13,5 +13,11 @@ or manually download here: https://dev.mysql.com/downloads/connector/python/
 3. `pip install --upgrade pip`
 4. `pip install -r requirements.txt`
 
+## Database Info
+* Online database was set on a virtual machine IP: 144.202.8.233 PORT: 3306
+* username: team2
+* password: password123
+* database: reversi
+
 ## Run the game
 In the command line, run: `python3 main.py`
