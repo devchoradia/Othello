@@ -23,12 +23,10 @@ class AppController(Observer):
     def __init__(self, database_client: DatabaseClient):
         super().__init__([])
         self.database_client = database_client
-        self.current_view = Views.LOGIN
     
     def init_app(self):
         self.root = tk.Tk()
-        self.root['background'] = '#cfbd9b'
-        self.root.after(1000, lambda: self.on_select_page(self.current_view))
+        self.root.after(1000, lambda: self.display_login())
         self.root.mainloop()
 
     def start_game(self):
@@ -40,7 +38,9 @@ class AppController(Observer):
                 game = Game(board_size=len(board), board=board, curr_player=current_player)
         self.game = game
         game.add_observer(self)
-        view = GameView(root=self.root, board=game.board, on_home=self.on_home, board_color = Settings().get_board_color())
+        view = GameView(master=self.root, board=game.board, on_home=self.on_home, board_color = Settings().get_board_color())
+        self.current_view = view
+        view.display()
         game_mode = Settings().get_game_mode()
         players = [LocalPlayer(view)]
         if game_mode == GameMode.LOCAL:
@@ -53,20 +53,20 @@ class AppController(Observer):
         controller.run_game()
 
     def display_home(self):
-        home = HomeView(on_select_page=self.on_select_page, root=self.root)
-        home.display()
+        self.current_view = HomeView(on_select_page=self.on_select_page, master=self.root)
+        self.current_view.display()
 
     def display_login(self):
-        login = AccountInfoView(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER), on_home=self.on_home)
-        login.display()
+        self.current_view = AccountInfoView(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER), on_home=self.on_home)
+        self.current_view.display()
 
     def display_register(self):
-        register = AccountInfoView(self.root, self.on_register, lambda: self.on_select_page(Views.LOGIN), self.on_home, view=Views.REGISTER, \
+        self.current_view = AccountInfoView(self.root, self.on_register, lambda: self.on_select_page(Views.LOGIN), self.on_home, view=Views.REGISTER, \
             submit_results=REGISTER_RESULT, result_messages=REGISTER_RESULT_MESSAGE, submit_label="REGISTER", switch_view_label="Log in")
-        register.display()
+        self.current_view.display()
 
     def on_select_page(self, view):
-        self.current_view = view
+        self.current_view.destroy()
         if view == Views.LOGIN:
             self.display_login()
         elif view == Views.GAME:
@@ -82,12 +82,12 @@ class AppController(Observer):
         
     def display_leaderboard(self):
         players = self.database_client.get_leaderboard()
-        leaderboard = LeaderboardView(root=self.root, players=players, on_home=self.on_home)
-        leaderboard.display()
+        self.current_view = LeaderboardView(self.root, players=players, on_home=self.on_home)
+        self.current_view.display()
     
     def display_settings(self):
-        settings = SettingsView(root=self.root, on_home=self.on_home)
-        settings.display()
+        self.current_view = SettingsView(master=self.root, on_home=self.on_home)
+        self.current_view.display()
 
     def on_home(self):
         self.on_select_page(Views.HOME)

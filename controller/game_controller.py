@@ -14,7 +14,6 @@ class GameController(Observer):
 
     # Run the game
     def run_game(self):
-        self.view.display()
         self.view.display_current_player(self.model.curr_player)
         self.players[self.model.curr_player].request_move()
 

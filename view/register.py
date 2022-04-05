@@ -1,11 +1,12 @@
 from tkinter import *
-from view.abstract_page_view import AbstractPageView
+from view.abstract_page_view import AbstractPageView, APP_COLOR
 from model.views import Views
 from server.database_client import REGISTER_RESULT, REGISTER_RESULT_MESSAGE
 
 class Register(AbstractPageView):
     def __init__(self, root, on_register, on_login, on_home):
         super().__init__(root, Views.REGISTER)
+        self.root['background'] = APP_COLOR
         self.on_login = on_login
         self.on_home = on_home
         self.on_register = on_register
@@ -27,8 +28,6 @@ class Register(AbstractPageView):
 
         t = ('Consolas', 13)
 
-
-
         f2 = Frame(self.root, width=250, height=400, bg='white')
         f2.place(x=50, y=50)
 
@@ -40,14 +39,6 @@ class Register(AbstractPageView):
         e4.config(font= t)
         e4.place(x=80, y=230)
         e4.bind('<Return>', lambda x: self.click_register())
-
-        # We'll add this once we add emails
-        # l1 = Label(self.root, text='email-id', bg='white', font='Helvetica 15 bold')
-        # l1.place(x=80, y=200)
-
-        # e1 = Entry(self.root, width=20, border=0)
-        # e1.config(font= t)
-        # e1.place(x=80, y=230)
 
         e2 = Entry(self.root, width=20, border=0, show='*', textvariable=self.password, fg="black", bg="white", highlightbackground="white")
         e2.config(font=t)
@@ -66,15 +57,11 @@ class Register(AbstractPageView):
 
         b2 = Button(self.root, text = "Log in", bg='white', fg = 'blue', font = 'Helvetica 10', command=self.on_login, highlightbackground="white")
         b2.place(x = 68, y = 422)
-    
-    def close(self):
-        super().close()
-        self.root.geometry("")
 
     def click_register(self):
         result = self.on_register(self.username.get(), self.password.get())
         if result == REGISTER_RESULT.SUCCESS:
-            self.close()
+            self.destroy()
             self.on_home()
         else:
             self.display_error(result)

@@ -19,4 +19,4 @@ class AIPlayer(GamePlayer):
         return self.ai.decision(self.board_view.board)
 
     def request_move(self):
-        self.board_view.root.after(1000, self.notify_observers)
+        self.board_view.master.after(1000, self.notify_observers)

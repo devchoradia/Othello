@@ -1,32 +1,28 @@
-from view.abstract_page_view import AbstractPageView, STICKY
-from model.player.player import PLAYER_COLOR
-from model.views import Views
+from view.abstract_page_view import STICKY, ROW_HEIGHT, PageView, BUTTON_FONT, APP_COLOR
+from model.player.player import PLAYER_COLOR, Player
+from model.views import Views, VIEW_TITLES
 from view.board_view import BoardView, ROW_KEY, MIN_TILE_LENGTH
 import tkinter as tk
 
-class GameView(AbstractPageView):
-    def __init__(self, root, board, board_color, on_home):
-        super().__init__(root, Views.GAME, columnspan=len(board), on_home=on_home)
+class GameView(PageView):
+    def __init__(self, master, board, board_color, on_home):
+        super().__init__(master, Views.GAME, on_home=on_home)
+        self['background'] = 'white'
         self.board = board
-        self.root.geometry(f'{MIN_TILE_LENGTH*len(board)}x{MIN_TILE_LENGTH*(len(board)+2)}')
-        self.root.aspect(len(board), len(board)+2, len(board), len(board)+2)
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
-        self.board_view = BoardView(board, root, board_color)
         self.board_color = board_color
+        self.add_title()
 
     def display(self):
-        self.display_board()
+        self.add_current_player()
+        self.board_view = BoardView(self.board, self, self.board_color)
         self.add_navigator()
+        self.pack(expand=True, fill=tk.BOTH)
 
     def display_current_player(self, player):
-        self.root.rowconfigure(len(self.board), weight=1, uniform=ROW_KEY,  minsize=MIN_TILE_LENGTH)
-        label = tk.Label(relief=tk.RAISED, borderwidth=2, font=("Arial", 16), text=f"Player move: {PLAYER_COLOR[player]}",bg=self.board_color, fg="black")
-        label.grid(row=len(self.board), columnspan=len(self.board), sticky=STICKY)
-        self.add_navigator()
+        self.current_player_label.config(text=f"Player move: {PLAYER_COLOR[player]}")
 
     def display_board(self):
-        self.board_view.display()
+        self.board_view.update_board()
 
     def display_illegal_move(self, row, col):
         self.board_view.display_illegal_move(row, col)
@@ -34,23 +30,16 @@ class GameView(AbstractPageView):
     def get_move(self):
         return self.board_view.get_move()
 
+    def add_current_player(self, player=Player.BLACK):
+        frame = tk.Frame(self, bg="white", borderwidth=1)
+        frame.pack(expand=True, fill=tk.BOTH)
+        label = tk.Label(frame, borderwidth=2, font=BUTTON_FONT, height=ROW_HEIGHT, text=f"Player move: {PLAYER_COLOR[player]}",bg='white', fg="black")
+        label.pack(padx=10, pady=10)
+        self.current_player_label = label
+
     def display_winner(self, player):
         result_string = f"{PLAYER_COLOR[player].upper()} WINS"
         if player == 0:
             result_string = "DRAW"
-        label = tk.Label(relief=tk.RAISED, borderwidth=2, width=5, height=2, font=("Arial", 20), text=result_string,bg=self.board_color, fg="black")
-        label.grid(row=len(self.board), columnspan=len(self.board), sticky= STICKY)
-        self.add_navigator()
-
-    def add_navigator(self):
-        self.root.rowconfigure(len(self.board)+1, weight=1, uniform=ROW_KEY, minsize=MIN_TILE_LENGTH)
-        super().add_navigator(len(self.board)+1, bg=self.board_color, omit_height=True, use_grid=True, pady=15)
-    
-    def close(self):
-        self.board_view.clear_frame()
-        super().close()
-        self.root['background'] = 'white'
-        self.root.aspect("", "", "", "")
-        self.root.geometry("")
-        self.on_home()
+        self.current_player_label.config(text=result_string)
 
