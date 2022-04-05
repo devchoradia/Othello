@@ -33,8 +33,8 @@ class AppController(Observer):
         game = Game(board_size = Settings().get_board_size())
         # Resume previous game if it was interrupted
         if Session().is_logged_in():
-            board, current_player = self.database_client.get_game_state(Session().get_username())
-            if all(item is not None for item in (board, current_player)) and Settings().get_board_size() == len(board):
+            board, game_mode, current_player = self.database_client.get_game_state(Session().get_username())
+            if all(item is not None for item in (board, game_mode, current_player)) and Settings().get_board_size() == len(board) and game_mode == Settings().get_game_mode():
                 game = Game(board_size=len(board), board=board, curr_player=current_player)
         self.game = game
         game.add_observer(self)
@@ -111,7 +111,7 @@ class AppController(Observer):
         if subject == self.game and self.game.is_game_terminated():
             self.database_client.remove_game_state(Session().get_username())
         elif subject == self.game:
-            self.database_client.update_game_state(subject.board, subject.curr_player, Session().get_username())
+            self.database_client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())
 
     def on_win(self):
         pass

@@ -52,7 +52,7 @@ class BoardView(tk.Frame):
             for col in range(len(self.board)):
                 frame, tile = self.widgets[row][col]
                 player = self.board[row][col]
-                if self.get_tile_color(player) != tile.cget('bg'):
+                if self.get_tile_color(player) != tile.cget('bg') or (row, col) == self.illegal_move:
                     frame.destroy()
                     frame, tile = self.add_tile(row, col)
                     self.widgets[row][col] = (frame, tile)
@@ -125,9 +125,3 @@ class BoardView(tk.Frame):
         if player != 0:
             return PLAYER_COLOR[player]
         return self.board_color
-
-    def clear_frame(self):
-        pass
-        # widgets = self.root.winfo_children()
-        # for widget in widgets:
-        #     widget.destroy()

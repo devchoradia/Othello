@@ -151,14 +151,15 @@ class DatabaseClient:
             conn.close()
         return result
 
-    def update_game_state(self, board, current_player, username):
+    def update_game_state(self, board, game_mode, current_player, username):
         conn = self.make_connection()
         statement = """
-            UPDATE users set gameState = %s, currentPlayer = %s where username = %s;
+            INSERT INTO game_state (username, gameState, gameMode, currentPlayer) VALUES (%s, %s, %s, %s) 
+            ON DUPLICATE KEY UPDATE gameState = %s, gameMode = %s, currentPlayer = %s
         """
         numpyData = {"board": board}
         encodedBoard = json.dumps(numpyData, cls=NumpyArrayEncoder)
-        args = (encodedBoard, int(current_player), username)
+        args = (username, encodedBoard, str(game_mode), int(current_player), encodedBoard, str(game_mode), int(current_player))
         try:
             with conn.cursor() as cursor:
                 cursor.execute(statement, args)
@@ -169,7 +170,7 @@ class DatabaseClient:
     def remove_game_state(self, username):
         conn = self.make_connection()
         statement = """
-            UPDATE users set gameState = NULL, currentPlayer = NULL where username = %s;
+            DELETE FROM game_state where username = %s;
         """
         try:
             with conn.cursor() as cursor:
@@ -181,7 +182,7 @@ class DatabaseClient:
     def get_game_state(self, username):
         conn = self.make_connection()
         statement = """
-            SELECT gameState, currentPlayer from users WHERE username = %s;
+            SELECT gameState, gameMode, currentPlayer from game_state WHERE username = %s;
         """
         try:
             with conn.cursor() as cursor:
@@ -189,18 +190,19 @@ class DatabaseClient:
                 result = cursor.fetchall()
                 if len(result) == 0:
                     print("Found no row with username " + username)
-                    return None, None
-                state, player_int = result[0]
+                    return None, None, None
+                state, game_mode, player_int = result[0]
                 if None in result[0] and any(i is not None for i in result[0]):
                     print("Found interrupted state with missing value in database")
                     print(result[0])
-                    return None, None
+                    return None, None, None
                 if None in result[0]:
-                    return None, None
+                    return None, None, None
+                game_mode = GameMode.fromstring(game_mode)
                 decodedState = json.loads(state)
                 board = numpy.asarray(decodedState["board"])
                 player = Player(player_int)
-                return board, player
+                return board, game_mode, player
         finally:
             conn.close()
 

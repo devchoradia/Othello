@@ -2,8 +2,6 @@ CREATE TABLE `users` (
   `username` varchar(20) NOT NULL,
   `password` varchar(45) NOT NULL,
   `ELORating` int DEFAULT '0',
-  `gameState` json DEFAULT NULL,
-  `currentPlayer` int DEFAULT NULL,
   `gameMode` varchar(45) DEFAULT 'local',
   `boardColor` varchar(45) DEFAULT 'green',
   `boardSize` int DEFAULT '4',
