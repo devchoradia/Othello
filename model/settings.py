@@ -2,8 +2,8 @@ import threading
 from model.player.player import PLAYER_COLOR
 from enum import IntEnum, Enum
 from model.session import Session
-from server.database_client import DatabaseClient
 from model.game_mode import GameMode
+from client.client import Client
 
 class Setting(IntEnum):
     BOARD_SIZE = 0
@@ -19,7 +19,7 @@ SETTING_LABELS = {
 SETTING_OPTIONS = {
     Setting.BOARD_SIZE: [4, 6, 8, 10],
     Setting.BOARD_COLOR: ["green", "blue", "cyan", "yellow", "magenta"],
-    Setting.GAME_MODE: [GameMode.LOCAL, GameMode.AI]
+    Setting.GAME_MODE: [GameMode.LOCAL, GameMode.AI, GameMode.REMOTE]
 }
 
 '''
@@ -33,15 +33,11 @@ class Settings:
 
     def __init__(self):      
         if(self._initialized): return
-        board_size = 4
-        board_color = PLAYER_COLOR[0]
-        game_mode = GameMode.LOCAL
-        if Session().is_logged_in():
-            board_size, board_color, game_mode = DatabaseClient().get_settings(Session().get_username())
+        self.client = Client()
         self.state = {
-            Setting.BOARD_SIZE: board_size,
-            Setting.BOARD_COLOR: board_color,
-            Setting.GAME_MODE: game_mode
+            Setting.BOARD_SIZE: 4,
+            Setting.BOARD_COLOR: PLAYER_COLOR[0],
+            Setting.GAME_MODE: GameMode.LOCAL
         }
         self._initialized = True
 
@@ -74,7 +70,7 @@ class Settings:
             Setting.GAME_MODE: game_mode
         }
         if Session().is_logged_in():
-            DatabaseClient().update_settings(board_size, board_color, game_mode, Session().get_username())
+            self.client.update_settings(board_size, board_color, game_mode, Session().get_username())
 
     def get_board_size(self):
         return self.state[Setting.BOARD_SIZE]

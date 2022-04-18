@@ -5,7 +5,7 @@ from server.database_client import DatabaseClient
 from enum import Enum
 
 class Server:
-    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1203, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -71,6 +71,14 @@ class Server:
     def get_game_state(self, username):
         return self.database_client.get_game_state(username)
 
+    def update_settings(self, board_size, board_color, game_mode, username):
+        self.database_client.update_settings(board_size, board_color, game_mode, username)
+
+    def get_settings(self, username):
+        print("got here")
+        print(self.database_client.get_settings(username))
+        return self.database_client.get_settings(username)
+
     def compute_result(self, message):
         message_type = message.message_type
         body = message.body
@@ -87,6 +95,10 @@ class Server:
             return Message(Request.UPDATE_GAME_STATE, self.update_game_state(body['board'], body['game_mode'], body['current_player'], body['username']))
         elif message_type == Request.LEADERBOARD:
             return Message(Request.LEADERBOARD, self.get_leaderboard())
+        elif message_type == Request.UPDATE_SETTINGS:
+            self.update_settings(body['board_size'], body['board_color'], body['game_mode'], body['username'])
+        elif message_type == Request.GET_SETTINGS:
+            return Message(Request.GET_SETTINGS, self.get_settings(body['username']))
         return None
 
     class ChatMessage:
@@ -100,6 +112,8 @@ class Request(Enum):
     UPDATE_GAME_STATE = "update game state"
     GET_GAME_STATE = "get game state"
     LEADERBOARD = "leaderboard"
+    UPDATE_SETTINGS = "update settings"
+    GET_SETTINGS = "get settings"
 
 class Message:
     def __init__(self, message_type: Request, body):

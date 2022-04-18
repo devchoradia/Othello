@@ -101,6 +101,15 @@ class AppController(Observer):
     def on_login(self, username, password):
         self.client.login(username, password)
 
+    def update_settings(self, message_body):
+        board_size, board_color, game_mode = message_body
+        new_state = {
+            Setting.BOARD_SIZE: board_size,
+            Setting.BOARD_COLOR: board_color,
+            Setting.GAME_MODE: game_mode
+        }
+        Settings().update_settings(new_state)
+
     def handle_message(self, message):
         message_type = message.message_type
         body = message.body
@@ -111,11 +120,14 @@ class AppController(Observer):
             self.game_state = body
         elif message_type == Request.LEADERBOARD:
             self.display_leaderboard(body)
+        elif message_type == Request.GET_SETTINGS:
+            self.update_settings(body)
     
     def login_result(self, result, username, rating):
         if result == LOGIN_RESULT.SUCCESS:
             Session().log_in(username, rating)
             self.client.get_game_state(username)
+            self.client.get_settings(username)
         self.current_view.login_result(result)
 
     def on_register(self, username, password):
