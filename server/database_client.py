@@ -50,7 +50,7 @@ class DatabaseClient:
         # self.set_up_database()
 
     def set_up_database(self):
-        skip_database_config = input("Proceed with local database configuration? [Y/N]: ")
+        skip_database_config = input("Proceed with local database configuration? [Y(for local)/N(for online)]: ")
         if (skip_database_config != "N" and skip_database_config != "n"):
             self.host = "localhost"
             self.username = "team2"
