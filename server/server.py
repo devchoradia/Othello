@@ -2,15 +2,23 @@ import socket
 import pickle
 import threading
 from server.database_client import DatabaseClient
+from datetime import datetime
 from enum import Enum
+from model.player.player import Player
+import schedule
+import time
+from server.request import Request, Message
 
 class Server:
-    def __init__(self, host='127.0.0.1', port=1203, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
         self.clients = []
         self.database_client = DatabaseClient()
+        self.remote_connections = {}
+        self.remote_pairs = {}
+        self.remote_queue = []
 
     def start(self):
         with socket.socket() as my_socket:
@@ -38,20 +46,32 @@ class Server:
                     break
                 message = pickle.loads(message_binary)
                 print(f'Received message: {message}')
-                result = self.compute_result(message)
-                if result is not None:
-                    result_binary = pickle.dumps(result)
-                    conn.sendall(result_binary)
-                print('Client disconnected')
+                result = self.compute_result(message, conn)
+                self.send_message(result, conn)
+            print('Client disconnected')
             self.clients.remove(conn)
+            if conn in self.remote_connections.values():
+                user = list(self.remote_connections.keys())[list(mydict.values()).index(conn)]
+                print(f'Deleting connection {user} from remote_connections')
+                del self.remote_connections[user]
+                if user in self.remote_queue:
+                    self.remote_queue.remove(user)
+                else:
+                    opponent = self.remote_pairs.pop(user, None)
+                    self.remote_pairs.pop(opponent, None)
+                    self.remote_queue.remove()
             # text = f'{username} has disconnected from the chat'
-            print(text)
 
     def broadcast_message(self, text):
         message = ChatMessage(text)
         message_binary = pickles.dumps(message)
         for client in self.clients:
             client.sendall(message_binary)
+        
+    def send_message(self, result, conn):
+        if result is not None:
+            result_binary = pickle.dumps(result)
+            conn.sendall(result_binary)
 
     def on_login(self, username, password):
         return self.database_client.login(username, password)
@@ -75,11 +95,63 @@ class Server:
         self.database_client.update_settings(board_size, board_color, game_mode, username)
 
     def get_settings(self, username):
-        print("got here")
-        print(self.database_client.get_settings(username))
         return self.database_client.get_settings(username)
 
-    def compute_result(self, message):
+    def handle_remote_play(self, username, board_size, conn):
+        self.remote_connections[username] = conn
+        dt = datetime.now()
+        if len(self.remote_queue) == 0:
+            print("empty remote queue")
+            self.remote_queue.append((username, board_size, dt))
+            return
+        self.remote_queue.append((username, board_size, dt))
+        print("Foudn unempty remote queue")
+        print(self.remote_queue)
+        # Look for someone looking for same board size
+        schedule.every(5).seconds.do(lambda u=username, s=board_size: self.check_remote_queue(u, s)).tag(username)
+        thread = threading.Thread(target=self.run_scheduled_tasks, args=())
+        thread.start()
+
+    def run_scheduled_tasks(self):
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    def check_remote_queue(self, username, board_size):
+        print("Checking remote queue")
+        print(self.remote_queue)
+        now = datetime.now()
+        queue_index = len(self.remote_queue)
+        if username in self.remote_pairs:
+            schedule.clear(username)
+            return
+        for index, (opponent, opp_board_size, dt) in enumerate(self.remote_queue):
+            if opponent == username:
+                queue_index = index
+                continue
+            time_waited = now - dt
+            games_match = board_size == opp_board_size
+            if time_waited.total_seconds() >= 45 or games_match:
+                print("got match")
+                if index < queue_index:
+                    self.match_opponents(username, opponent, opp_board_size)
+                else:
+                    self.match_opponents(username, opponent, board_size)
+                del self.remote_queue[index]
+                current_user = next((x for x in self.remote_queue if x[0] == username), None)
+                if current_user is not None:
+                    self.remote_queue.remove(current_user)
+                return
+    
+    def match_opponents(self, username, opponent, board_size):
+        if opponent == self.remote_pairs.get(username, None) and username == self.remote_pairs.get(opponent, None):
+            return
+        self.remote_pairs[username] = opponent
+        self.remote_pairs[opponent] = username
+        self.send_message(Message(Request.REMOTE_PLAY, (opponent, board_size, Player.BLACK)), self.remote_connections[username])
+        self.send_message(Message(Request.REMOTE_PLAY, (username, board_size, Player.WHITE)), self.remote_connections[opponent])
+
+    def compute_result(self, message, conn):
         message_type = message.message_type
         body = message.body
         print(body)
@@ -99,23 +171,11 @@ class Server:
             self.update_settings(body['board_size'], body['board_color'], body['game_mode'], body['username'])
         elif message_type == Request.GET_SETTINGS:
             return Message(Request.GET_SETTINGS, self.get_settings(body['username']))
+        elif message_type == Request.REMOTE_PLAY:
+            return self.handle_remote_play(body['username'], body['board_size'], conn)
         return None
 
     class ChatMessage:
         def __init(self, text):
             self.text = text
 
-class Request(Enum):
-    LOGIN = "login"
-    REGISTER = "register"
-    REMOVE_GAME_STATE = "remove game state"
-    UPDATE_GAME_STATE = "update game state"
-    GET_GAME_STATE = "get game state"
-    LEADERBOARD = "leaderboard"
-    UPDATE_SETTINGS = "update settings"
-    GET_SETTINGS = "get settings"
-
-class Message:
-    def __init__(self, message_type: Request, body):
-        self.message_type = message_type
-        self.body = body

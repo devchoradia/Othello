@@ -1,10 +1,10 @@
 import socket
 import pickle
 import threading
-from server.server import Request, Message
+from server.request import Request, Message
 
 class Client:
-    def __init__(self, host='127.0.0.1', port=1203, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
         self.host = host # the server's host name or IP address
         self.port = port # the port used by the server
         self.buffer_size = buffer_size
@@ -55,6 +55,12 @@ class Client:
             'board_color': board_color,
             'game_mode': game_mode,
             'username': username
+        }))
+    
+    def request_opponent(self, username, board_size):
+        self.send_message(Message(Request.REMOTE_PLAY, {
+            'username': username,
+            'board_size': board_size
         }))
 
     def get_settings(self, username):

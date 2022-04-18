@@ -27,6 +27,7 @@ class AppController(Observer):
         self.client = Client()
         self.client.set_observer(self)
         self.game_state = (None, None, None)
+        self.remote_game_state = (None, None, None)
 
     def init_app(self):
         self.root = tk.Tk()
@@ -35,11 +36,19 @@ class AppController(Observer):
 
     def start_game(self):
         game = Game(board_size = Settings().get_board_size())
+        player_color = Player.BLACK
         # Resume previous game if it was interrupted
-        if Session().is_logged_in():
+        if Session().is_logged_in() and Settings().get_game_mode() == GameMode.REMOTE:
+            opponent, board_size, player_color = self.remote_game_state
+            if opponent is None:
+                self.request_opponent()
+                return
+            game = Game(board_size=board_size)
+        elif Session().is_logged_in():
             board, game_mode, current_player = self.game_state
             if all(item is not None for item in (board, game_mode, current_player)) and Settings().get_board_size() == len(board) and game_mode == Settings().get_game_mode():
-                game = Game(board_size=len(board), board=board, curr_player=current_player)
+                game = Game(board_size=len(board), game=game, curr_player=current_player)
+        self.current_view.destroy()
         self.game = game
         game.add_observer(self)
         view = GameView(master=self.root, board=game.board, on_home=self.on_home, board_color = Settings().get_board_color())
@@ -51,10 +60,16 @@ class AppController(Observer):
             players.append(LocalPlayer(view, player_color=Player.WHITE))
         elif game_mode == GameMode.AI:
             players.append(AIPlayer(ai=MinimaxAI(), view=view))
+        elif game_mode == GameMode.REMOTE:
+            players = [LocalPlayer(view, player_color=player_color), RemotePlayer(player_color=Player(len(Player) + 1 - player_color), board=game.board)]
         else:
             raise ValueError("Received invalid game mode: " + str(game_mode))
         controller = GameController(game, view, players=players)
         controller.run_game()
+
+    def request_opponent(self):
+        self.current_view.display_awaiting_component()
+        self.client.request_opponent(Session().get_username(), Settings().get_board_size())
 
     def display_home(self):
         self.current_view = HomeView(on_select_page=self.on_select_page, master=self.root)
@@ -70,18 +85,22 @@ class AppController(Observer):
         self.current_view.display()
 
     def on_select_page(self, view):
-        self.current_view.destroy()
         if view == Views.LOGIN:
+            self.current_view.destroy()
             self.display_login()
         elif view == Views.GAME:
             self.start_game()
         elif view == Views.SETTINGS:
+            self.current_view.destroy()
             self.display_settings()
         elif view == Views.LEADERBOARD:
+            self.current_view.destroy()
             self.request_leaderboard()
         elif view == Views.REGISTER:
+            self.current_view.destroy()
             self.display_register()
         else:
+            self.current_view.destroy()
             self.display_home()
 
     def request_leaderboard(self):
@@ -122,12 +141,21 @@ class AppController(Observer):
             self.display_leaderboard(body)
         elif message_type == Request.GET_SETTINGS:
             self.update_settings(body)
+        elif message_type == Request.REMOTE_PLAY:
+            self.remote_game_state = body
+            self.start_game()
     
     def login_result(self, result, username, rating):
+        print("loggin int")
+        print(result)
         if result == LOGIN_RESULT.SUCCESS:
+            print("logged in")
             Session().log_in(username, rating)
             self.client.get_game_state(username)
             self.client.get_settings(username)
+        elif result == REGISTER_RESULT.SUCCESS:
+            print("registered")
+            Session().log_in(username, rating)
         self.current_view.login_result(result)
 
     def on_register(self, username, password):

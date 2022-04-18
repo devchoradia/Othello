@@ -13,6 +13,7 @@ class HomeView(PageView):
         self['background'] = APP_COLOR
         self['borderwidth'] = 1
         self.configure(background="white")
+        self.loading_label = None
 
     def display(self):
         self.add_title()   
@@ -20,7 +21,16 @@ class HomeView(PageView):
             padyt = 10 if idx != 0 else 60
             button = tk.Button(self, text=VIEW_TITLES[view], font=BUTTON_FONT, borderwidth=1, width=20, height=ROW_HEIGHT, command=lambda v=view: self.on_click(v))
             button.pack(padx=5, pady=(padyt, 5))
+        frame = tk.Frame(self, bg="white")
+        frame.pack(expand=True, fill=tk.BOTH)
+        l = tk.Label(frame, text="", bg='white', fg='red', font = 'Helvetica 15')
+        l.pack(pady=10)
+        self.loading_label = l
         self.pack(fill=tk.BOTH, ipadx=50, ipady=50)
+
+    def display_awaiting_component(self):
+        if self.loading_label is not None:
+            self.loading_label.config(text="Looking for opponent...")
 
     def on_click(self, view):
         self.on_select_page(view)

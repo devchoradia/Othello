@@ -29,6 +29,7 @@ class Game(Observable):
         '''
         Once the board is updated, notify the observers
         '''
+        self.
         self.board[row, col] = int(self.curr_player)
         self.update_tiles(row, col)
 

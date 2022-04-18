@@ -34,6 +34,8 @@ class Settings:
     def __init__(self):      
         if(self._initialized): return
         self.client = Client()
+        if not Session().is_logged_in():
+            SETTING_OPTIONS[Setting.GAME_MODE].remove(GameMode.REMOTE)
         self.state = {
             Setting.BOARD_SIZE: 4,
             Setting.BOARD_COLOR: PLAYER_COLOR[0],
