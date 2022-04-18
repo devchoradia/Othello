@@ -17,13 +17,17 @@ from model.game_mode import GameMode
 from model.ai.minimax_ai import MinimaxAI
 from model.observer import Observer
 from model.session import Session
+from client.client import Client
+from server.server import Request
 import tkinter as tk
 
 class AppController(Observer):
-    def __init__(self, database_client: DatabaseClient):
+    def __init__(self):
         super().__init__([])
-        self.database_client = database_client
-    
+        self.client = Client()
+        self.client.set_observer(self)
+        self.game_state = (None, None, None)
+
     def init_app(self):
         self.root = tk.Tk()
         self.root.after(1000, lambda: self.display_login())
@@ -33,7 +37,7 @@ class AppController(Observer):
         game = Game(board_size = Settings().get_board_size())
         # Resume previous game if it was interrupted
         if Session().is_logged_in():
-            board, game_mode, current_player = self.database_client.get_game_state(Session().get_username())
+            board, game_mode, current_player = self.game_state
             if all(item is not None for item in (board, game_mode, current_player)) and Settings().get_board_size() == len(board) and game_mode == Settings().get_game_mode():
                 game = Game(board_size=len(board), board=board, curr_player=current_player)
         self.game = game
@@ -74,14 +78,16 @@ class AppController(Observer):
         elif view == Views.SETTINGS:
             self.display_settings()
         elif view == Views.LEADERBOARD:
-            self.display_leaderboard()
+            self.request_leaderboard()
         elif view == Views.REGISTER:
             self.display_register()
         else:
             self.display_home()
+
+    def request_leaderboard(self):
+        self.client.get_leaderboard()
         
-    def display_leaderboard(self):
-        players = self.database_client.get_leaderboard()
+    def display_leaderboard(self, players):
         self.current_view = LeaderboardView(self.root, players=players, on_home=self.on_home)
         self.current_view.display()
     
@@ -93,25 +99,41 @@ class AppController(Observer):
         self.on_select_page(Views.HOME)
 
     def on_login(self, username, password):
-        result, (username, rating) = self.database_client.login(username, password)
+        self.client.login(username, password)
+
+    def handle_message(self, message):
+        message_type = message.message_type
+        body = message.body
+        if message_type == Request.LOGIN or message_type == Request.REGISTER:
+            result, (username, rating) = body
+            self.login_result(result, username, rating)
+        elif message_type in [Request.GET_GAME_STATE, Request.REMOVE_GAME_STATE, Request.UPDATE_GAME_STATE]:
+            self.game_state = body
+        elif message_type == Request.LEADERBOARD:
+            self.display_leaderboard(body)
+    
+    def login_result(self, result, username, rating):
         if result == LOGIN_RESULT.SUCCESS:
             Session().log_in(username, rating)
-        return result
+            self.client.get_game_state(username)
+        self.current_view.login_result(result)
 
     def on_register(self, username, password):
-        result, (username, rating) = self.database_client.register_user(username, password)
-        if result == LOGIN_RESULT.SUCCESS:
-            Session().log_in(username, rating)
-        return result
+        self.client.register(username, password)
 
-    def update(self, subject):
+    def update(self, subject, message=None):
+        if subject == self.client:
+            self.handle_message(message)
         # Don't save game state if user is playing remotely
-        if not Session().is_logged_in() or Settings().get_game_mode() == GameMode.REMOTE:
+        elif not Session().is_logged_in() or Settings().get_game_mode() == GameMode.REMOTE:
+            print("logged in")
             return
-        if subject == self.game and self.game.is_game_terminated():
-            self.database_client.remove_game_state(Session().get_username())
+        elif subject == self.game and self.game.is_game_terminated():
+            print("removing game state")
+            self.client.remove_game_state(Session().get_username())
         elif subject == self.game:
-            self.database_client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())
+            print("updating game state")
+            self.client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())
 
     def on_win(self):
         pass

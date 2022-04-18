@@ -164,6 +164,7 @@ class DatabaseClient:
             with conn.cursor() as cursor:
                 cursor.execute(statement, args)
                 conn.commit()
+                return board, game_mode, current_player
         finally:
             conn.close()
 
@@ -176,6 +177,7 @@ class DatabaseClient:
             with conn.cursor() as cursor:
                 cursor.execute(statement, (username,))
                 conn.commit()
+                return None, None, None
         finally:
             conn.close()
 

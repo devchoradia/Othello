@@ -114,6 +114,8 @@ class AccountInfoView(PageView):
 
     def click_login(self):
         result = self.on_submit(self.username.get(), self.password.get())
+
+    def login_result(self, result):
         if result == self.submit_results.SUCCESS:
             self.on_home()
         else:
