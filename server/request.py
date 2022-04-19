@@ -11,6 +11,7 @@ class Request(Enum):
     GET_SETTINGS = "get settings"
     REMOTE_PLAY = "remote play"
     UPDATE_REMOTE_GAME = "update remote game"
+    END_REMOTE_GAME = "end remote game"
 
 class Message:
     def __init__(self, message_type: Request, body):

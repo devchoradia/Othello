@@ -10,7 +10,7 @@ import time
 from server.request import Request, Message
 
 class Server:
-    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -155,6 +155,19 @@ class Server:
         opponent = self.remote_connections[self.remote_pairs[username]]
         self.send_message(Message(Request.UPDATE_REMOTE_GAME, move), opponent)
 
+    def end_remote_game(self, username):
+        if username in self.remote_connections:
+            del self.remote_connections[username]
+        user_in_queue = next((x for x in self.remote_queue if x[0] == username), None)
+        if user_in_queue is not None:
+            self.remote_queue.remove(user_in_queue)
+        if username in self.remote_pairs:
+            opponent = self.remote_pairs[username]            
+            del self.remote_pairs[username]
+            if opponent in self.remote_pairs and self.remote_pairs[opponent] == username:
+                del self.remote_pairs[opponent]
+
+
     def compute_result(self, message, conn):
         message_type = message.message_type
         body = message.body
@@ -179,6 +192,8 @@ class Server:
             return self.handle_remote_play(body['username'], body['board_size'], conn)
         elif message_type == Request.UPDATE_REMOTE_GAME:
             self.handle_remote_game_update(body['username'], body['move'])
+        elif message_type == Request.END_REMOTE_GAME:
+            self.end_remote_game(body['username'])
         return None
 
     class ChatMessage:

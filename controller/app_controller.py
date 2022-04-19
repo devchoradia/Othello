@@ -172,8 +172,10 @@ class AppController(Observer):
             print("logged in")
             return
         elif subject == self.game and self.game.is_game_terminated():
-            print("removing game state")
             self.client.remove_game_state(Session().get_username())
+            if Settings().get_game_mode() == GameMode.REMOTE:
+                self.client.end_remote_game(Session().get_username())
+                self.remote_game_state = (None, None, None)
         elif subject == self.game:
             print("updating game state")
             self.client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())
