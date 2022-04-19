@@ -4,7 +4,7 @@ import threading
 from server.request import Request, Message
 
 class Client:
-    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
         self.host = host # the server's host name or IP address
         self.port = port # the port used by the server
         self.buffer_size = buffer_size
@@ -74,9 +74,10 @@ class Client:
             'username': username
         }))
 
-    def end_remote_game(self, username):
+    def end_remote_game(self, username, player_disrupted_game):
         self.send_message(Message(Request.END_REMOTE_GAME, {
-            'username': username
+            'username': username,
+            'player_disrupted_game': player_disrupted_game
         }))
 
     def send_message(self, message):

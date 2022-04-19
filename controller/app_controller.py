@@ -65,7 +65,7 @@ class AppController(Observer):
             players.append(AIPlayer(ai=MinimaxAI(), view=view))
         elif game_mode == GameMode.REMOTE:
             local_player = LocalPlayer(view, player_color=player_color)
-            remote_player = RemotePlayer(player_color=Player(len(Player) + 1 - player_color), game=game, local_player=local_player, client=self.client)
+            remote_player = RemotePlayer(player_color=Player(len(Player) + 1 - player_color), local_player=local_player, client=self.client, on_opponent_disconnect=self.on_opponent_disconnect)
             players = [local_player, remote_player]
             players.sort(key=lambda p: p.player_color)
         else:
@@ -76,13 +76,19 @@ class AppController(Observer):
             player.observers.reverse()
         controller.run_game()
 
-    def on_exit_game(self):
+    def on_opponent_disconnect(self, message):
+        self.on_exit_game(player_disrupted_game=False)
+        self.current_view.display_opponent_disconnected(message)
+
+    def on_exit_game(self, player_disrupted_game=True):
+        if self.game and self.game.is_game_terminated():
+            player_disrupted_game = False
         self.on_home()
-        self.end_remote_game()
+        self.end_remote_game(player_disrupted_game)
     
-    def end_remote_game(self):
+    def end_remote_game(self, player_disrupted_game):
         self.client.set_observer(self)
-        self.client.end_remote_game(Session().get_username())
+        self.client.end_remote_game(Session().get_username(), player_disrupted_game)
         self.remote_game_state = (None, None, None)
 
     def request_opponent(self):
@@ -103,8 +109,6 @@ class AppController(Observer):
         self.current_view.display()
 
     def on_select_page(self, view):
-        self.client.end_remote_game(Session().get_username())
-        self.remote_game_state = (None, None, None)
         if view == Views.LOGIN:
             self.current_view.destroy()
             self.display_login()

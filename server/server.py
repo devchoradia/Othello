@@ -10,7 +10,7 @@ import time
 from server.request import Request, Message
 
 class Server:
-    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -154,7 +154,7 @@ class Server:
         opponent = self.remote_connections[self.remote_pairs[username]]
         self.send_message(Message(Request.UPDATE_REMOTE_GAME, move), opponent)
 
-    def end_remote_game(self, username):
+    def end_remote_game(self, username, player_disrupted_game=False):
         user_in_queue = next((x for x in self.remote_queue if x[0] == username), None)
         if user_in_queue is not None:
             self.remote_queue.remove(user_in_queue)
@@ -162,9 +162,14 @@ class Server:
             opponent = self.remote_pairs[username]            
             del self.remote_pairs[username]
             if opponent in self.remote_pairs and self.remote_pairs[opponent] == username:
+                if player_disrupted_game:
+                    self.notify_opponent_disconnected(opponent)
                 del self.remote_pairs[opponent]
         schedule.clear(username)
 
+    def notify_opponent_disconnected(self, user):
+        if user in self.remote_connections:
+            self.send_message(Message(Request.OPPONENT_DISCONNECTED, "Opponent disconnected from the game"), self.remote_connections[user])
 
     def compute_result(self, message, conn):
         message_type = message.message_type
@@ -191,7 +196,7 @@ class Server:
         elif message_type == Request.UPDATE_REMOTE_GAME:
             self.handle_remote_game_update(body['username'], body['move'])
         elif message_type == Request.END_REMOTE_GAME:
-            self.end_remote_game(body['username'])
+            self.end_remote_game(body['username'], body['player_disrupted_game'])
         return None
 
     class ChatMessage:

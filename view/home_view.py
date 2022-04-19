@@ -32,6 +32,10 @@ class HomeView(PageView):
         if self.loading_label is not None:
             self.loading_label.config(text="Looking for opponent...")
 
+    def display_opponent_disconnected(self, message):
+        if self.loading_label is not None:
+            self.loading_label.config(text=message)
+
     def on_click(self, view):
         self.on_select_page(view)
 
