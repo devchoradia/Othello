@@ -57,6 +57,12 @@ class Client:
             'username': username
         }))
     
+    def update_remote_game(self, username, move):
+        self.send_message(Message(Request.UPDATE_REMOTE_GAME, {
+            'username': username,
+            'move': move
+        }))
+    
     def request_opponent(self, username, board_size):
         self.send_message(Message(Request.REMOTE_PLAY, {
             'username': username,

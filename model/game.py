@@ -10,6 +10,7 @@ class Game(Observable):
             board_size = 8
         self.board_size = board_size
         self.curr_player = curr_player
+        self.move_history = []
         if board is None:
             self.board = np.zeros((board_size, board_size), dtype=np.int)
             self.init_board()
@@ -29,7 +30,7 @@ class Game(Observable):
         '''
         Once the board is updated, notify the observers
         '''
-        self.
+        self.move_history.append((self.curr_player, (row, col)))
         self.board[row, col] = int(self.curr_player)
         self.update_tiles(row, col)
 

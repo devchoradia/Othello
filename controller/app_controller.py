@@ -61,7 +61,10 @@ class AppController(Observer):
         elif game_mode == GameMode.AI:
             players.append(AIPlayer(ai=MinimaxAI(), view=view))
         elif game_mode == GameMode.REMOTE:
-            players = [LocalPlayer(view, player_color=player_color), RemotePlayer(player_color=Player(len(Player) + 1 - player_color), board=game.board)]
+            local_player = LocalPlayer(view, player_color=player_color)
+            remote_player = RemotePlayer(player_color=Player(len(Player) + 1 - player_color), game=game, local_player=local_player, client=self.client)
+            players = [local_player, remote_player]
+            players.sort(key=lambda p: p.player_color)
         else:
             raise ValueError("Received invalid game mode: " + str(game_mode))
         controller = GameController(game, view, players=players)

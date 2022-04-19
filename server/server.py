@@ -151,6 +151,10 @@ class Server:
         self.send_message(Message(Request.REMOTE_PLAY, (opponent, board_size, Player.BLACK)), self.remote_connections[username])
         self.send_message(Message(Request.REMOTE_PLAY, (username, board_size, Player.WHITE)), self.remote_connections[opponent])
 
+    def handle_remote_game_update(self, username, move):
+        opponent = self.remote_connections[self.remote_pairs[username]]
+        self.send_message(Message(Request.UPDATE_REMOTE_GAME, move), opponent)
+
     def compute_result(self, message, conn):
         message_type = message.message_type
         body = message.body
@@ -173,6 +177,8 @@ class Server:
             return Message(Request.GET_SETTINGS, self.get_settings(body['username']))
         elif message_type == Request.REMOTE_PLAY:
             return self.handle_remote_play(body['username'], body['board_size'], conn)
+        elif message_type == Request.UPDATE_REMOTE_GAME:
+            self.handle_remote_game_update(body['username'], body['move'])
         return None
 
     class ChatMessage:
