@@ -29,6 +29,7 @@ class AppController(Observer):
         self.game_state = (None, None, None)
         self.remote_game_state = (None, None, None)
         self.game = None
+        self.is_awaiting_opponent = False
 
     def init_app(self):
         self.root = tk.Tk()
@@ -87,11 +88,13 @@ class AppController(Observer):
         self.end_remote_game(player_disrupted_game)
     
     def end_remote_game(self, player_disrupted_game):
+        self.is_awaiting_opponent = False
         self.client.set_observer(self)
         self.client.end_remote_game(Session().get_username(), player_disrupted_game)
         self.remote_game_state = (None, None, None)
 
     def request_opponent(self):
+        self.is_awaiting_opponent = True
         self.current_view.display_awaiting_component()
         self.client.request_opponent(Session().get_username(), Settings().get_board_size())
 
@@ -109,6 +112,11 @@ class AppController(Observer):
         self.current_view.display()
 
     def on_select_page(self, view):
+        # Stop requesting a remote game
+        if self.is_awaiting_opponent and view != Views.GAME:
+            print("Stopping remote game request")
+            self.end_remote_game(False)
+
         if view == Views.LOGIN:
             self.current_view.destroy()
             self.display_login()
@@ -166,6 +174,7 @@ class AppController(Observer):
         elif message_type == Request.GET_SETTINGS:
             self.update_settings(body)
         elif message_type == Request.REMOTE_PLAY:
+            self.is_awaiting_opponent = False
             self.remote_game_state = body
             self.start_game()
     
