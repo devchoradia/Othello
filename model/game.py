@@ -138,6 +138,8 @@ class Game(Observable):
         for player in Player:
             if self.has_valid_move(player):
                 has_valid_move = True
+        print("is_game_terminated:")
+        print(self.has_player_captured_all() or self.is_board_full() or not has_valid_move)
         return self.has_player_captured_all() or self.is_board_full() or not has_valid_move
 
     # Returns whether the current player has captured all of their opponents tiles

@@ -19,18 +19,23 @@ class RemotePlayer(GamePlayer):
         self.requested_moves = []
 
     def get_requested_move(self) -> (int, int):
+        print(self.requested_moves)
         return self.requested_moves.pop(0)
     
     def request_move(self):
         pass
 
     def update(self, subject, message=None):
+        print("Requested moves:")
+        print(self.requested_moves)
+        print(message)
         # Local player requested a move
         if subject == self.local_player:
-            move = self.local_player.get_requested_move()
+            move = self.local_player.board_view.get_requested_move()
             self.client.update_remote_game(Session().get_username(), move)
         elif subject == self.client:
             self.requested_moves.append(message.body)
+            print(self.requested_moves)
             # Received move from opponent
             self.notify_observers()
         

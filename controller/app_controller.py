@@ -28,6 +28,7 @@ class AppController(Observer):
         self.client.set_observer(self)
         self.game_state = (None, None, None)
         self.remote_game_state = (None, None, None)
+        self.game = None
 
     def init_app(self):
         self.root = tk.Tk()
@@ -36,6 +37,8 @@ class AppController(Observer):
 
     def start_game(self):
         game = Game(board_size = Settings().get_board_size())
+        print("game state")
+        print(self.game_state)
         player_color = Player.BLACK
         # Resume previous game if it was interrupted
         if Session().is_logged_in() and Settings().get_game_mode() == GameMode.REMOTE:
@@ -47,11 +50,11 @@ class AppController(Observer):
         elif Session().is_logged_in():
             board, game_mode, current_player = self.game_state
             if all(item is not None for item in (board, game_mode, current_player)) and Settings().get_board_size() == len(board) and game_mode == Settings().get_game_mode():
-                game = Game(board_size=len(board), game=game, curr_player=current_player)
+                game = Game(board_size=len(board), board=board, curr_player=current_player)
         self.current_view.destroy()
         self.game = game
         game.add_observer(self)
-        view = GameView(master=self.root, board=game.board, on_home=self.on_home, board_color = Settings().get_board_color())
+        view = GameView(master=self.root, board=game.board, on_home=self.on_exit_game, board_color = Settings().get_board_color())
         self.current_view = view
         view.display()
         game_mode = Settings().get_game_mode()
@@ -68,7 +71,19 @@ class AppController(Observer):
         else:
             raise ValueError("Received invalid game mode: " + str(game_mode))
         controller = GameController(game, view, players=players)
+        # Reverse order of observers so controller is notified first
+        for player in players:
+            player.observers.reverse()
         controller.run_game()
+
+    def on_exit_game(self):
+        self.on_home()
+        self.end_remote_game()
+    
+    def end_remote_game(self):
+        self.client.set_observer(self)
+        self.client.end_remote_game(Session().get_username())
+        self.remote_game_state = (None, None, None)
 
     def request_opponent(self):
         self.current_view.display_awaiting_component()
@@ -88,6 +103,8 @@ class AppController(Observer):
         self.current_view.display()
 
     def on_select_page(self, view):
+        self.client.end_remote_game(Session().get_username())
+        self.remote_game_state = (None, None, None)
         if view == Views.LOGIN:
             self.current_view.destroy()
             self.display_login()
@@ -165,18 +182,17 @@ class AppController(Observer):
         self.client.register(username, password)
 
     def update(self, subject, message=None):
+        is_remote = Settings().get_game_mode() == GameMode.REMOTE
         if subject == self.client:
             self.handle_message(message)
-        # Don't save game state if user is playing remotely
-        elif not Session().is_logged_in() or Settings().get_game_mode() == GameMode.REMOTE:
-            print("logged in")
+        # Don't save game state if user is not logged in
+        elif not Session().is_logged_in():
+            print("not logged in")
             return
-        elif subject == self.game and self.game.is_game_terminated():
+        elif subject == self.game and self.game.is_game_terminated() and not is_remote:
+            print("game ended!")
             self.client.remove_game_state(Session().get_username())
-            if Settings().get_game_mode() == GameMode.REMOTE:
-                self.client.end_remote_game(Session().get_username())
-                self.remote_game_state = (None, None, None)
-        elif subject == self.game:
+        elif subject == self.game and not is_remote:
             print("updating game state")
             self.client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())
 

@@ -18,10 +18,10 @@ class Observer(ABC):
 
 class Observable(ABC):
     def __init__(self):
-        self.observers = set()
+        self.observers = []
 
     def add_observer(self, observer):
-        self.observers.add(observer)
+        self.observers.append(observer)
     
     def remove_observer(self, observer):
         self.observers.remove(observer)

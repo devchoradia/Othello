@@ -51,15 +51,11 @@ class Server:
             print('Client disconnected')
             self.clients.remove(conn)
             if conn in self.remote_connections.values():
-                user = list(self.remote_connections.keys())[list(mydict.values()).index(conn)]
+                user = list(self.remote_connections.keys())[list(self.remote_connections.values()).index(conn)]
                 print(f'Deleting connection {user} from remote_connections')
-                del self.remote_connections[user]
-                if user in self.remote_queue:
-                    self.remote_queue.remove(user)
-                else:
-                    opponent = self.remote_pairs.pop(user, None)
-                    self.remote_pairs.pop(opponent, None)
-                    self.remote_queue.remove()
+                if username in self.remote_connections:
+                    del self.remote_connections[username]
+                self.end_remote_game(user)
             # text = f'{username} has disconnected from the chat'
 
     def broadcast_message(self, text):
@@ -70,6 +66,7 @@ class Server:
         
     def send_message(self, result, conn):
         if result is not None:
+            print(f'Sending message ({result.message_type}, {result.body}) to {conn}')
             result_binary = pickle.dumps(result)
             conn.sendall(result_binary)
 
@@ -108,7 +105,7 @@ class Server:
         print("Foudn unempty remote queue")
         print(self.remote_queue)
         # Look for someone looking for same board size
-        schedule.every(5).seconds.do(lambda u=username, s=board_size: self.check_remote_queue(u, s)).tag(username)
+        schedule.every(2).seconds.do(lambda u=username, s=board_size: self.check_remote_queue(u, s)).tag(username)
         thread = threading.Thread(target=self.run_scheduled_tasks, args=())
         thread.start()
 
@@ -144,7 +141,9 @@ class Server:
                 return
     
     def match_opponents(self, username, opponent, board_size):
+        print(self.remote_pairs)
         if opponent == self.remote_pairs.get(username, None) and username == self.remote_pairs.get(opponent, None):
+            print("Skipping match")
             return
         self.remote_pairs[username] = opponent
         self.remote_pairs[opponent] = username
@@ -156,8 +155,6 @@ class Server:
         self.send_message(Message(Request.UPDATE_REMOTE_GAME, move), opponent)
 
     def end_remote_game(self, username):
-        if username in self.remote_connections:
-            del self.remote_connections[username]
         user_in_queue = next((x for x in self.remote_queue if x[0] == username), None)
         if user_in_queue is not None:
             self.remote_queue.remove(user_in_queue)
@@ -166,6 +163,7 @@ class Server:
             del self.remote_pairs[username]
             if opponent in self.remote_pairs and self.remote_pairs[opponent] == username:
                 del self.remote_pairs[opponent]
+        schedule.clear(username)
 
 
     def compute_result(self, message, conn):

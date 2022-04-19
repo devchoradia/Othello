@@ -89,7 +89,7 @@ class Client:
                 message_binary = self.my_socket.recv(self.buffer_size)
                 message = pickle.loads(message_binary)
                 if self.observer:
-                    self.observer.update(self, message)
+                    self.observer.update(self, message=message)
             except OSError:
                 break
 

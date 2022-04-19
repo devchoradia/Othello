@@ -34,8 +34,6 @@ class Settings:
     def __init__(self):      
         if(self._initialized): return
         self.client = Client()
-        if not Session().is_logged_in():
-            SETTING_OPTIONS[Setting.GAME_MODE].remove(GameMode.REMOTE)
         self.state = {
             Setting.BOARD_SIZE: 4,
             Setting.BOARD_COLOR: PLAYER_COLOR[0],
@@ -55,6 +53,11 @@ class Settings:
         return SETTING_LABELS[setting]
 
     def get_setting_options(self, setting: Setting):
+        options = SETTING_OPTIONS.copy()
+        if not Session().is_logged_in():
+            print("removing options")
+            options[Setting.GAME_MODE].remove(GameMode.REMOTE)
+        print(options)
         return SETTING_OPTIONS[setting]
 
     def get_setting(self, setting: Setting):
