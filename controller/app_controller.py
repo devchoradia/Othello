@@ -38,8 +38,6 @@ class AppController(Observer):
 
     def start_game(self):
         game = Game(board_size = Settings().get_board_size())
-        print("game state")
-        print(self.game_state)
         player_color = Player.BLACK
         # Resume previous game if it was interrupted
         if Session().is_logged_in() and Settings().get_game_mode() == GameMode.REMOTE:
@@ -55,7 +53,7 @@ class AppController(Observer):
         self.current_view.destroy()
         self.game = game
         game.add_observer(self)
-        view = GameView(master=self.root, board=game.board, on_home=self.on_exit_game, board_color = Settings().get_board_color())
+        view = GameView(master=self.root, board=game.board, on_home=self.on_exit_game, board_color = Settings().get_board_color(), main_player=player_color)
         self.current_view = view
         view.display()
         game_mode = Settings().get_game_mode()
@@ -114,7 +112,6 @@ class AppController(Observer):
     def on_select_page(self, view):
         # Stop requesting a remote game
         if self.is_awaiting_opponent and view != Views.GAME:
-            print("Stopping remote game request")
             self.end_remote_game(False)
 
         if view == Views.LOGIN:
@@ -179,15 +176,11 @@ class AppController(Observer):
             self.start_game()
     
     def login_result(self, result, username, rating):
-        print("loggin int")
-        print(result)
         if result == LOGIN_RESULT.SUCCESS:
-            print("logged in")
             Session().log_in(username, rating)
             self.client.get_game_state(username)
             self.client.get_settings(username)
         elif result == REGISTER_RESULT.SUCCESS:
-            print("registered")
             Session().log_in(username, rating)
         self.current_view.login_result(result)
 
@@ -200,13 +193,10 @@ class AppController(Observer):
             self.handle_message(message)
         # Don't save game state if user is not logged in
         elif not Session().is_logged_in():
-            print("not logged in")
             return
         elif subject == self.game and self.game.is_game_terminated() and not is_remote:
-            print("game ended!")
             self.client.remove_game_state(Session().get_username())
         elif subject == self.game and not is_remote:
-            print("updating game state")
             self.client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())
 
     def on_win(self):

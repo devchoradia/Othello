@@ -28,6 +28,3 @@ class BoardConsoleView:
             ascii_representation.append(border)
         # Combine rows into one string
         text_display = '\n'.join(ascii_representation)
-        print(column_labels)
-        print(border)
-        print(text_display)

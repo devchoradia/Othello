@@ -29,7 +29,6 @@ class GameController(Observer):
 
     # Event handler when player clicks a move
     def request_move(self, row, col, player):
-        print("requested move")
         # Ignore if it's not the player's move
         if player.player_color != self.model.curr_player:
             return
@@ -68,7 +67,6 @@ class GameController(Observer):
             self.view.display_current_player(self.model.curr_player)
 
     def end_game(self):
-        print("game controller ended")
         # Display the final state of the board and the winner
         self.view.display_board()
         self.view.display_winner(self.model.get_winner())

@@ -20,16 +20,12 @@ class RemotePlayer(GamePlayer):
         self.on_opponent_disconnect = on_opponent_disconnect
 
     def get_requested_move(self) -> (int, int):
-        print(self.requested_moves)
         return self.requested_moves.pop(0)
     
     def request_move(self):
         pass
 
     def update(self, subject, message=None):
-        print("Requested moves:")
-        print(self.requested_moves)
-        print(message)
         # Local player requested a move
         if subject == self.local_player:
             move = self.local_player.board_view.get_requested_move()
@@ -40,7 +36,6 @@ class RemotePlayer(GamePlayer):
                 self.on_opponent_disconnect(message.body)
             else:
                 self.requested_moves.append(message.body)
-                print(self.requested_moves)
                 # Received move from opponent
                 self.notify_observers()
         

@@ -5,11 +5,12 @@ from view.board_view import BoardView, ROW_KEY, MIN_TILE_LENGTH
 import tkinter as tk
 
 class GameView(PageView):
-    def __init__(self, master, board, board_color, on_home):
+    def __init__(self, master, board, board_color, on_home, main_player=Player.BLACK):
         super().__init__(master, Views.GAME, on_home=on_home)
         self['background'] = 'white'
         self.board = board
         self.board_color = board_color
+        self.main_player = main_player
         self.add_title()
 
     def display(self):
@@ -19,7 +20,11 @@ class GameView(PageView):
         self.pack(expand=True, fill=tk.BOTH)
 
     def display_current_player(self, player):
-        self.current_player_label.config(text=f"Player move: {PLAYER_COLOR[player]}")
+        if player == self.main_player:
+            text = f"Your turn: {PLAYER_COLOR[player]}"
+        else:
+            text = f"Opponent turn: {PLAYER_COLOR[player]}"
+        self.current_player_label.config(text=text)
 
     def display_board(self):
         self.board_view.update_board()
@@ -33,7 +38,7 @@ class GameView(PageView):
     def add_current_player(self, player=Player.BLACK):
         frame = tk.Frame(self, bg="white", borderwidth=1)
         frame.pack(expand=True, fill=tk.BOTH)
-        label = tk.Label(frame, borderwidth=2, font=BUTTON_FONT, height=ROW_HEIGHT, text=f"Player move: {PLAYER_COLOR[player]}",bg='white', fg="black")
+        label = tk.Label(frame, borderwidth=2, font=BUTTON_FONT, height=ROW_HEIGHT, text=f"Your turn: {PLAYER_COLOR[player]}",bg='white', fg="black")
         label.pack(padx=10, pady=10)
         self.current_player_label = label
 

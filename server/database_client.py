@@ -218,7 +218,7 @@ class DatabaseClient:
                 cursor.execute(statement, (username,))
                 result = cursor.fetchall()
                 if len(result) == 0:
-                    print("Found no row with username " + username)
+                    print("Found no settings for row with username " + username)
                     return None, None, None
                 board_size, board_color, game_mode = result[0]
                 game_mode = GameMode.fromstring(game_mode)

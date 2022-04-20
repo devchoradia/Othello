@@ -59,11 +59,9 @@ class BoardView(tk.Frame):
 
     
     def set_move_handler(self, move_handler):
-        print("set move hander")
         self.move_handler = move_handler
 
     def remove_move_handler(self):
-        print("removed move handler")
         self.move_handler = None
 
     def add_tile(self, row, col):
@@ -92,11 +90,8 @@ class BoardView(tk.Frame):
         '''
         Whenever a click is moved, we notify the observers
         '''
-        print("move clicked")
         if self.move_handler != None:
-            print("has move handler")
             self.requested_move.set((row, col))
-            print(self.requested_move.get())
             self.move_handler()
 
     def get_requested_move(self):

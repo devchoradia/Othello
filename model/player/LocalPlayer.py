@@ -20,10 +20,7 @@ class LocalPlayer(GamePlayer):
         return (row, col)
     
     def request_move(self):
-        print("requesting move")
         self.board_view.set_move_handler(self.notify_observers)
 
     def notify_observers(self):
-        print("notifying observers")
-        print(self.observers)
         super().notify_observers()
