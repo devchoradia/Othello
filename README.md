@@ -20,4 +20,7 @@ or manually download here: https://dev.mysql.com/downloads/connector/python/
 * database: reversi
 
 ## Run the game
-In the command line, run: `python3 main.py`
+### Run server
+`python3 sever_main.py`
+### Run the app (once server is running)
+`python3 main.py`
