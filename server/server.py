@@ -10,7 +10,7 @@ import time
 from server.request import Request, Message
 
 class Server:
-    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -25,6 +25,8 @@ class Server:
             my_socket.bind((self.host, self.port))
             my_socket.listen()
             print('Server started')
+            thread = threading.Thread(target=self.run_scheduled_tasks, args=())
+            thread.start()
 
             while True:
                 conn, address = my_socket.accept()
@@ -98,8 +100,6 @@ class Server:
         self.remote_queue.append((username, board_size, dt))
         # Look for someone looking for same board size
         schedule.every(2).seconds.do(lambda u=username, s=board_size: self.check_remote_queue(u, s)).tag(username)
-        thread = threading.Thread(target=self.run_scheduled_tasks, args=())
-        thread.start()
 
     def run_scheduled_tasks(self):
         while True:
