@@ -83,7 +83,8 @@ class AppController(Observer):
         if self.game and self.game.is_game_terminated():
             player_disrupted_game = False
         self.on_home()
-        self.end_remote_game(player_disrupted_game)
+        if Settings().get_game_mode() == GameMode.REMOTE and None not in self.remote_game_state:
+            self.end_remote_game(player_disrupted_game)
     
     def end_remote_game(self, player_disrupted_game):
         self.is_awaiting_opponent = False

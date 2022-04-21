@@ -100,6 +100,9 @@ class AccountInfoView(PageView):
         switch_view_button = Button(button_frame, text=self.switch_view_label, bg='white', fg = 'blue', font = 'Helvetica 12', borderwidth=3, highlightbackground="white", command=self.switch_view)
         switch_view_button.pack(side=TOP, pady=5)
 
+        login_as_guest_button = Button(button_frame, text="Log in as guest", bg='white', fg = 'blue', font = 'Helvetica 12', borderwidth=3, highlightbackground="white", command=self.on_home)
+        login_as_guest_button.pack(side=TOP, pady=2)
+
     def add_label(self, label, pady=None, entry_frame=None):
         l1 = Label(entry_frame, text=label, fg='gray', bg='white', font='Helvetica 15 bold')
         l1.pack(anchor='w', pady=pady)

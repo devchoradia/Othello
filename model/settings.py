@@ -54,7 +54,7 @@ class Settings:
 
     def get_setting_options(self, setting: Setting):
         options = SETTING_OPTIONS.copy()
-        if not Session().is_logged_in():
+        if not Session().is_logged_in() and GameMode.REMOTE in options[Setting.GAME_MODE]:
             options[Setting.GAME_MODE].remove(GameMode.REMOTE)
         return SETTING_OPTIONS[setting]
 
