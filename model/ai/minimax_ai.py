@@ -95,11 +95,11 @@ class MinimaxAI2(AbstractMinimaxAI):
                 if tile == int(AI_PLAYER): # Our tile
                     computer_score += 1
                     if self.corner_closeness(state, AI_PLAYER, row_idx, col_idx, 0):
-                        computer_score += 999
+                        opponent_score += 999
                 elif tile == int(HUMAN_PLAYER): # Opponent tile
                     opponent_score += 1
                     if self.corner_closeness(state, HUMAN_PLAYER, row_idx, col_idx, 0):
-                        opponent_score += 999
+                        computer_score += 999
         return computer_score, opponent_score
 
 
