@@ -63,4 +63,51 @@ class MinimaxAI(AbstractMinimaxAI):
         '''
         computer_score, opponent_score, = self.heuristic(state)
         return computer_score - opponent_score
+
+
+class MinimaxAI2(AbstractMinimaxAI):
+    def __init__(self,):
+        super().__init__(4)
     
+    def corner_closeness(self, board, player, row, col, d):
+        '''
+        Determines whether the player's tile at the given location is close to the corner squares.
+        Squares adjacent to corners are a huge disadvantage as 
+        it gives the opponent the opportunity to capture the corner. Therefore, we avoid capturing close corner squares.
+        '''
+
+        board_size = len(board)
+        close_corner_tiles = [(0,1),(1,0),(1,1),(0, board_size - 2),(1, board_size - 2),(1, board_size - 1),
+        (board_size - 2, 0),(board_size - 2, 1),(board_size - 1, 1), (board_size - 2, board_size - 2), 
+        (board_size - 1, board_size - 2), (board_size - 2, board_size - 1)]
+        if (row, col) in close_corner_tiles:
+            return True
+
+
+    def heuristic(self, state):
+        '''
+        Estimates the utility value of the state of the board for this AI level
+        '''
+        computer_score = 0
+        opponent_score = 0
+        for row_idx, row in enumerate(state):
+            for col_idx, tile in enumerate(row):
+                if tile == int(AI_PLAYER): # Our tile
+                    computer_score += 1
+                    if self.corner_closeness(state, AI_PLAYER, row_idx, col_idx, 0):
+                        computer_score += 999
+                elif tile == int(HUMAN_PLAYER): # Opponent tile
+                    opponent_score += 1
+                    if self.corner_closeness(state, HUMAN_PLAYER, row_idx, col_idx, 0):
+                        opponent_score += 999
+        return computer_score, opponent_score
+
+
+
+    def get_utility_value(self, state):
+        '''
+        Returns the utility value of the given state
+        '''
+        computer_score, opponent_score, = self.heuristic(state)
+        return computer_score - opponent_score
+        
