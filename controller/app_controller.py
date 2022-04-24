@@ -114,8 +114,14 @@ class AppController(Observer):
         # Stop requesting a remote game
         if self.is_awaiting_opponent and view != Views.GAME:
             self.end_remote_game(False)
+        elif self.is_awaiting_opponent:
+            return
 
-        if view == Views.LOGIN:
+        if view == Views.LOGIN and Session().is_logged_in():
+            self.current_view.destroy()
+            Session().log_out()
+            self.display_login()
+        elif view == Views.LOGIN:
             self.current_view.destroy()
             self.display_login()
         elif view == Views.GAME:
@@ -162,9 +168,10 @@ class AppController(Observer):
     def handle_message(self, message):
         message_type = message.message_type
         body = message.body
+        print(f"Received message: {message_type}, {body}")
         if message_type == Request.LOGIN or message_type == Request.REGISTER:
-            result, (username, rating) = body
-            self.login_result(result, username, rating)
+            result, (username, rating, board_size, board_color, game_mode) = body
+            self.login_result(result, username, rating, board_size, board_color, game_mode)
         elif message_type in [Request.GET_GAME_STATE, Request.REMOVE_GAME_STATE, Request.UPDATE_GAME_STATE]:
             self.game_state = body
         elif message_type == Request.LEADERBOARD:
@@ -175,12 +182,18 @@ class AppController(Observer):
             self.is_awaiting_opponent = False
             self.remote_game_state = body
             self.start_game()
+        elif message_type == Request.UPDATE_ELO_RATING:
+            Session().update_ELORating(body)
+            if self.current_view.page_view == Views.HOME:
+                self.current_view.update_rating()
+        else:
+            print(f"Unknown message: {message_type}, {body}")
     
-    def login_result(self, result, username, rating):
+    def login_result(self, result, username, rating, board_size, board_color, game_mode):
         if result == LOGIN_RESULT.SUCCESS:
             Session().log_in(username, rating)
+            self.update_settings((board_size, board_color, game_mode))
             self.client.get_game_state(username)
-            self.client.get_settings(username)
         elif result == REGISTER_RESULT.SUCCESS:
             Session().log_in(username, rating)
         self.current_view.login_result(result)
@@ -195,7 +208,10 @@ class AppController(Observer):
         # Don't save game state if user is not logged in
         elif not Session().is_logged_in():
             return
-        elif subject == self.game and self.game.is_game_terminated() and not is_remote:
+        elif subject == self.game and self.game.is_game_terminated() and is_remote:
+            self.client.add_observer(self)
+            self.client.update_elo_rating(Session().get_username(), self.game.get_winner())
+        elif subject == self.game and self.game.is_game_terminated():
             self.client.remove_game_state(Session().get_username())
         elif subject == self.game and not is_remote:
             self.client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())

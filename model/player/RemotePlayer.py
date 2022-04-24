@@ -34,7 +34,7 @@ class RemotePlayer(GamePlayer):
             # Opponent disconnected during game
             if message.message_type == Request.OPPONENT_DISCONNECTED:
                 self.on_opponent_disconnect(message.body)
-            else:
+            elif message.message_type == Request.UPDATE_REMOTE_GAME:
                 self.requested_moves.append(message.body)
                 # Received move from opponent
                 self.notify_observers()

@@ -68,11 +68,11 @@ class DatabaseClient:
         return conn
 
     def register_user(self, username, password):
-        user_info = (username, 0)
+        user_info = (username, 0, None, None, None)
         if not username or not password:
             return REGISTER_RESULT.INVALID_INPUT, user_info
         insert = """
-            INSERT into users (username, password) VALUES(%s, %s);
+            INSERT into users (username, password, ELORating) VALUES(%s, %s, 1200);
         """
         register_result = REGISTER_RESULT.UNKNOWN_ERROR
         if self.does_user_exist(username):
@@ -84,6 +84,7 @@ class DatabaseClient:
                 cursor.execute(insert, args)
                 conn.commit()
                 register_result = REGISTER_RESULT.SUCCESS
+                user_info = (username, 1200, None, None, None)
         except Error as e:
             print(e)
         finally:
@@ -109,9 +110,12 @@ class DatabaseClient:
         conn = self.make_connection()
         args = (username, password)
         ELORating = None
+        boardSize = None
+        boardColor = None
+        gameMode = None
         login_result = LOGIN_RESULT.UNKNOWN_ERROR
         get_user_info_query = """
-            SELECT username, ELORating from users WHERE username=%s AND password=%s;
+            SELECT username, ELORating, boardSize, boardColor, gameMode from users WHERE username=%s AND password=%s;
         """
         try:
             with conn.cursor() as cursor:
@@ -122,9 +126,12 @@ class DatabaseClient:
                 else:
                     login_result = LOGIN_RESULT.SUCCESS
                     ELORating = result[0][1]
+                    boardSize = result[0][2]
+                    boardColor = result[0][3]
+                    gameMode = result[0][4]
         finally:
             conn.close()
-        return login_result, (username, ELORating)
+        return login_result, (username, ELORating, boardSize, boardColor, gameMode)
 
     def get_leaderboard(self, count=10):
         conn = self.make_connection()
@@ -142,10 +149,24 @@ class DatabaseClient:
         statement = """
             UPDATE users set ELORating = %s where username = %s;
         """
-        args = (rating, username)
+        args = (str(rating), username)
         try:
             with conn.cursor() as cursor:
                 cursor.execute(statement, args)
+                conn.commit()
+                result = cursor.fetchall()
+        finally:
+            conn.close()
+        return result
+
+    def get_rating(self, username):
+        conn = self.make_connection()
+        query = """
+            SELECT ELORating FROM users WHERE username = %s;
+        """
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (username,))
                 result = cursor.fetchall()
         finally:
             conn.close()

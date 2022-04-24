@@ -19,6 +19,7 @@ class Server:
         self.remote_connections = {}
         self.remote_pairs = {}
         self.remote_queue = []
+        self.player_colors = {}
 
     def start(self):
         with socket.socket() as my_socket:
@@ -49,9 +50,10 @@ class Server:
             self.clients.remove(conn)
             if conn in self.remote_connections.values():
                 user = list(self.remote_connections.keys())[list(self.remote_connections.values()).index(conn)]
+                player_left_game = user in self.remote_connections and user in self.remote_pairs and user in self.player_colors
                 if user in self.remote_connections:
                     del self.remote_connections[user]
-                self.end_remote_game(user)
+                self.end_remote_game(user, player_left_game)
             # text = f'{username} has disconnected from the chat'
 
     def broadcast_message(self, text):
@@ -62,7 +64,7 @@ class Server:
         
     def send_message(self, result, conn):
         if result is not None:
-            print(f'Sending message ({result.message_type}, {result.body}) to {conn}')
+            print(f'Sending message {result.message_type}, {result.body}')
             result_binary = pickle.dumps(result)
             conn.sendall(result_binary)
 
@@ -137,8 +139,12 @@ class Server:
             return
         self.remote_pairs[username] = opponent
         self.remote_pairs[opponent] = username
-        self.send_message(Message(Request.REMOTE_PLAY, (opponent, board_size, Player.BLACK)), self.remote_connections[username])
-        self.send_message(Message(Request.REMOTE_PLAY, (username, board_size, Player.WHITE)), self.remote_connections[opponent])
+        self.player_colors[opponent] = Player.BLACK
+        self.player_colors[username] = Player.WHITE
+        self.send_message(Message(Request.REMOTE_PLAY, (opponent, board_size, self.player_colors[username])), self.remote_connections[username])
+        self.send_message(Message(Request.REMOTE_PLAY, (username, board_size, self.player_colors[opponent])), self.remote_connections[opponent])
+        schedule.clear(username)
+        schedule.clear(opponent)
 
     def handle_remote_game_update(self, username, move):
         opponent = self.remote_connections[self.remote_pairs[username]]
@@ -155,7 +161,36 @@ class Server:
                 if player_disrupted_game:
                     self.notify_opponent_disconnected(opponent)
                 del self.remote_pairs[opponent]
+        if username in self.player_colors:
+            del self.player_colors[username]
         schedule.clear(username)
+    
+    def update_elo_rating(self, username, winner):
+        K = 32 # K-FACTOR
+        if username in self.remote_pairs and username in self.player_colors:
+            player_color = self.player_colors[username]
+            opponent = self.remote_pairs[username]
+            if opponent not in self.player_colors:
+                print(f"Could not find player color saved for opponent {opponent}")
+                return
+            opponent_rating = int(self.database_client.get_rating(opponent)[0][0])
+            user_rating = int(self.database_client.get_rating(username)[0][0])
+            r1 = pow(10, user_rating/400)
+            r2 = pow(10, opponent_rating/400)
+            e1 = r1 / (r1 + r2)
+            e2 = r2 / (r1 + r2)
+            s1 = 0.5 # DRAW
+            if player_color == winner: # USER WON
+                s1 = 1
+            elif winner == self.player_colors[opponent]: # USER LOST
+                s1 = 0
+            new_rating = round(user_rating + K*(s1-e1))
+            result = self.database_client.update_rating(new_rating, username)
+            print(result)
+            print(self.database_client.get_rating(username))
+            print(f"Updated ELORating from {user_rating} to {new_rating} for {username}")
+            return new_rating
+        print(f"Could not find {username} in remote pairs and/or player_colors")
 
     def notify_opponent_disconnected(self, user):
         if user in self.remote_connections:
@@ -186,6 +221,8 @@ class Server:
             self.handle_remote_game_update(body['username'], body['move'])
         elif message_type == Request.END_REMOTE_GAME:
             self.end_remote_game(body['username'], body['player_disrupted_game'])
+        elif message_type == Request.UPDATE_ELO_RATING:
+            return Message(Request.UPDATE_ELO_RATING, self.update_elo_rating(body['username'], body['winner']))
         return None
 
     class ChatMessage:

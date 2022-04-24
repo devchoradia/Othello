@@ -10,11 +10,15 @@ class Client:
         self.buffer_size = buffer_size
         self.my_socket = socket.socket()
         self.my_socket.connect((self.host, self.port))
+        self.observers = []
         thread = threading.Thread(target=self.receive_messages)
         thread.start()
 
     def set_observer(self, observer):
-        self.observer = observer
+        self.observers = [observer]
+    
+    def add_observer(self, observer):
+        self.observers.append(observer)
 
     def login(self, username, password):
         self.send_message(Message(Request.LOGIN, {
@@ -80,7 +84,14 @@ class Client:
             'player_disrupted_game': player_disrupted_game
         }))
 
+    def update_elo_rating(self, username, winner):
+        self.send_message(Message(Request.UPDATE_ELO_RATING, {
+            'username': username,
+            'winner': winner
+        }))
+
     def send_message(self, message):
+        print(f"Sending message {message.message_type}, {message.body}")
         message_binary = pickle.dumps(message)
         self.my_socket.sendall(message_binary)
 
@@ -89,10 +100,13 @@ class Client:
             try:
                 message_binary = self.my_socket.recv(self.buffer_size)
                 message = pickle.loads(message_binary)
-                if self.observer:
-                    self.observer.update(self, message=message)
+                self.update_observers(message)
             except OSError:
                 break
+    
+    def update_observers(self, message):
+        for observer in self.observers:
+            observer.update(self, message=message)
 
     def disconnect(self):
         self.my_socket.shutdown(socket.SHUT_RDWR)

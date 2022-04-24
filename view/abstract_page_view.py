@@ -15,6 +15,7 @@ class AbstractPageView(tk.Frame):
     '''
     def __init__(self, master, page_view, on_home=None, **kwargs):
         super().__init__(master, **kwargs)
+        self.page_view = page_view
         self.master = master
         self.title = VIEW_TITLES[page_view]
         self.on_home = on_home

@@ -39,3 +39,6 @@ class Session:
 
     def get_ELORating(self):
         return self.ELORating
+
+    def update_ELORating(self, rating):
+        self.ELORating = int(rating)

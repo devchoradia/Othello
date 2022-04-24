@@ -13,6 +13,7 @@ class Request(Enum):
     UPDATE_REMOTE_GAME = "update remote game"
     END_REMOTE_GAME = "end remote game"
     OPPONENT_DISCONNECTED = "opponent disconnected"
+    UPDATE_ELO_RATING = "update ELO rating"
 
 class Message:
     def __init__(self, message_type: Request, body):
