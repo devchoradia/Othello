@@ -247,6 +247,20 @@ class DatabaseClient:
         finally:
             conn.close()
 
+    def get_ratings(self, players):
+        conn = self.make_connection()
+        statement = """
+            SELECT username, ELORating from users WHERE username in (%s);
+        """
+        format_usernames = ','.join(['%s'] * len(players))
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(statement % format_usernames, tuple(players))
+                result = cursor.fetchall()
+                return result
+        finally:
+            conn.close()
+
     def update_settings(self, board_size, board_color, game_mode, username):
         conn = self.make_connection()
         statement = """

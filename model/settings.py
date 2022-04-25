@@ -4,6 +4,7 @@ from enum import IntEnum, Enum
 from model.session import Session
 from model.game_mode import GameMode
 from client.client import Client
+import copy
 
 class Setting(IntEnum):
     BOARD_SIZE = 0
@@ -22,6 +23,12 @@ SETTING_OPTIONS = {
     Setting.GAME_MODE: [GameMode.LOCAL, GameMode.AI, GameMode.REMOTE]
 }
 
+DEFAULT_SETTINGS = {
+    Setting.BOARD_SIZE: 4,
+    Setting.BOARD_COLOR: PLAYER_COLOR[0],
+    Setting.GAME_MODE: GameMode.LOCAL
+}
+
 '''
 Thread-safe singleton settings class.
 This makes sure only one settings class is instantiated so that a single state can be shared/accessed among different components,
@@ -34,11 +41,8 @@ class Settings:
     def __init__(self):      
         if(self._initialized): return
         self.client = Client()
-        self.state = {
-            Setting.BOARD_SIZE: 4,
-            Setting.BOARD_COLOR: PLAYER_COLOR[0],
-            Setting.GAME_MODE: GameMode.LOCAL
-        }
+        self.state = copy.deepcopy(DEFAULT_SETTINGS)
+        self.options = copy.deepcopy(SETTING_OPTIONS)
         self._initialized = True
 
     def __new__(cls, *args, **kwargs):
@@ -53,10 +57,13 @@ class Settings:
         return SETTING_LABELS[setting]
 
     def get_setting_options(self, setting: Setting):
-        options = SETTING_OPTIONS.copy()
-        if not Session().is_logged_in() and GameMode.REMOTE in options[Setting.GAME_MODE]:
-            options[Setting.GAME_MODE].remove(GameMode.REMOTE)
-        return SETTING_OPTIONS[setting]
+        if not Session().is_logged_in() and GameMode.REMOTE in self.options[Setting.GAME_MODE]:
+            self.options[Setting.GAME_MODE].remove(GameMode.REMOTE)
+        return self.options[setting]
+
+    def set_default_settings(self):
+        self.state = copy.deepcopy(DEFAULT_SETTINGS)
+        self.options = copy.deepcopy(SETTING_OPTIONS)
 
     def get_setting(self, setting: Setting):
         return self.state[setting]
@@ -72,8 +79,19 @@ class Settings:
             Setting.BOARD_COLOR: board_color,
             Setting.GAME_MODE: game_mode
         }
+
+    def update_setting(self, setting, value):
+        self.state[setting] = value
+        print(self.state)
+
+    def save_settings(self, settings):
+        board_size = settings[Setting.BOARD_SIZE]
+        board_color = settings[Setting.BOARD_COLOR]
+        game_mode = settings[Setting.GAME_MODE]
+        self.update_settings(settings)
         if Session().is_logged_in():
             self.client.update_settings(board_size, board_color, game_mode, Session().get_username())
+
 
     def get_board_size(self):
         return self.state[Setting.BOARD_SIZE]

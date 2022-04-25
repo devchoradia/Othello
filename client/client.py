@@ -25,6 +25,11 @@ class Client:
             'username': username,
             'password': password
         }))
+
+    def logout(self, username):
+        self.send_message(Message(Request.LOGOUT, {
+            'username': username
+        }))
     
     def register(self, username, password):
         self.send_message(Message(Request.REGISTER, {
@@ -88,6 +93,23 @@ class Client:
         self.send_message(Message(Request.UPDATE_ELO_RATING, {
             'username': username,
             'winner': winner
+        }))
+
+    def get_online_players(self):
+        self.send_message(Message(Request.GET_ONLINE_PLAYERS, None))
+
+    def request_game(self, username, opponent, board_size):
+        self.send_message(Message(Request.REQUEST_REMOTE_GAME, {
+            'username': username,
+            'opponent': opponent,
+            'board_size': board_size
+        }))
+
+    def answer_game_request(self, username, opponent, remote_game_request_status):
+        self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, {
+            'username': username,
+            'opponent': opponent,
+            'response': remote_game_request_status
         }))
 
     def send_message(self, message):

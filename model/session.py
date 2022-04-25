@@ -1,4 +1,5 @@
 import threading
+from client.client import Client
 
 '''
 Thread-safe singleton session class.
@@ -14,6 +15,7 @@ class Session:
         self.username = None
         self.ELORating = None
         self._initialized = True
+        self.client = Client()
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -31,6 +33,7 @@ class Session:
         self.ELORating = ELORating
 
     def log_out(self):
+        self.client.logout(self.username)
         self.username = None
         self.ELORating = None
     
