@@ -1,16 +1,17 @@
-from view.abstract_page_view import STICKY, ROW_HEIGHT, PageView, BUTTON_FONT, APP_COLOR
+from view.abstract_page_view import STICKY, ROW_HEIGHT, PageView, BUTTON_FONT, APP_COLOR, ROW_HEIGHT
 from model.player.player import PLAYER_COLOR, Player
 from model.views import Views, VIEW_TITLES
 from view.board_view import BoardView, ROW_KEY, MIN_TILE_LENGTH
 import tkinter as tk
 
 class GameView(PageView):
-    def __init__(self, master, board, board_color, on_home, main_player=Player.BLACK):
+    def __init__(self, master, board, board_color, on_home, main_player=Player.BLACK, on_restart = None):
         super().__init__(master, Views.GAME, on_home=on_home)
         self['background'] = 'white'
         self.board = board
         self.board_color = board_color
         self.main_player = main_player
+        self.on_restart = on_restart
         self.add_title()
 
     def display(self):
@@ -47,4 +48,18 @@ class GameView(PageView):
         if player == 0:
             result_string = "DRAW"
         self.current_player_label.config(text=result_string)
+
+    def add_navigator(self):
+        if self.on_restart is None:
+            super().add_navigator()
+        else:
+            left_frame = tk.Frame(self, borderwidth=0, bg=APP_COLOR, highlightbackground = APP_COLOR, highlightcolor=APP_COLOR)
+            left_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
+            label = tk.Button(left_frame, text="Restart", borderwidth=1, height=ROW_HEIGHT, command=self.on_restart, bg=APP_COLOR, highlightbackground=APP_COLOR)
+            label.pack(side=tk.RIGHT, padx=10, pady=10)
+            right_frame = tk.Frame(self, borderwidth=0, bg=APP_COLOR, highlightbackground = APP_COLOR, highlightcolor=APP_COLOR)
+            right_frame.pack(expand=True, fill=tk.BOTH, side=tk.RIGHT)
+            home_button = tk.Button(right_frame, text=VIEW_TITLES[Views.HOME], borderwidth=1, height=ROW_HEIGHT, \
+                command=self.on_home, bg=APP_COLOR, highlightbackground=APP_COLOR)
+            home_button.pack(side=tk.LEFT, padx=10, pady=10)
 

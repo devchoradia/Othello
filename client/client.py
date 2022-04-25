@@ -4,7 +4,7 @@ import threading
 from server.request import Request, Message
 
 class Client:
-    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
         self.host = host # the server's host name or IP address
         self.port = port # the port used by the server
         self.buffer_size = buffer_size
@@ -24,6 +24,11 @@ class Client:
         self.send_message(Message(Request.LOGIN, {
             'username': username,
             'password': password
+        }))
+
+    def logout(self, username):
+        self.send_message(Message(Request.LOGOUT, {
+            'username': username
         }))
     
     def register(self, username, password):
@@ -88,6 +93,23 @@ class Client:
         self.send_message(Message(Request.UPDATE_ELO_RATING, {
             'username': username,
             'winner': winner
+        }))
+
+    def get_online_players(self):
+        self.send_message(Message(Request.GET_ONLINE_PLAYERS, None))
+
+    def request_game(self, username, opponent, board_size):
+        self.send_message(Message(Request.REQUEST_REMOTE_GAME, {
+            'username': username,
+            'opponent': opponent,
+            'board_size': board_size
+        }))
+
+    def answer_game_request(self, username, opponent, remote_game_request_status):
+        self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, {
+            'username': username,
+            'opponent': opponent,
+            'response': remote_game_request_status
         }))
 
     def send_message(self, message):

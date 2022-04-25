@@ -75,5 +75,5 @@ class SettingsView(GridPageView):
     def close(self):
         if(self.saved.get()):
             settings = {k: v.get() for k, v in self.setting_inputs.items()}
-            Settings().update_settings(settings)
+            Settings().save_settings(settings)
         self.on_home()

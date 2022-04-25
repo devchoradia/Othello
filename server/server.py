@@ -1,16 +1,17 @@
 import socket
 import pickle
 import threading
-from server.database_client import DatabaseClient
+from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT
 from datetime import datetime
 from enum import Enum
 from model.player.player import Player
+from model.game_mode import REMOTE_GAME_REQUEST_STATUS
 import schedule
 import time
 from server.request import Request, Message
 
 class Server:
-    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -18,7 +19,7 @@ class Server:
         self.database_client = DatabaseClient()
         self.remote_connections = {}
         self.remote_pairs = {}
-        self.remote_queue = []
+        self.game_requests = {}
         self.player_colors = {}
 
     def start(self):
@@ -54,6 +55,7 @@ class Server:
                 if user in self.remote_connections:
                     del self.remote_connections[user]
                 self.end_remote_game(user, player_left_game)
+                self.logout(user)
             # text = f'{username} has disconnected from the chat'
 
     def broadcast_message(self, text):
@@ -68,11 +70,17 @@ class Server:
             result_binary = pickle.dumps(result)
             conn.sendall(result_binary)
 
-    def on_login(self, username, password):
-        return self.database_client.login(username, password)
+    def on_login(self, username, password, conn):
+        result, body = self.database_client.login(username, password)
+        if result == LOGIN_RESULT.SUCCESS:
+            self.remote_connections[username] = conn
+        return (result, body)
 
-    def on_register(self, username, password):
-        return self.database_client.register_user(username, password)
+    def on_register(self, username, password, conn):
+        result, body = self.database_client.register_user(username, password)
+        if result == REGISTER_RESULT.SUCCESS:
+            self.remote_connections[username] = conn
+        return (result, body)
 
     def get_leaderboard(self):
         return self.database_client.get_leaderboard()
@@ -91,6 +99,10 @@ class Server:
 
     def get_settings(self, username):
         return self.database_client.get_settings(username)
+
+    def get_online_players(self):
+        online_players = list(self.remote_connections.keys())
+        return self.database_client.get_ratings(online_players)
 
     def handle_remote_play(self, username, board_size, conn):
         print(f'Current remote game queue: {self.remote_queue}')
@@ -134,26 +146,20 @@ class Server:
                 return
     
     def match_opponents(self, username, opponent, board_size):
-        if opponent == self.remote_pairs.get(username, None) and username == self.remote_pairs.get(opponent, None):
-            print(f'Skipping match {username} and {opponent} because pair exists already')
-            return
         self.remote_pairs[username] = opponent
         self.remote_pairs[opponent] = username
         self.player_colors[opponent] = Player.BLACK
         self.player_colors[username] = Player.WHITE
-        self.send_message(Message(Request.REMOTE_PLAY, (opponent, board_size, self.player_colors[username])), self.remote_connections[username])
-        self.send_message(Message(Request.REMOTE_PLAY, (username, board_size, self.player_colors[opponent])), self.remote_connections[opponent])
-        schedule.clear(username)
-        schedule.clear(opponent)
+        if username in self.game_requests:
+            del self.game_requests[username]
+        if opponent in self.game_requests:
+            del self.game_requests[opponent]
 
     def handle_remote_game_update(self, username, move):
         opponent = self.remote_connections[self.remote_pairs[username]]
         self.send_message(Message(Request.UPDATE_REMOTE_GAME, move), opponent)
 
     def end_remote_game(self, username, player_disrupted_game=False):
-        user_in_queue = next((x for x in self.remote_queue if x[0] == username), None)
-        if user_in_queue is not None:
-            self.remote_queue.remove(user_in_queue)
         if username in self.remote_pairs:
             opponent = self.remote_pairs[username]            
             del self.remote_pairs[username]
@@ -163,6 +169,11 @@ class Server:
                 del self.remote_pairs[opponent]
         if username in self.player_colors:
             del self.player_colors[username]
+        if username in self.game_requests:
+            del self.game_requests[username]
+        for requester, (board_size, opponent) in self.game_requests.items():
+            if opponent == username:
+                self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None))
         schedule.clear(username)
     
     def update_elo_rating(self, username, winner):
@@ -196,13 +207,37 @@ class Server:
         if user in self.remote_connections:
             self.send_message(Message(Request.OPPONENT_DISCONNECTED, "Opponent disconnected from the game"), self.remote_connections[user])
 
+    def request_remote_game(self, username, opponent, board_size, conn):
+        if username not in self.remote_connections:
+            print(f"Remote connections was missing user {username}")
+            self.remote_connections[username] = conn
+        if opponent not in self.remote_connections:
+            return REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None
+        self.game_requests[username] = (board_size, opponent)
+        self.send_message(Message(Request.REQUEST_REMOTE_GAME, (username, board_size, Player.WHITE)), self.remote_connections[opponent])
+
+    def update_remote_game_status(self, remote_game_request_status, username, opponent, conn):
+        if username not in self.remote_connections:
+            print(f"Remote connections was missing user {username}")
+            self.remote_connections[username] = conn
+        if opponent not in self.remote_connections or opponent not in self.game_requests:
+            return REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None
+        board_size = self.game_requests[opponent][0]
+        if remote_game_request_status == REMOTE_GAME_REQUEST_STATUS.ACCEPTED:
+            self.match_opponents(opponent, username, self.game_requests[opponent][0])
+        self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, (remote_game_request_status, username, board_size, Player.BLACK)), self.remote_connections[opponent])
+    
+    def logout(self, username):
+        if username in self.remote_connections:
+            del self.remote_connections[username]
+
     def compute_result(self, message, conn):
         message_type = message.message_type
         body = message.body
         if message_type == Request.LOGIN:
-            return Message(Request.LOGIN, self.on_login(body['username'], body['password']))
+            return Message(Request.LOGIN, self.on_login(body['username'], body['password'], conn))
         elif message_type == Request.REGISTER:
-            return Message(Request.REGISTER, self.on_register(body['username'], body['password']))
+            return Message(Request.REGISTER, self.on_register(body['username'], body['password'], conn))
         elif message_type == Request.GET_GAME_STATE:
             return Message(Request.GET_GAME_STATE, self.get_game_state(body['username']))
         elif message_type == Request.REMOVE_GAME_STATE:
@@ -215,14 +250,24 @@ class Server:
             self.update_settings(body['board_size'], body['board_color'], body['game_mode'], body['username'])
         elif message_type == Request.GET_SETTINGS:
             return Message(Request.GET_SETTINGS, self.get_settings(body['username']))
-        elif message_type == Request.REMOTE_PLAY:
-            return self.handle_remote_play(body['username'], body['board_size'], conn)
+        elif message_type == Request.GET_ONLINE_PLAYERS:
+            return Message(Request.GET_ONLINE_PLAYERS, self.get_online_players())
+        elif message_type == Request.REQUEST_REMOTE_GAME:
+            error = self.request_remote_game(body['username'], body['opponent'], body['board_size'], conn)
+            if error is not None:
+                return Message(Request.UPDATE_REMOTE_GAME_STATUS, error)
+        elif message_type == Request.UPDATE_REMOTE_GAME_STATUS:
+            error = self.update_remote_game_status(body['response'], body['username'], body['opponent'], conn)
+            if error is not None:
+                return Message(Request.UPDATE_REMOTE_GAME_STATUS, error)
         elif message_type == Request.UPDATE_REMOTE_GAME:
             self.handle_remote_game_update(body['username'], body['move'])
         elif message_type == Request.END_REMOTE_GAME:
             self.end_remote_game(body['username'], body['player_disrupted_game'])
         elif message_type == Request.UPDATE_ELO_RATING:
             return Message(Request.UPDATE_ELO_RATING, self.update_elo_rating(body['username'], body['winner']))
+        elif message_type == Request.LOGOUT:
+            self.logout(body['username'])
         return None
 
     class ChatMessage:
