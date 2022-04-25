@@ -23,10 +23,10 @@ class TestGame(unittest.TestCase):
             self.assertEqual(self.game.curr_player, Player.BLACK)
 
     def test_is_legal_move_with_not_legal(self):
-        self.assertFalse(self.game.is_legal_move())
+        self.assertFalse(self.game.is_legal_move(3,3))
 
     def test_is_legal_move_with_legal(self):
-        self.assertTrue(self.game.is_legal_move())
+        self.assertTrue(self.game.is_legal_move(3,2))
 
     def test_is_capturable_with_capturable(self):
         # set board
