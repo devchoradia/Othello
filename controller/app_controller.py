@@ -54,7 +54,8 @@ class AppController(Observer):
         self.current_view.destroy()
         self.game = game
         game.add_observer(self)
-        view = GameView(master=self.root, board=game.board, on_home=self.on_exit_game, board_color = Settings().get_board_color(), main_player=player_color)
+        on_restart = self.restart_game if Settings().get_game_mode() != GameMode.REMOTE else None
+        view = GameView(master=self.root, board=game.board, on_home=self.on_exit_game, board_color = Settings().get_board_color(), main_player=player_color, on_restart=on_restart)
         self.current_view = view
         view.display()
         game_mode = Settings().get_game_mode()
@@ -65,7 +66,7 @@ class AppController(Observer):
             players.append(AIPlayer(ai=MinimaxAI(), view=view))
         elif game_mode == GameMode.REMOTE:
             local_player = LocalPlayer(view, player_color=player_color)
-            remote_player = RemotePlayer(player_color=Player(len(Player) + 1 - player_color), local_player=local_player, client=self.client, on_opponent_disconnect=self.on_opponent_disconnect)
+            remote_player = RemotePlayer(player_color=Player(len(Player) + 1 - player_color), local_player=local_player, client=self.client, on_opponent_disconnect=self.on_opponent_disconnect, on_game_request=self.handle_game_request_notification)
             players = [local_player, remote_player]
             players.sort(key=lambda p: p.player_color)
         else:
@@ -75,6 +76,10 @@ class AppController(Observer):
         for player in players:
             player.observers.reverse()
         controller.run_game()
+    
+    def restart_game(self):
+        self.game_state = None, None, None
+        self.start_game()
 
     def on_opponent_disconnect(self, message):
         self.on_exit_game(player_disrupted_game=False)
@@ -170,7 +175,7 @@ class AppController(Observer):
     def handle_game_request_status(self, remote_game_request_status, opponent, board_size, player_color):
         if self.current_view.page_view == Views.ONLINE_PLAYERS:
             self.current_view.update_request(opponent, remote_game_request_status)
-        elif remote_game_request_status == REMOTE_GAME_REQUEST_STATUS.DECLINED:
+        if remote_game_request_status == REMOTE_GAME_REQUEST_STATUS.DECLINED:
             messagebox.showerror(title="Game Request", message=f"{opponent} declined your game request.")
         elif remote_game_request_status == REMOTE_GAME_REQUEST_STATUS.DISCONNECTED:
             messagebox.showerror(title="Game Request", message=f"{opponent} disconnected.")
@@ -181,6 +186,8 @@ class AppController(Observer):
 
     def handle_game_request_notification(self, username, board_size, player_color):
         answer = messagebox.askyesno(title="Game notification", message=f"{username} has requested to play with you. Do you accept?")
+        if answer and Settings().get_game_mode() == GameMode.REMOTE and self.current_view.page_view == Views.GAME and not self.game.is_game_terminated():
+            self.end_remote_game(True)
         if answer:
             self.remote_game_state = (username, board_size, player_color)
             Settings().update_setting(Setting.GAME_MODE, GameMode.REMOTE)
