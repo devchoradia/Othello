@@ -8,7 +8,7 @@ from model.game_mode import REMOTE_GAME_REQUEST_STATUS
 from server.request import Request, Message
 
 class Server:
-    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -92,15 +92,15 @@ class Server:
         online_players = list(self.remote_connections.keys())
         return self.database_client.get_ratings(online_players)
 
-    def match_opponents(self, username, opponent, board_size):
-        self.remote_pairs[username] = opponent
-        self.remote_pairs[opponent] = username
-        self.player_colors[opponent] = Player.BLACK
-        self.player_colors[username] = Player.WHITE
-        if username in self.game_requests:
-            del self.game_requests[username]
-        if opponent in self.game_requests:
-            del self.game_requests[opponent]
+    def match_opponents(self, player_1, player_2, board_size):
+        self.remote_pairs[player_1] = player_2
+        self.remote_pairs[player_2] = player_1
+        self.player_colors[player_1] = Player.BLACK
+        self.player_colors[player_2] = Player.WHITE
+        if player_1 in self.game_requests:
+            del self.game_requests[player_1]
+        if player_2 in self.game_requests:
+            del self.game_requests[player_2]
 
     def handle_remote_game_update(self, username, move):
         opponent = self.remote_connections[self.remote_pairs[username]]
@@ -119,8 +119,8 @@ class Server:
         if username in self.game_requests:
             del self.game_requests[username]
         for requester, (board_size, opponent) in self.game_requests.items():
-            if opponent == username:
-                self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None))
+            if opponent == username and requester in self.remote_connections:
+                self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, (REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None)), self.remote_connections[requester])
     
     def update_elo_rating(self, username, winner):
         K = 32 # K-FACTOR
@@ -167,7 +167,8 @@ class Server:
             print(f"Remote connections was missing user {username}")
             self.remote_connections[username] = conn
         if opponent not in self.remote_connections or opponent not in self.game_requests:
-            return REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None
+            self.notify_opponent_disconnected(username)
+            return
         board_size = self.game_requests[opponent][0]
         if remote_game_request_status == REMOTE_GAME_REQUEST_STATUS.ACCEPTED:
             self.match_opponents(opponent, username, self.game_requests[opponent][0])
@@ -203,9 +204,7 @@ class Server:
             if error is not None:
                 return Message(Request.UPDATE_REMOTE_GAME_STATUS, error)
         elif message_type == Request.UPDATE_REMOTE_GAME_STATUS:
-            error = self.update_remote_game_status(body['response'], body['username'], body['opponent'], conn)
-            if error is not None:
-                return Message(Request.UPDATE_REMOTE_GAME_STATUS, error)
+            self.update_remote_game_status(body['response'], body['username'], body['opponent'], conn)
         elif message_type == Request.UPDATE_REMOTE_GAME:
             self.handle_remote_game_update(body['username'], body['move'])
         elif message_type == Request.END_REMOTE_GAME:
