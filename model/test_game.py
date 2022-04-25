@@ -11,7 +11,8 @@ class TestGame(unittest.TestCase):
         self.game = Game()
 
     def test_make_move(self):
-        self.assertEqual()
+        self.game.make_move(3,2)
+        self.assertEqual(self.game.board[3, 3], int(Player.BLACK))
 
     def test_switch_player_turn(self):
         previous_player = self.game.curr_player
@@ -30,24 +31,24 @@ class TestGame(unittest.TestCase):
     def test_is_capturable_with_capturable(self):
         # set board
         '''
-        0   1   2   3   4   5   6   7
-           │   │   │   │   │   │   │   │0
-        ───┼───┼───┼───┼───┼───┼───┼───┼
-           │   │   │   │   │   │   │   │1
-        ───┼───┼───┼───┼───┼───┼───┼───┼
-           │   │   │   │   │   │   │   │2
-        ───┼───┼───┼───┼───┼───┼───┼───┼
-           │   │   │ X │ O │   │   │   │3
-        ───┼───┼───┼───┼───┼───┼───┼───┼
-           │   │   │ O │ X │   │   │   │4
-        ───┼───┼───┼───┼───┼───┼───┼───┼
-           │   │   │   │   │   │   │   │5
-        ───┼───┼───┼───┼───┼───┼───┼───┼
-           │   │   │   │   │   │   │   │6
-        ───┼───┼───┼───┼───┼───┼───┼───┼
-           │   │   │   │   │   │   │   │7
-        ───┼───┼───┼───┼───┼───┼───┼───┼
-        '''
+                0   1   2   3   4   5   6   7
+                   │   │   │   │   │   │   │   │0
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │1
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │2
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │ X │   │   │   │3
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ X │ O │   │   │   │4
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │5
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │6
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │7
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                '''
         self.assertTrue(self.game.is_capturable(4,4))
 
     def test_is_capturable_not_capturable(self):
@@ -79,23 +80,37 @@ class TestGame(unittest.TestCase):
     def test_has_valid_moves_with_valid(self):
         self.assertTrue(self.game.has_valid_move(Player.BLACK))
 
-    def test_get_valid_moves(self):
-        self.assertEqual(self.game.get_valid_moves(), [])
+    def test_get_valid_moves_BLACK(self):
+        self.assertEqual(self.game.get_valid_moves(), [(2,3), (3,2), (4,5), (5,4)])
+
+    def test_get_valid_moves_WHITE(self):
+        self.game.switch_player_turn()
+        self.assertEqual(self.game.get_valid_moves(), [(2,4), (3,5), (4,2), (5,3)])
+
 
     def test_is_game_terminated_not_over(self):
-        self.assertFalse()
+        self.assertFalse(self.game.is_game_terminated())
 
     def test_is_game_terminated_over(self):
-        self.assertTrue()
+        self.game.board = np.full((self.game.board_size, self.game.board_size), int(Player.BLACK))
+        self.game.board[3, 3] = int(Player.WHITE)
+        self.assertTrue(self.game.is_game_terminated())
 
     def test_has_player_captured_no_tiles_left(self):
-        self.assertTrue()
+        self.game.board = np.full((self.game.board_size, self.game.board_size), int(Player.BLACK))
+        self.assertTrue(self.game.has_player_captured_all())
 
-    def test_has_player_captured_some_tiles_left(self):
-        self.assertFalse()
+    def test_has_player_captured_full_with_different_players_tiles(self):
+        self.game.board = np.full((self.game.board_size, self.game.board_size), int(Player.BLACK))
+        self.game.board[3,3] = int(Player.WHITE)
+        self.assertFalse(self.game.has_player_captured_all())
+
+    def test_has_player_captured_empty_tiles_left(self):
+        self.assertFalse(self.game.has_player_captured_all())
 
     def test_get_winner(self):
-        self.assertEqual()
+        self.game.make_move(3, 2)
+        self.assertEqual(self.game.get_winner(), Player.BLACK)
 
     def test_get_player_with_max_tiles_white(self):
         self.game.switch_player_turn()
