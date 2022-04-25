@@ -2,12 +2,9 @@ import socket
 import pickle
 import threading
 from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT
-from datetime import datetime
 from enum import Enum
 from model.player.player import Player
 from model.game_mode import REMOTE_GAME_REQUEST_STATUS
-import schedule
-import time
 from server.request import Request, Message
 
 class Server:
@@ -27,8 +24,6 @@ class Server:
             my_socket.bind((self.host, self.port))
             my_socket.listen()
             print('Server started')
-            thread = threading.Thread(target=self.run_scheduled_tasks, args=())
-            thread.start()
 
             while True:
                 conn, address = my_socket.accept()
@@ -56,14 +51,7 @@ class Server:
                     del self.remote_connections[user]
                 self.end_remote_game(user, player_left_game)
                 self.logout(user)
-            # text = f'{username} has disconnected from the chat'
 
-    def broadcast_message(self, text):
-        message = ChatMessage(text)
-        message_binary = pickles.dumps(message)
-        for client in self.clients:
-            client.sendall(message_binary)
-        
     def send_message(self, result, conn):
         if result is not None:
             print(f'Sending message {result.message_type}, {result.body}')
@@ -104,47 +92,6 @@ class Server:
         online_players = list(self.remote_connections.keys())
         return self.database_client.get_ratings(online_players)
 
-    def handle_remote_play(self, username, board_size, conn):
-        print(f'Current remote game queue: {self.remote_queue}')
-        self.remote_connections[username] = conn
-        dt = datetime.now()
-        if len(self.remote_queue) == 0:
-            self.remote_queue.append((username, board_size, dt))
-            return
-        self.remote_queue.append((username, board_size, dt))
-        # Look for someone looking for same board size
-        schedule.every(2).seconds.do(lambda u=username, s=board_size: self.check_remote_queue(u, s)).tag(username)
-
-    def run_scheduled_tasks(self):
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
-
-    def check_remote_queue(self, username, board_size):
-        print(f'Current remote game queue: {self.remote_queue}')
-        now = datetime.now()
-        queue_index = len(self.remote_queue)
-        if username in self.remote_pairs:
-            schedule.clear(username)
-            return
-        for index, (opponent, opp_board_size, dt) in enumerate(self.remote_queue):
-            if opponent == username:
-                queue_index = index
-                continue
-            time_waited = now - dt
-            games_match = board_size == opp_board_size
-            if time_waited.total_seconds() >= 45 or games_match:
-                print(f'Matching {username} with {opponent}')
-                if index < queue_index:
-                    self.match_opponents(username, opponent, opp_board_size)
-                else:
-                    self.match_opponents(username, opponent, board_size)
-                del self.remote_queue[index]
-                current_user = next((x for x in self.remote_queue if x[0] == username), None)
-                if current_user is not None:
-                    self.remote_queue.remove(current_user)
-                return
-    
     def match_opponents(self, username, opponent, board_size):
         self.remote_pairs[username] = opponent
         self.remote_pairs[opponent] = username
@@ -174,7 +121,6 @@ class Server:
         for requester, (board_size, opponent) in self.game_requests.items():
             if opponent == username:
                 self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None))
-        schedule.clear(username)
     
     def update_elo_rating(self, username, winner):
         K = 32 # K-FACTOR
