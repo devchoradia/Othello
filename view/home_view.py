@@ -1,10 +1,11 @@
 import tkinter as tk
-from view.abstract_page_view import PageView, ROW_HEIGHT, BUTTON_FONT, APP_COLOR
-from model.views import Views, VIEW_TITLES
+
 from model.session import Session
-from enum import Enum
+from model.views import Views, VIEW_TITLES
+from view.abstract_page_view import PageView, ROW_HEIGHT, BUTTON_FONT, APP_COLOR
 
 ROWS = [Views.GAME, Views.LEADERBOARD, Views.SETTINGS, Views.LOGIN]
+
 
 # Renders the home page
 class HomeView(PageView):
@@ -18,10 +19,11 @@ class HomeView(PageView):
         self.rating_label = None
 
     def display(self):
-        self.add_title()   
+        self.add_title()
         self.add_rating()
         for idx, view in enumerate(ROWS):
-            button = tk.Button(self, text=self.get_button_label(view), font=BUTTON_FONT, borderwidth=1, width=20, height=ROW_HEIGHT, command=lambda v=view: self.on_click(v))
+            button = tk.Button(self, text=self.get_button_label(view), font=BUTTON_FONT, borderwidth=1, width=20,
+                               height=ROW_HEIGHT, command=lambda v=view: self.on_click(v))
             button.pack(padx=5, pady=(10, 5))
         self.add_loading_label()
         self.pack(fill=tk.BOTH, ipadx=50, ipady=50)
@@ -29,7 +31,7 @@ class HomeView(PageView):
     def add_loading_label(self):
         frame = tk.Frame(self, bg="white")
         frame.pack(expand=True, fill=tk.BOTH)
-        l = tk.Label(frame, text="", bg='white', fg='red', font = 'Helvetica 15')
+        l = tk.Label(frame, text="", bg='white', fg='red', font='Helvetica 15')
         l.pack(pady=10)
         self.loading_label = l
 
@@ -42,7 +44,7 @@ class HomeView(PageView):
         text = ""
         if rating is not None:
             text = f"Rating: {str(rating)}"
-        rating = tk.Label(frame, text=text, bg='white', fg='black', font = rating_font)
+        rating = tk.Label(frame, text=text, bg='white', fg='black', font=rating_font)
         rating.pack(pady=(50, 10))
         self.rating_label = rating
 
@@ -70,4 +72,3 @@ class HomeView(PageView):
 
     def on_click(self, view):
         self.on_select_page(view)
-

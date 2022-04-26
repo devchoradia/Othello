@@ -1,8 +1,9 @@
 # test settings
 import unittest
-from client.client import Client
+
 from model.game_mode import GameMode
 from settings import Settings
+
 
 class TestSettings(unittest.TestCase):
     def setUp(self):
@@ -16,5 +17,3 @@ class TestSettings(unittest.TestCase):
 
     def test_get_game_mode(self):
         self.assertEqual(self.settings.get_board_color(), GameMode.LOCAL)
-
-

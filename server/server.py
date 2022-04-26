@@ -1,17 +1,19 @@
-import socket
 import pickle
+import socket
 import threading
-from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT
-from enum import Enum
-from model.player.player import Player
+
 from model.game_mode import REMOTE_GAME_REQUEST_STATUS
+from model.player.player import Player
+from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT
 from server.request import Request, Message
+
 
 class Server:
     '''
     Reversi Game Server
     Handles all client requests and database queries
     '''
+
     def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
         self.host = host
         self.port = port
@@ -164,7 +166,7 @@ class Server:
         Unmatch the player and opponent, and notify the opponent if the player abandoned the game while it was still playing.
         '''
         if username in self.remote_pairs:
-            opponent = self.remote_pairs[username]            
+            opponent = self.remote_pairs[username]
             del self.remote_pairs[username]
             if opponent in self.remote_pairs and self.remote_pairs[opponent] == username:
                 if player_disrupted_game:
@@ -174,7 +176,7 @@ class Server:
             del self.player_colors[username]
         if username in self.game_requests:
             del self.game_requests[username]
-    
+
     def update_elo_rating(self, username, winner):
         '''
         Update the ELORating for the user, given the winner of the game.
@@ -196,7 +198,7 @@ class Server:
         * Implemented algorithm based on this guide:
             https://metinmediamath.wordpress.com/2013/11/27/how-to-calculate-the-elo-rating-including-example/
         '''
-        K = 32 # K-FACTOR
+        K = 32  # K-FACTOR
         if username in self.remote_pairs and username in self.player_colors:
             player_color = self.player_colors[username]
             opponent = self.remote_pairs[username]
@@ -205,16 +207,16 @@ class Server:
                 return
             opponent_rating = int(self.database_client.get_rating(opponent)[0][0])
             user_rating = int(self.database_client.get_rating(username)[0][0])
-            r1 = pow(10, user_rating/400)
-            r2 = pow(10, opponent_rating/400)
+            r1 = pow(10, user_rating / 400)
+            r2 = pow(10, opponent_rating / 400)
             e1 = r1 / (r1 + r2)
             e2 = r2 / (r1 + r2)
-            s1 = 0.5 # DRAW
-            if player_color == winner: # USER WON
+            s1 = 0.5  # DRAW
+            if player_color == winner:  # USER WON
                 s1 = 1
-            elif winner == self.player_colors[opponent]: # USER LOST
+            elif winner == self.player_colors[opponent]:  # USER LOST
                 s1 = 0
-            new_rating = round(user_rating + K*(s1-e1))
+            new_rating = round(user_rating + K * (s1 - e1))
             result = self.database_client.update_rating(new_rating, username)
             print(result)
             print(self.database_client.get_rating(username))
@@ -227,7 +229,8 @@ class Server:
         Notifies the user's opponent that the user has disconnected from the ongoing remote game
         '''
         if user in self.remote_connections:
-            self.send_message(Message(Request.OPPONENT_DISCONNECTED, "Opponent disconnected from the game"), self.remote_connections[user])
+            self.send_message(Message(Request.OPPONENT_DISCONNECTED, "Opponent disconnected from the game"),
+                              self.remote_connections[user])
 
     def request_remote_game(self, username, opponent, board_size, conn):
         '''
@@ -239,7 +242,8 @@ class Server:
         if opponent not in self.remote_connections:
             return REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, opponent, None, None
         self.game_requests[username] = (board_size, opponent)
-        self.send_message(Message(Request.REQUEST_REMOTE_GAME, (username, board_size, Player.WHITE)), self.remote_connections[opponent])
+        self.send_message(Message(Request.REQUEST_REMOTE_GAME, (username, board_size, Player.WHITE)),
+                          self.remote_connections[opponent])
 
     def update_remote_game_status(self, remote_game_request_status, username, opponent, conn):
         '''
@@ -255,8 +259,10 @@ class Server:
         board_size = self.game_requests[opponent][0]
         if remote_game_request_status == REMOTE_GAME_REQUEST_STATUS.ACCEPTED:
             self.match_opponents(opponent, username, self.game_requests[opponent][0])
-        self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, (remote_game_request_status, username, board_size, Player.BLACK)), self.remote_connections[opponent])
-    
+        self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS,
+                                  (remote_game_request_status, username, board_size, Player.BLACK)),
+                          self.remote_connections[opponent])
+
     def logout(self, username):
         '''
         Log the user out of the system.
@@ -281,7 +287,9 @@ class Server:
         elif message_type == Request.REMOVE_GAME_STATE:
             return Message(Request.REMOVE_GAME_STATE, self.remove_game_state(body['username']))
         elif message_type == Request.UPDATE_GAME_STATE:
-            return Message(Request.UPDATE_GAME_STATE, self.update_game_state(body['board'], body['game_mode'], body['current_player'], body['username']))
+            return Message(Request.UPDATE_GAME_STATE,
+                           self.update_game_state(body['board'], body['game_mode'], body['current_player'],
+                                                  body['username']))
         elif message_type == Request.LEADERBOARD:
             return Message(Request.LEADERBOARD, self.get_leaderboard())
         elif message_type == Request.UPDATE_SETTINGS:
@@ -305,5 +313,3 @@ class Server:
         elif message_type == Request.LOGOUT:
             self.logout(body['username'])
         return None
-
-

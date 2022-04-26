@@ -1,20 +1,22 @@
 from tkinter import *
-from view.abstract_page_view import PageView, ROW_HEIGHT, TEXT_FONT, APP_COLOR
-from model.views import Views, VIEW_TITLES
-from server.database_client import LOGIN_RESULT, LOGIN_RESULT_MESSAGE, REGISTER_RESULT, REGISTER_RESULT_MESSAGE
-import math
-from abc import abstractmethod
+
 from PIL import Image, ImageTk
 
+from model.views import Views
+from server.database_client import LOGIN_RESULT, LOGIN_RESULT_MESSAGE
+from view.abstract_page_view import PageView, ROW_HEIGHT, TEXT_FONT, APP_COLOR
+
 LOGO_LENGTH = 200
+
 
 class AccountInfoView(PageView):
     '''
     Renders a page where a user inputs their username and password
     '''
+
     def __init__(self, master, on_submit, on_switch_view, on_home, view=Views.LOGIN, \
-        submit_results = LOGIN_RESULT, result_messages = LOGIN_RESULT_MESSAGE, \
-        submit_label="LOGIN", switch_view_label="Register account"):
+                 submit_results=LOGIN_RESULT, result_messages=LOGIN_RESULT_MESSAGE, \
+                 submit_label="LOGIN", switch_view_label="Register account"):
         super().__init__(master, view, on_home=on_home, width=500, height=600, bg='white')
         master.geometry('600x800')
         master['background'] = APP_COLOR
@@ -30,7 +32,6 @@ class AccountInfoView(PageView):
         logo = Image.open("logo.png").resize((LOGO_LENGTH, LOGO_LENGTH), Image.ANTIALIAS)
         self.logo = ImageTk.PhotoImage(logo)
 
-    
     def display(self):
         font = TEXT_FONT
         self.add_title()
@@ -44,7 +45,8 @@ class AccountInfoView(PageView):
         self.add_label('Username', entry_frame=entry_frame)
 
         # Username entry
-        username_entry = Entry(entry_frame, width=30, border=0, textvariable=self.username, insertbackground="black", fg="black", bg="white", highlightbackground="white")
+        username_entry = Entry(entry_frame, width=30, border=0, textvariable=self.username, insertbackground="black",
+                               fg="black", bg="white", highlightbackground="white")
         username_entry.config(font=font)
         username_entry.pack()
         username_entry.focus()
@@ -55,9 +57,10 @@ class AccountInfoView(PageView):
         f3.pack()
 
         # Password label
-        self.add_label('Password', (10,0), entry_frame)
+        self.add_label('Password', (10, 0), entry_frame)
 
-        e2 = Entry(entry_frame, width=30, border=0, show='*', textvariable=self.password, insertbackground="black", fg="black", bg="white", highlightbackground="white")
+        e2 = Entry(entry_frame, width=30, border=0, show='*', textvariable=self.password, insertbackground="black",
+                   fg="black", bg="white", highlightbackground="white")
         e2.config(font=font)
         e2.pack()
         e2.bind('<Return>', lambda x: self.click_login())
@@ -82,11 +85,13 @@ class AccountInfoView(PageView):
         button_frame.pack()
         button_frame.place(anchor='center', relx=0.5, rely=0.85)
 
-        submit_button = Button(button_frame, text=self.submit_label,width=20,height=2,fg=e_color, bg=l_color,activeforeground=l_color,activebackground=e_color, highlightbackground="white", command=self.click_login)
+        submit_button = Button(button_frame, text=self.submit_label, width=20, height=2, fg=e_color, bg=l_color,
+                               activeforeground=l_color, activebackground=e_color, highlightbackground="white",
+                               command=self.click_login)
 
         def on_hover(e):
-            submit_button['background'] = e_color  
-            submit_button['foreground'] = l_color  
+            submit_button['background'] = e_color
+            submit_button['foreground'] = l_color
 
         def on_leave(e):
             submit_button['background'] = l_color
@@ -97,19 +102,22 @@ class AccountInfoView(PageView):
 
         submit_button.pack()
 
-        switch_view_button = Button(button_frame, text=self.switch_view_label, bg='white', fg = 'blue', font = 'Helvetica 12', borderwidth=3, highlightbackground="white", command=self.switch_view)
+        switch_view_button = Button(button_frame, text=self.switch_view_label, bg='white', fg='blue',
+                                    font='Helvetica 12', borderwidth=3, highlightbackground="white",
+                                    command=self.switch_view)
         switch_view_button.pack(side=TOP, pady=5)
 
-        login_as_guest_button = Button(button_frame, text="Log in as guest", bg='white', fg = 'blue', font = 'Helvetica 12', borderwidth=3, highlightbackground="white", command=self.on_home)
+        login_as_guest_button = Button(button_frame, text="Log in as guest", bg='white', fg='blue', font='Helvetica 12',
+                                       borderwidth=3, highlightbackground="white", command=self.on_home)
         login_as_guest_button.pack(side=TOP, pady=2)
 
     def add_label(self, label, pady=None, entry_frame=None):
         l1 = Label(entry_frame, text=label, fg='gray', bg='white', font='Helvetica 15 bold')
         l1.pack(anchor='w', pady=pady)
-    
+
     def add_logo(self):
         img_frame = self.make_frame(0.5, 0.3, LOGO_LENGTH, LOGO_LENGTH)
-        label = Label(img_frame, image = self.logo, bg="white")
+        label = Label(img_frame, image=self.logo, bg="white")
         label.pack()
 
     def switch_view(self):
@@ -123,9 +131,9 @@ class AccountInfoView(PageView):
             self.on_home()
         else:
             self.display_error(result)
-    
+
     def display_error(self, result):
-        l = Label(self, text=self.result_messages[result], bg='white', fg='red', font = 'Helvetica 14')
+        l = Label(self, text=self.result_messages[result], bg='white', fg='red', font='Helvetica 14')
         l.place(relx=0.5, rely=0.73, anchor=CENTER)
         if self.error is not None:
             self.error.destroy()
@@ -135,5 +143,6 @@ class AccountInfoView(PageView):
         title_frame = Frame(self, bg="white")
         title_frame.pack()
         title_frame.place(anchor='n', relx=0.5)
-        label = Label(title_frame, relief=RAISED, borderwidth=1, width=self.cget("width"), height=ROW_HEIGHT, font=("Palatino", 40), text=self.title, bg="white", fg="black")
+        label = Label(title_frame, relief=RAISED, borderwidth=1, width=self.cget("width"), height=ROW_HEIGHT,
+                      font=("Palatino", 40), text=self.title, bg="white", fg="black")
         label.pack(expand=True)

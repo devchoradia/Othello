@@ -1,16 +1,19 @@
-import socket
 import pickle
+import socket
 import threading
+
 from server.request import Request, Message
+
 
 class Client:
     '''
     A client which connects and sends requests to the server.
     Sends server's responses/notifications to the observers of the Client.
     '''
+
     def __init__(self, host='144.202.8.233', port=1234, buffer_size=1024):
-        self.host = host # the server's host name or IP address
-        self.port = port # the port used by the server
+        self.host = host  # the server's host name or IP address
+        self.port = port  # the port used by the server
         self.buffer_size = buffer_size
         self.my_socket = socket.socket()
         self.my_socket.connect((self.host, self.port))
@@ -23,7 +26,7 @@ class Client:
         Sets the observer to the given observer
         '''
         self.observers = [observer]
-    
+
     def add_observer(self, observer):
         '''
         Adds the given observer to the list of observers
@@ -46,7 +49,7 @@ class Client:
         self.send_message(Message(Request.LOGOUT, {
             'username': username
         }))
-    
+
     def register(self, username, password):
         '''
         Attempt to register the given username and password
@@ -100,7 +103,7 @@ class Client:
             'game_mode': game_mode,
             'username': username
         }))
-    
+
     def update_remote_game(self, username, move):
         '''
         Send a move to the opponent during a remote game
@@ -184,7 +187,7 @@ class Client:
                 self.update_observers(message)
             except OSError:
                 break
-    
+
     def update_observers(self, message):
         '''
         Send the observers a message from the server

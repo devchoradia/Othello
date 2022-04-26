@@ -1,15 +1,15 @@
-from enum import IntEnum
-from model.observer import Observable
-from abc import abstractmethod
 from model.player.player import Player, GamePlayer
-from server.request import Request
 from model.session import Session
+from server.request import Request
 
 '''
 Represents a remote player in a remote game.
 '''
+
+
 class RemotePlayer(GamePlayer):
-    def __init__(self, player_color=Player.WHITE, local_player=None, client=None, on_opponent_disconnect=None, on_game_request=None):
+    def __init__(self, player_color=Player.WHITE, local_player=None, client=None, on_opponent_disconnect=None,
+                 on_game_request=None):
         super().__init__(player_color)
         self.local_player = local_player
         if local_player is not None:
@@ -22,7 +22,7 @@ class RemotePlayer(GamePlayer):
 
     def get_requested_move(self) -> (int, int):
         return self.requested_moves.pop(0)
-    
+
     def request_move(self):
         '''
         No need to request a move. Simply wait until a move is sent from the server

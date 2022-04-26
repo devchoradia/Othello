@@ -1,4 +1,3 @@
-
 from abc import ABC, abstractmethod
 
 '''
@@ -7,6 +6,8 @@ The observer (game controller) observes the observables (view and controller) by
 The observables notify/update the observer when important events occur
 (e.g. a move is clicked on the view, the board is updated in the model, etc.)
 '''
+
+
 class Observer(ABC):
     def __init__(self, observables):
         for observable in observables:
@@ -16,17 +17,17 @@ class Observer(ABC):
     def update(self, subject):
         pass
 
+
 class Observable(ABC):
     def __init__(self):
         self.observers = []
 
     def add_observer(self, observer):
         self.observers.append(observer)
-    
+
     def remove_observer(self, observer):
         self.observers.remove(observer)
-    
+
     def notify_observers(self):
         for observer in self.observers:
             observer.update(self)
-

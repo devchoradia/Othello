@@ -1,9 +1,11 @@
-from model.player.player import Player
 import numpy as np
+
 from model.observer import Observable
+from model.player.player import Player
+
 
 class Game(Observable):
-    def __init__(self, board_size = 8, board=None, curr_player=Player.BLACK):
+    def __init__(self, board_size=8, board=None, curr_player=Player.BLACK):
         super().__init__()
         if board_size < 3:
             print("Invalid board size. Using default 8x8 board.")
@@ -23,9 +25,10 @@ class Game(Observable):
         self.board[center, center] = int(Player.WHITE)
         self.board[center, center - 1] = int(Player.BLACK)
         self.board[center - 1, center] = int(Player.BLACK)
-        self.board[center - 1, center - 1] = int(Player.WHITE) 
+        self.board[center - 1, center - 1] = int(Player.WHITE)
 
-    # Performs the given move for the current player, and updates the resulting captured tiles
+        # Performs the given move for the current player, and updates the resulting captured tiles
+
     def make_move(self, row, col):
         '''
         Once the board is updated, notify the observers
@@ -55,15 +58,15 @@ class Game(Observable):
                     if self.board[row + i * dy, col + i * dx] == 0:
                         break
                     if self.board[row + i * dy, col + i * dx] == int(self.curr_player):
-                          self.capture_tiles(captured)       
+                        self.capture_tiles(captured)
                     i += 1
         return False
-    
+
     # Takes a list of tile positions that are captured, and updates those tiles
     def capture_tiles(self, captured_positions):
         for row, col in captured_positions:
             self.board[row, col] = int(self.curr_player)
-    
+
     # Switches the player turn
     def switch_player_turn(self):
         '''
@@ -82,7 +85,7 @@ class Game(Observable):
             return False
         if self.board[row, col] != 0:
             return False
-        
+
         for dx in range(-1, 2):
             for dy in range(-1, 2):
                 isInvalidDirection = dx == 0 and dy == 0
@@ -96,8 +99,8 @@ class Game(Observable):
                     if hasReachedEndOfBoard or self.board[newRow, newCol] == 0:
                         break
                     if self.board[newRow, newCol] == int(player):
-                        return True;            
-                    i+=1
+                        return True;
+                    i += 1
         return False
 
     # Determine whether the tile at the given location is the current player's opponent
@@ -165,12 +168,9 @@ class Game(Observable):
                 player_with_max_tile_count = i
                 max_tile_count = count
             elif count == max_tile_count:
-                player_with_max_tile_count = 0 # DRAW
+                player_with_max_tile_count = 0  # DRAW
         return player_with_max_tile_count
 
     # Determines whether the board is full
     def is_board_full(self):
         return not np.any(self.board == 0)
-
-    
-    

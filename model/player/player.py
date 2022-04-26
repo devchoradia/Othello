@@ -1,10 +1,13 @@
-from enum import IntEnum
-from model.observer import Observable
 from abc import abstractmethod
+from enum import IntEnum
+
+from model.observer import Observable
+
 
 class Player(IntEnum):
     BLACK = 1
     WHITE = 2
+
 
 PLAYER_SYMBOL = {
     Player.BLACK: 'X',
@@ -25,6 +28,8 @@ HUMAN_PLAYER = Player.BLACK
 Abstract player class.
 The player notifies the GameController when a move is made, and has a method to retrieve this last move requested.
 '''
+
+
 class GamePlayer(Observable):
     def __init__(self, player_color: Player):
         super().__init__()
@@ -37,4 +42,3 @@ class GamePlayer(Observable):
     @abstractmethod
     def request_move(self):
         pass
-    

@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class GameMode(Enum):
     def __str__(self):
         return str(self.value)
@@ -11,6 +12,7 @@ class GameMode(Enum):
     LOCAL = "local"
     AI = "AI"
     REMOTE = "remote"
+
 
 class REMOTE_GAME_REQUEST_STATUS(Enum):
     PENDING = "Pending"

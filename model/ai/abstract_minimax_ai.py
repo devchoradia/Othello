@@ -1,7 +1,7 @@
-from model.player.player import Player, AI_PLAYER, HUMAN_PLAYER
-from model.game_state_manager import GameStateManager
 from abc import ABC, abstractmethod
-import numpy as np
+
+from model.game_state_manager import GameStateManager
+from model.player.player import AI_PLAYER, HUMAN_PLAYER
 
 '''
 Template method
@@ -10,10 +10,13 @@ AbstractMinimaxAI defines the skeleton of the minimax algorithm, but leaves the 
 
 Different levels of the AI might implement different heuristics and calculate different depths of gameplay.
 '''
+
+
 class AbstractMinimaxAI(ABC):
     '''
     Abstract class a minimax ai player
     '''
+
     def __init__(self, max_depth):
         self.max_depth = max_depth
 
@@ -36,7 +39,7 @@ class AbstractMinimaxAI(ABC):
         best_value = float('-inf')
         for row, col in moves:
             board = GameStateManager.make_move(state, AI_PLAYER, row, col)
-            min_value = self.min_value(board, alpha, beta, depth=depth-1)
+            min_value = self.min_value(board, alpha, beta, depth=depth - 1)
             best_value = max(best_value, min_value)
             if best_value == min_value:
                 best_move = (row, col)
@@ -56,7 +59,7 @@ class AbstractMinimaxAI(ABC):
             return self.get_utility_value(state)
         for row, col in moves:
             board = GameStateManager.make_move(state, HUMAN_PLAYER, row, col)
-            max_value, max_move = self.max_value(board, alpha, beta, depth-1)
+            max_value, max_move = self.max_value(board, alpha, beta, depth - 1)
             min_value = min(min_value, max_value)
             if min_value <= alpha:
                 return min_value
@@ -69,4 +72,3 @@ class AbstractMinimaxAI(ABC):
         Returns the utility value of the given state
         '''
         pass
-    

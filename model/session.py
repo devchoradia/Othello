@@ -1,4 +1,5 @@
 import threading
+
 from client.client import Client
 
 '''
@@ -6,12 +7,14 @@ Thread-safe singleton session class.
 This makes sure only one Session class is instantiated so that a single login session can be shared/accessed among different components,
 via a single Session instance.
 '''
+
+
 class Session:
     _instance = None
     _lock = threading.Lock()
 
-    def __init__(self):      
-        if(self._initialized): return
+    def __init__(self):
+        if (self._initialized): return
         self.username = None
         self.ELORating = None
         self._initialized = True
@@ -24,10 +27,10 @@ class Session:
                     cls._instance = super().__new__(cls, *args, **kwargs)
                     cls._instance._initialized = False
         return cls._instance
-    
+
     def is_logged_in(self):
         return self.username != None
-    
+
     def log_in(self, username, ELORating):
         self.username = username
         self.ELORating = ELORating
@@ -36,7 +39,7 @@ class Session:
         self.client.logout(self.username)
         self.username = None
         self.ELORating = None
-    
+
     def get_username(self):
         return self.username
 

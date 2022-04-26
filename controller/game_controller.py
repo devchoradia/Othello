@@ -1,13 +1,12 @@
 from model.game import Game
-from view.game_view import GameView
-from model.ai.minimax_ai import MinimaxAI
-from model.settings import GameMode
-from model.player.player import Player, GamePlayer
 from model.observer import Observer
+from model.player.player import GamePlayer
+from view.game_view import GameView
+
 
 class GameController(Observer):
     def __init__(self, model: Game, view: GameView, players: [GamePlayer]):
-        super().__init__([*players, model]) # Subscribe to the model and players
+        super().__init__([*players, model])  # Subscribe to the model and players
         self.model = model
         self.view = view
         self.players = {players[i].player_color: players[i] for i in range(0, len(players))}
@@ -41,7 +40,7 @@ class GameController(Observer):
         # Make the move
         else:
             self.make_move(row, col)
-       
+
     def make_move(self, row, col):
         # Make the move
         self.model.make_move(row, col)

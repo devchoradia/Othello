@@ -1,14 +1,13 @@
-from enum import IntEnum
-from model.observer import Observable
-from abc import abstractmethod
-from model.player.player import Player, GamePlayer
 from model.ai.abstract_minimax_ai import AbstractMinimaxAI
+from model.player.player import Player, GamePlayer
 from view.game_view import GameView
 
 '''
 AI player class.
 The player uses the minimax ai to retrieve a move
 '''
+
+
 class AIPlayer(GamePlayer):
     def __init__(self, ai: AbstractMinimaxAI, view: GameView, player_color=Player.WHITE):
         super().__init__(player_color)
