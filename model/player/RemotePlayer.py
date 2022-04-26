@@ -6,7 +6,7 @@ from server.request import Request
 from model.session import Session
 
 '''
-Stub class for RemotePlayer class (TODO)
+Represents a remote player in a remote game.
 '''
 class RemotePlayer(GamePlayer):
     def __init__(self, player_color=Player.WHITE, local_player=None, client=None, on_opponent_disconnect=None, on_game_request=None):
@@ -24,9 +24,16 @@ class RemotePlayer(GamePlayer):
         return self.requested_moves.pop(0)
     
     def request_move(self):
+        '''
+        No need to request a move. Simply wait until a move is sent from the server
+        '''
         pass
 
     def update(self, subject, message=None):
+        '''
+        Listen to the moves sent by the local player.
+        Also listen to moves sent by the remote opponent (through the client)
+        '''
         # Local player requested a move
         if subject == self.local_player:
             move = self.local_player.board_view.get_requested_move()
