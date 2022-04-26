@@ -69,7 +69,7 @@ class Server:
         Send a message to the given client connection
         '''
         if result is not None:
-            print(f'Sending message {result.message_type}, {result.body}')
+            print(f'Sending message: {result.message_type}, {result.body}')
             result_binary = pickle.dumps(result)
             conn.sendall(result_binary)
 
