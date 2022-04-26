@@ -67,7 +67,8 @@ class OnlinePlayersView(GridPageView):
         self.request_game(username)
 
     def update_request(self, username, status):
-        self.buttons[username].config(text=status.value)
+        if username in self.buttons:
+            self.buttons[username].config(text=status.value)
 
     def add_no_online_players_message(self):
         grid_row = 2 + len(self.players)

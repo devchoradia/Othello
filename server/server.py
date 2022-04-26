@@ -8,7 +8,7 @@ from model.game_mode import REMOTE_GAME_REQUEST_STATUS
 from server.request import Request, Message
 
 class Server:
-    def __init__(self, host='127.0.0.1', port=1200, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -118,9 +118,6 @@ class Server:
             del self.player_colors[username]
         if username in self.game_requests:
             del self.game_requests[username]
-        for requester, (board_size, opponent) in self.game_requests.items():
-            if opponent == username and requester in self.remote_connections:
-                self.send_message(Message(Request.UPDATE_REMOTE_GAME_STATUS, (REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None)), self.remote_connections[requester])
     
     def update_elo_rating(self, username, winner):
         K = 32 # K-FACTOR
@@ -158,7 +155,7 @@ class Server:
             print(f"Remote connections was missing user {username}")
             self.remote_connections[username] = conn
         if opponent not in self.remote_connections:
-            return REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, None, None, None
+            return REMOTE_GAME_REQUEST_STATUS.DISCONNECTED, opponent, None, None
         self.game_requests[username] = (board_size, opponent)
         self.send_message(Message(Request.REQUEST_REMOTE_GAME, (username, board_size, Player.WHITE)), self.remote_connections[opponent])
 
