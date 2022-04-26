@@ -9,6 +9,7 @@ from model.game import Game
 class TestMinimax(unittest.TestCase):
     def setUp(self):
         self.minimax = MinimaxAI()
+        self.minimax2 = MinimaxAI2()
         self.minimax3 = MinimaxAI3()
         self.game = Game()
 
@@ -30,7 +31,7 @@ class TestMinimax(unittest.TestCase):
 
     def test_heuristic(self):
         self.game.make_move(3, 2)
-        self.assertEqual(self.minimax.heuristic(self.game.board), (1, 4))
+        self.assertEqual(self.minimax.heuristic(self.game.board), (2, 8))
 
     def test_heuristic_with_uncapturables(self):
         self.game.make_move(3, 2)
@@ -61,7 +62,7 @@ class TestMinimax(unittest.TestCase):
         self.game.make_move(3, 1)
         for spot in range(self.game.board_size):
             self.game.board[spot, 0] = int(Player.BLACK)
-        self.assertEqual(self.minimax.heuristic(self.game.board), (5, 8003))
+        self.assertEqual(self.minimax.heuristic(self.game.board), (10, 9014))
 
     def test_utility_score(self):
         self.game.make_move(3, 2)
@@ -90,7 +91,7 @@ class TestMinimax(unittest.TestCase):
         self.game.make_move(4, 5)
         self.game.switch_player_turn()
         self.game.make_move(3, 1)
-        self.assertEqual(self.minimax.get_utility_value(self.game.board), 2)
+        self.assertEqual(self.minimax.get_utility_value(self.game.board), 4)
 
     def test_utility_score_with_black_untouchables(self):
         self.game.make_move(3, 2)
@@ -121,9 +122,9 @@ class TestMinimax(unittest.TestCase):
         self.game.make_move(3, 1)
         for spot in range(self.game.board_size):
             self.game.board[spot, 0] = int(Player.BLACK)
-        self.assertEqual(self.minimax.get_utility_value(self.game.board), -7998)
+        self.assertEqual(self.minimax.get_utility_value(self.game.board), -9004)
 
-    def test_utility_score_with_black_untouchables_minimaxAI3(self):
+    def test_heuristic_with_black_untouchables_minimaxAI2(self):
         self.game.make_move(3, 2)
         self.game.switch_player_turn()
         '''
@@ -152,4 +153,124 @@ class TestMinimax(unittest.TestCase):
         self.game.make_move(3, 1)
         for spot in range(self.game.board_size):
             self.game.board[spot, 0] = int(Player.BLACK)
-        self.assertEqual(self.minimax3.heuristic(self.game.board), (5, 8003))
+        self.assertEqual(self.minimax2.heuristic(self.game.board), (5, 8003))
+
+    def test_utility_score_minimax2(self):
+        self.game.make_move(3, 2)
+        self.game.switch_player_turn()
+        '''
+                0   1   2   3   4   5   6   7
+                   │   │   │   │   │   │   │   │0
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │   │   │   │   │1
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │   │   │   │   │2
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │ X │   │   │   │3
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │ O │ O │ X │   │   │   │4
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │ X │   │   │   │5
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │6
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │7
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                '''
+        self.game.make_move(2, 4)
+        self.game.switch_player_turn()
+        self.game.make_move(4, 5)
+        self.game.switch_player_turn()
+        self.game.make_move(3, 1)
+        self.assertEqual(self.minimax2.get_utility_value(self.game.board), 2)
+
+    def test_utility_score_with_black_untouchables_minimax2(self):
+        self.game.make_move(3, 2)
+        self.game.switch_player_turn()
+        '''
+                0   1   2   3   4   5   6   7
+                 X │ X │ X │ X │ X │ X │ X │ X │0
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │   │   │   │   │1
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │   │   │   │   │2
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │ X │   │   │   │3
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │ O │ O │ X │   │   │   │4
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │ X │   │   │   │5
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │6
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │7
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                '''
+        self.game.make_move(2, 4)
+        self.game.switch_player_turn()
+        self.game.make_move(4, 5)
+        self.game.switch_player_turn()
+        self.game.make_move(3, 1)
+        for spot in range(self.game.board_size):
+            self.game.board[spot, 0] = int(Player.BLACK)
+        self.assertEqual(self.minimax2.get_utility_value(self.game.board), -7998)
+
+    def test_heuristic_with_black_untouchables_minimaxAI3(self):
+        self.game.make_move(3, 2)
+        self.game.switch_player_turn()
+        '''
+                0   1   2   3   4   5   6   7
+                 X │ X │ X │ X │ X │ X │ X │ X │0
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │   │   │   │   │1
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │   │   │   │   │2
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │ X │   │   │   │3
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │ O │ O │ X │   │   │   │4
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │ X │   │   │   │5
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │6
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │7
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                '''
+        self.game.make_move(2, 4)
+        self.game.switch_player_turn()
+        self.game.make_move(4, 5)
+        self.game.switch_player_turn()
+        self.game.make_move(3, 1)
+        for spot in range(self.game.board_size):
+            self.game.board[spot, 0] = int(Player.BLACK)
+        self.assertEqual(self.minimax3.heuristic(self.game.board), (5, 2009))
+
+    def test_utility_score_minimax3(self):
+        self.game.make_move(3, 2)
+        self.game.switch_player_turn()
+        '''
+                0   1   2   3   4   5   6   7
+                   │   │   │   │   │   │   │   │0
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │   │   │   │   │1
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │   │   │   │   │2
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │ O │ X │   │   │   │3
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │ O │ O │ X │   │   │   │4
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │ X │   │   │   │5
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │6
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                   │   │   │   │   │   │   │   │7
+                ───┼───┼───┼───┼───┼───┼───┼───┼
+                '''
+        self.game.make_move(2, 4)
+        self.game.switch_player_turn()
+        self.game.make_move(4, 5)
+        self.game.switch_player_turn()
+        self.game.make_move(3, 1)
+        self.assertEqual(self.minimax3.get_utility_value(self.game.board), 2)
