@@ -83,7 +83,7 @@ class AppController(Observer):
 
     def on_opponent_disconnect(self, message):
         self.on_exit_game(player_disrupted_game=False)
-        self.current_view.display_opponent_disconnected(message)
+        self.current_view.display_error(message)
 
     def on_exit_game(self, player_disrupted_game=True):
         if self.game and self.game.is_game_terminated():

@@ -97,7 +97,7 @@ class AccountInfoView(PageView):
 
         submit_button.pack()
 
-        switch_view_button = Button(button_frame, text=self.switch_view_label, bg='white', fg = 'blue', font = 'Helvetica 12', borderwidth=3, highlightbackground="white", command=self.switch_view)
+        switch_view_button = Button(button_frame, text=self.switch_view_label, bg='white', fg = 'blue', font = 'Helvetica 12', borderwidth=3, highlightbackground="white", command=self.on_switch_view)
         switch_view_button.pack(side=TOP, pady=5)
 
         login_as_guest_button = Button(button_frame, text="Log in as guest", bg='white', fg = 'blue', font = 'Helvetica 12', borderwidth=3, highlightbackground="white", command=self.on_home)
@@ -111,9 +111,6 @@ class AccountInfoView(PageView):
         img_frame = self.make_frame(0.5, 0.3, LOGO_LENGTH, LOGO_LENGTH)
         label = Label(img_frame, image = self.logo, bg="white")
         label.pack()
-
-    def switch_view(self):
-        self.on_switch_view()
 
     def click_login(self):
         result = self.on_submit(self.username.get(), self.password.get())

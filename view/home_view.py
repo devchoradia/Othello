@@ -53,11 +53,7 @@ class HomeView(PageView):
             text = f"Rating: {str(rating)}"
         self.rating_label.config(text=text)
 
-    def display_awaiting_component(self):
-        if self.loading_label is not None:
-            self.loading_label.config(text="Looking for opponent...")
-
-    def display_opponent_disconnected(self, message):
+    def display_error(self, message):
         if self.loading_label is not None:
             self.loading_label.config(text=message)
 

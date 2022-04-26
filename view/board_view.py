@@ -19,7 +19,6 @@ class BoardView(tk.Frame):
         self.illegal_move = None
         self.requested_move = tk.Variable()
         self.move_handler = None
-        self.widgets = []
         self.illegal_move = None
         self.content_frame = tk.Frame(self)
         board_size = len(self.board)
