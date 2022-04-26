@@ -26,6 +26,11 @@ import tkinter as tk
 from tkinter import messagebox
 
 class AppController(Observer):
+    '''
+    - Initializes the application
+    - Controls the the views of the app
+    - Handles messages from the client
+    '''
     def __init__(self):
         super().__init__([])
         self.client = Client()
@@ -40,6 +45,10 @@ class AppController(Observer):
         self.root.mainloop()
 
     def start_game(self):
+        '''
+        Display the game view.
+        Initialize the game according to the game settings
+        '''
         game = Game(board_size = Settings().get_board_size())
         player_color = Player.BLACK
         # Resume previous game if it was interrupted
@@ -92,14 +101,25 @@ class AppController(Observer):
         controller.run_game()
     
     def restart_game(self):
+        '''
+        Restart the current game
+        '''
         self.game_state = None, None, None
         self.start_game()
 
     def on_opponent_disconnect(self, message):
+        '''
+        When the user exits a remote game, send a message to the server to notify the opponent
+        '''
         self.on_exit_game(player_disrupted_game=False)
         self.current_view.display_error(message)
 
     def on_exit_game(self, player_disrupted_game=True):
+        '''
+        Handles when the user exits the game view.
+        If the game is remote and the game has not been terminated, notify the opponent that the user
+        has exited.
+        '''
         if self.game and self.game.is_game_terminated():
             player_disrupted_game = False
         self.on_home()
@@ -107,24 +127,39 @@ class AppController(Observer):
             self.end_remote_game(player_disrupted_game)
     
     def end_remote_game(self, player_disrupted_game):
+        '''
+        Send a message to the server that the user has ended the remote game
+        '''
         self.client.set_observer(self)
         self.client.end_remote_game(Session().get_username(), player_disrupted_game)
         self.remote_game_state = (None, None, None)
 
     def display_home(self):
+        '''
+        Display the home page
+        '''
         self.current_view = HomeView(on_select_page=self.on_select_page, master=self.root)
         self.current_view.display()
 
     def display_login(self):
+        '''
+        Display the login page
+        '''
         self.current_view = AccountInfoView(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER), on_home=self.on_home)
         self.current_view.display()
 
     def display_register(self):
+        '''
+        Display the register page
+        '''
         self.current_view = AccountInfoView(self.root, self.on_register, lambda: self.on_select_page(Views.LOGIN), self.on_home, view=Views.REGISTER, \
             submit_results=REGISTER_RESULT, result_messages=REGISTER_RESULT_MESSAGE, submit_label="REGISTER", switch_view_label="Log in")
         self.current_view.display()
 
     def on_select_page(self, view):
+        '''
+        Display the selected page
+        '''
         if view == Views.LOGIN and Session().is_logged_in():
             self.current_view.destroy()
             Session().log_out()
@@ -150,34 +185,61 @@ class AppController(Observer):
             self.display_home()
 
     def request_leaderboard(self):
+        '''
+        Request the leaderboard from the server
+        '''
         self.client.get_leaderboard()
         
     def display_leaderboard(self, players):
+        '''
+        Display the leaderboard page
+        '''
         self.current_view = LeaderboardView(self.root, players=players, on_home=self.on_home)
         self.current_view.display()
 
     def request_online_players(self):
+        '''
+        Request current online players from the server
+        '''
         self.client.get_online_players()
 
     def display_online_players(self, players):
+        '''
+        Display the online players page
+        '''
         self.current_view.destroy()
         self.current_view = OnlinePlayersView(self.root, players=players, on_home=self.on_home, request_game=self.request_game)
         self.current_view.display()
 
     def request_game(self, opponent):
+        '''
+        Send a request to play a game with the given opponent
+        '''
         self.client.request_game(Session().get_username(), opponent, Settings().get_board_size())
     
     def display_settings(self):
+        '''
+        Display the settings page
+        '''
         self.current_view = SettingsView(master=self.root, on_home=self.on_home)
         self.current_view.display()
 
     def on_home(self):
+        '''
+        Display the home page
+        '''
         self.on_select_page(Views.HOME)
 
     def on_login(self, username, password):
+        '''
+        Request to log in
+        '''
         self.client.login(username, password)
 
     def update_settings(self, message_body):
+        '''
+        Display the local settings based on saved user preferences received from the client
+        '''
         board_size, board_color, game_mode = message_body
         new_state = {
             Setting.BOARD_SIZE: board_size,
@@ -187,6 +249,9 @@ class AppController(Observer):
         Settings().update_settings(new_state)
 
     def handle_game_request_status(self, remote_game_request_status, opponent, board_size, player_color):
+        '''
+        Update the view when we receive a response from a user we've requested to play
+        '''
         if self.current_view.page_view == Views.ONLINE_PLAYERS:
             self.current_view.update_request(opponent, remote_game_request_status)
         if remote_game_request_status == REMOTE_GAME_REQUEST_STATUS.DECLINED:
@@ -199,6 +264,9 @@ class AppController(Observer):
             self.start_game()
 
     def handle_game_request_notification(self, username, board_size, player_color):
+        '''
+        Display a notification when we receive a request to play a game online
+        '''
         answer = messagebox.askyesno(title="Game notification", message=f"{username} has requested to play with you. Do you accept?")
         if answer and Settings().get_game_mode() == GameMode.REMOTE and self.current_view.page_view == Views.GAME and not self.game.is_game_terminated():
             self.end_remote_game(True)
@@ -210,6 +278,9 @@ class AppController(Observer):
         self.client.answer_game_request(Session().get_username(), username, response)        
 
     def handle_message(self, message):
+        '''
+        Display a message from the client
+        '''
         message_type = message.message_type
         body = message.body
         print(f"Received message: {message_type}, {body}")
@@ -238,6 +309,9 @@ class AppController(Observer):
             print(f"Unknown message: {message_type}, {body}")
     
     def login_result(self, result, username, rating, board_size, board_color, game_mode):
+        '''
+        Handle the login result we receive from the client
+        '''
         if result == LOGIN_RESULT.SUCCESS:
             Session().log_in(username, rating)
             self.update_settings((board_size, board_color, game_mode))
@@ -247,9 +321,15 @@ class AppController(Observer):
         self.current_view.login_result(result)
 
     def on_register(self, username, password):
+        '''
+        Request to register the given username and password
+        '''
         self.client.register(username, password)
 
     def update(self, subject, message=None):
+        '''
+        Handles updates we receive from an observable
+        '''
         is_remote = Settings().get_game_mode() == GameMode.REMOTE
         if subject == self.client:
             self.handle_message(message)
@@ -264,6 +344,4 @@ class AppController(Observer):
         elif subject == self.game and not is_remote:
             self.client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())
 
-    def on_win(self):
-        pass
         
