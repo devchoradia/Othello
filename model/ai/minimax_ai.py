@@ -39,6 +39,8 @@ class MinimaxAI(AbstractMinimaxAI):
 
         if (row, col) in corner_tiles:
             return True
+
+
         elif col == board_size - 1 or col == 0:
             if d == 0 or d == -1:
                 if board[row - 1, col] == int(player):
@@ -65,16 +67,35 @@ class MinimaxAI(AbstractMinimaxAI):
         '''
         computer_score = 0
         opponent_score = 0
+
+        for row_idx, row in enumerate(state):
+            for col_idx, tile in enumerate(row):
+                
+                if tile == int(AI_PLAYER): # Our tile
+                    computer_score += 1
+                    if self.corner_closeness(state, HUMAN_PLAYER, row_idx, col_idx, 0):
+                        computer_score += 500
+
+                elif tile == int(HUMAN_PLAYER): # Opponent tile
+                    opponent_score += 1
+                    if self.corner_closeness(state, AI_PLAYER, row_idx, col_idx, 0):
+                        opponent_score += 500
+
+
+
+
         for row_idx, row in enumerate(state):
             for col_idx, tile in enumerate(row):
                 if tile == int(AI_PLAYER): # Our tile
                     computer_score += 1
-                    if self.is_uncapturable(state, AI_PLAYER, row_idx, col_idx, 0) or self.corner_closeness(state, HUMAN_PLAYER, row_idx, col_idx, 0):
+                    if self.is_uncapturable(state, AI_PLAYER, row_idx, col_idx, 0):
                         computer_score += 999
                 elif tile == int(HUMAN_PLAYER): # Opponent tile
                     opponent_score += 1
-                    if self.is_uncapturable(state, HUMAN_PLAYER, row_idx, col_idx, 0) or self.corner_closeness(state, AI_PLAYER, row_idx, col_idx, 0):
+                    if self.is_uncapturable(state, HUMAN_PLAYER, row_idx, col_idx, 0):
                         opponent_score += 999
+
+
         return computer_score, opponent_score
 
     def get_utility_value(self, state):
