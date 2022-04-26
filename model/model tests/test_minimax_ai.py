@@ -152,5 +152,4 @@ class TestMinimax(unittest.TestCase):
         self.game.make_move(3, 1)
         for spot in range(self.game.board_size):
             self.game.board[spot, 0] = int(Player.BLACK)
-        self.game.board[0, 1] = int(Player.WHITE)
-        self.assertEqual(self.minimax3.get_utility_value(self.game.board), 1992)
+        self.assertEqual(self.minimax3.heuristic(self.game.board), (5, 8003))
