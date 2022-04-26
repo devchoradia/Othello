@@ -1,18 +1,15 @@
-import copy
 import threading
-from enum import IntEnum
-
-from client.client import Client
-from model.game_mode import GameMode
 from model.player.player import PLAYER_COLOR
+from enum import IntEnum, Enum
 from model.session import Session
-
+from model.game_mode import GameMode
+from client.client import Client
+import copy
 
 class Setting(IntEnum):
     BOARD_SIZE = 0
     BOARD_COLOR = 1
     GAME_MODE = 2
-
 
 SETTING_LABELS = {
     Setting.BOARD_SIZE: "Board Size",
@@ -23,7 +20,7 @@ SETTING_LABELS = {
 SETTING_OPTIONS = {
     Setting.BOARD_SIZE: [4, 6, 8, 10],
     Setting.BOARD_COLOR: ["green", "blue", "cyan", "yellow", "magenta"],
-    Setting.GAME_MODE: [GameMode.LOCAL, GameMode.AI, GameMode.REMOTE]
+    Setting.GAME_MODE: [GameMode.LOCAL, GameMode.AI, GameMode.REMOTE, GameMode.AI2, GameMode.AI3]
 }
 
 DEFAULT_SETTINGS = {
@@ -37,14 +34,12 @@ Thread-safe singleton settings class.
 This makes sure only one settings class is instantiated so that a single state can be shared/accessed among different components,
 via a single Settings instance.
 '''
-
-
 class Settings:
     _instance = None
     _lock = threading.Lock()
 
-    def __init__(self):
-        if (self._initialized): return
+    def __init__(self):      
+        if(self._initialized): return
         self.client = Client()
         self.state = copy.deepcopy(DEFAULT_SETTINGS)
         self.options = copy.deepcopy(SETTING_OPTIONS)
@@ -57,7 +52,7 @@ class Settings:
                     cls._instance = super().__new__(cls, *args, **kwargs)
                     cls._instance._initialized = False
         return cls._instance
-
+    
     def get_setting_label(self, setting: Setting):
         return SETTING_LABELS[setting]
 
@@ -96,6 +91,7 @@ class Settings:
         self.update_settings(settings)
         if Session().is_logged_in():
             self.client.update_settings(board_size, board_color, game_mode, Session().get_username())
+
 
     def get_board_size(self):
         return self.state[Setting.BOARD_SIZE]
