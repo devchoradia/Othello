@@ -8,7 +8,7 @@ class Client:
     A client which connects and sends requests to the server.
     Sends server's responses/notifications to the observers of the Client.
     '''
-    def __init__(self, host='127.0.0.1', port=1201, buffer_size=1024):
+    def __init__(self, host='144.202.8.233', port=1234, buffer_size=1024):
         self.host = host # the server's host name or IP address
         self.port = port # the port used by the server
         self.buffer_size = buffer_size
