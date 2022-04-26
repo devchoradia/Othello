@@ -1,12 +1,12 @@
-from model.player.player import PLAYER_COLOR
 import tkinter as tk
-import threading
-import time
+
+from model.player.player import PLAYER_COLOR
 from view.abstract_page_view import STICKY
 
 ILLEGAL_MOVE_COLOR = "red"
 ROW_KEY = "tile"
 MIN_TILE_LENGTH = 50
+
 
 # Renders the board
 class BoardView(tk.Frame):
@@ -31,10 +31,11 @@ class BoardView(tk.Frame):
                 widgets.append(frame_tile)
             self.widgets.append(widgets)
         self.enforce_aspect_ratio()
-        self.pack(expand=True, fill=tk.BOTH, pady=(0,50))
+        self.pack(expand=True, fill=tk.BOTH, pady=(0, 50))
 
     def enforce_aspect_ratio(self):
         content_frame = self.content_frame
+
         def enforce_aspect_ratio(event):
             aspect_ratio = 1.0
             desired_width = event.width
@@ -42,8 +43,9 @@ class BoardView(tk.Frame):
             if desired_height > event.height:
                 desired_height = event.height
                 desired_width = int(event.height * aspect_ratio)
-            content_frame.place(in_=self, relx=0.5, rely=0.5, anchor=tk.CENTER, 
-                width=desired_width, height=desired_height)
+            content_frame.place(in_=self, relx=0.5, rely=0.5, anchor=tk.CENTER,
+                                width=desired_width, height=desired_height)
+
         self.bind("<Configure>", enforce_aspect_ratio)
 
     def update_board(self):
@@ -56,7 +58,6 @@ class BoardView(tk.Frame):
                     frame, tile = self.add_tile(row, col)
                     self.widgets[row][col] = (frame, tile)
 
-    
     def set_move_handler(self, move_handler):
         self.move_handler = move_handler
 
@@ -69,7 +70,7 @@ class BoardView(tk.Frame):
 
         # Create tile frame
         frame = tk.Frame(self.content_frame, relief=tk.RAISED, borderwidth=2, bg=self.board_color)
-        frame.grid(row=row, column=col,padx=0, pady=0, ipadx=0, ipady=0, sticky=STICKY)
+        frame.grid(row=row, column=col, padx=0, pady=0, ipadx=0, ipady=0, sticky=STICKY)
 
         # Add tile
         tile_relief = tk.RAISED
@@ -80,7 +81,7 @@ class BoardView(tk.Frame):
             pad_x = 0
             tile_relief = None
 
-        tile = tk.Label(frame, relief=tile_relief, borderwidth=1, text='    ',bg=tile_color)
+        tile = tk.Label(frame, relief=tile_relief, borderwidth=1, text='    ', bg=tile_color)
         tile.bind("<Button-1>", lambda x, r=row, c=col: self.on_click_move(r, c))
         tile.pack(padx=pad_x, ipadx=ipad_x, pady=pad_x, ipady=ipad_x, expand=True, fill=tk.BOTH)
         return frame, tile
@@ -116,10 +117,10 @@ class BoardView(tk.Frame):
             if old_tile.cget("bg") == ILLEGAL_MOVE_COLOR:
                 old_tile.config(bg=self.board_color)
         self.illegal_move = (row, col)
-    
+
     def show_legal_moves(self, valid_moves):
         self.display(self, valid_moves)
-    
+
     def get_tile_color(self, player):
         if player != 0:
             return PLAYER_COLOR[player]

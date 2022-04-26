@@ -140,6 +140,14 @@ class MinimaxAI2(AbstractMinimaxAI):
         return computer_score, opponent_score
 
 
+    def get_utility_value(self, state):
+        '''
+        Returns the utility value of the given state
+        '''
+        computer_score, opponent_score, = self.heuristic(state)
+        return computer_score - opponent_score
+
+
 
 
 class MinimaxAI3(AbstractMinimaxAI):

@@ -1,10 +1,13 @@
-from mysql.connector import connect, Error
-from enum import Enum
 import json
+from enum import Enum
 from json import JSONEncoder
-from model.player.player import Player
-from model.game_mode import GameMode
+
 import numpy
+from mysql.connector import connect, Error
+
+from model.game_mode import GameMode
+from model.player.player import Player
+
 
 # https://pynative.com/python-serialize-numpy-ndarray-into-json/
 # To store game state to database
@@ -14,18 +17,21 @@ class NumpyArrayEncoder(JSONEncoder):
             return obj.tolist()
         return JSONEncoder.default(self, obj)
 
+
 class LOGIN_RESULT(Enum):
     SUCCESS = 1
     INVALID_USER = 2
     INVALID_PASSWORD = 3
     UNKNOWN_ERROR = 4
 
+
 LOGIN_RESULT_MESSAGE = {
-    LOGIN_RESULT.SUCCESS: "Success logging in", 
-    LOGIN_RESULT.INVALID_USER: "This username doesn't exist", 
-    LOGIN_RESULT.INVALID_PASSWORD: "Invalid password", 
+    LOGIN_RESULT.SUCCESS: "Success logging in",
+    LOGIN_RESULT.INVALID_USER: "This username doesn't exist",
+    LOGIN_RESULT.INVALID_PASSWORD: "Invalid password",
     LOGIN_RESULT.UNKNOWN_ERROR: "An unknown error occurred"
 }
+
 
 class REGISTER_RESULT(Enum):
     SUCCESS = 1
@@ -40,6 +46,7 @@ REGISTER_RESULT_MESSAGE = {
     REGISTER_RESULT.INVALID_INPUT: "Invalid username or password input",
     REGISTER_RESULT.UNKNOWN_ERROR: "An unknown error occurred"
 }
+
 
 class DatabaseClient:
     def __init__(self):
@@ -79,7 +86,7 @@ class DatabaseClient:
             return REGISTER_RESULT.USER_EXISTS, user_info
         conn = self.make_connection()
         args = (username, password)
-        try: 
+        try:
             with conn.cursor() as cursor:
                 cursor.execute(insert, args)
                 conn.commit()
@@ -90,7 +97,7 @@ class DatabaseClient:
         finally:
             conn.close()
         return register_result, user_info
-    
+
     def does_user_exist(self, username):
         conn = self.make_connection()
         does_user_exist_query = """
@@ -122,7 +129,8 @@ class DatabaseClient:
                 cursor.execute(get_user_info_query, args)
                 result = cursor.fetchall()
                 if len(result) == 0:
-                    login_result = LOGIN_RESULT.INVALID_USER if not self.does_user_exist(username) else LOGIN_RESULT.INVALID_PASSWORD
+                    login_result = LOGIN_RESULT.INVALID_USER if not self.does_user_exist(
+                        username) else LOGIN_RESULT.INVALID_PASSWORD
                 else:
                     login_result = LOGIN_RESULT.SUCCESS
                     ELORating = result[0][1]
@@ -180,7 +188,8 @@ class DatabaseClient:
         """
         numpyData = {"board": board}
         encodedBoard = json.dumps(numpyData, cls=NumpyArrayEncoder)
-        args = (username, encodedBoard, str(game_mode), int(current_player), encodedBoard, str(game_mode), int(current_player))
+        args = (
+        username, encodedBoard, str(game_mode), int(current_player), encodedBoard, str(game_mode), int(current_player))
         try:
             with conn.cursor() as cursor:
                 cursor.execute(statement, args)

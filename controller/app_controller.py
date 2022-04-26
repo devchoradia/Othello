@@ -16,6 +16,8 @@ from model.player.RemotePlayer import RemotePlayer
 from model.settings import Settings, Setting
 from model.game_mode import GameMode, REMOTE_GAME_REQUEST_STATUS
 from model.ai.minimax_ai import MinimaxAI
+from model.ai.minimax_ai import MinimaxAI2
+from model.ai.minimax_ai import MinimaxAI3
 from model.observer import Observer
 from model.session import Session
 from client.client import Client
@@ -62,13 +64,25 @@ class AppController(Observer):
         players = [LocalPlayer(view)]
         if game_mode == GameMode.LOCAL:
             players.append(LocalPlayer(view, player_color=Player.WHITE))
+
+
         elif game_mode == GameMode.AI:
             players.append(AIPlayer(ai=MinimaxAI(), view=view))
+
+        elif game_mode == GameMode.AI2:
+            players.append(AIPlayer(ai=MinimaxAI2(), view=view))
+
+        elif game_mode == GameMode.AI3:
+            players.append(AIPlayer(ai=MinimaxAI3(), view=view))
+
+
         elif game_mode == GameMode.REMOTE:
             local_player = LocalPlayer(view, player_color=player_color)
             remote_player = RemotePlayer(player_color=Player(len(Player) + 1 - player_color), local_player=local_player, client=self.client, on_opponent_disconnect=self.on_opponent_disconnect, on_game_request=self.handle_game_request_notification)
             players = [local_player, remote_player]
             players.sort(key=lambda p: p.player_color)
+
+
         else:
             raise ValueError("Received invalid game mode: " + str(game_mode))
         controller = GameController(game, view, players=players)

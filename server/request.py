@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Request(Enum):
     LOGIN = "login"
     LOGOUT = "logout"
@@ -17,6 +18,7 @@ class Request(Enum):
     UPDATE_ELO_RATING = "update ELO rating"
     REQUEST_REMOTE_GAME = "request remote game"
     UPDATE_REMOTE_GAME_STATUS = "update remote game status"
+
 
 class Message:
     def __init__(self, message_type: Request, body):

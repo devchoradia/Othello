@@ -1,9 +1,11 @@
 # test game.py
 
 import unittest
+
 import numpy as np
-from model.player.player import Player
+
 from game import Game
+from model.player.player import Player
 
 
 class TestGame(unittest.TestCase):
@@ -11,7 +13,7 @@ class TestGame(unittest.TestCase):
         self.game = Game()
 
     def test_make_move(self):
-        self.game.make_move(3,2)
+        self.game.make_move(3, 2)
         self.assertEqual(self.game.board[3, 3], int(Player.BLACK))
 
     def test_switch_player_turn(self):
@@ -23,10 +25,10 @@ class TestGame(unittest.TestCase):
             self.assertEqual(self.game.curr_player, Player.BLACK)
 
     def test_is_legal_move_with_not_legal(self):
-        self.assertFalse(self.game.is_legal_move(3,3))
+        self.assertFalse(self.game.is_legal_move(3, 3))
 
     def test_is_legal_move_with_legal(self):
-        self.assertTrue(self.game.is_legal_move(3,2))
+        self.assertTrue(self.game.is_legal_move(3, 2))
 
     def test_is_capturable_with_capturable(self):
         # set board
@@ -49,7 +51,7 @@ class TestGame(unittest.TestCase):
                    │   │   │   │   │   │   │   │7
                 ───┼───┼───┼───┼───┼───┼───┼───┼
                 '''
-        self.assertTrue(self.game.is_capturable(4,4))
+        self.assertTrue(self.game.is_capturable(4, 4))
 
     def test_is_capturable_not_capturable(self):
         '''
@@ -71,7 +73,7 @@ class TestGame(unittest.TestCase):
                    │   │   │   │   │   │   │   │7
                 ───┼───┼───┼───┼───┼───┼───┼───┼
                 '''
-        self.assertFalse(self.game.is_capturable(6,6))
+        self.assertFalse(self.game.is_capturable(6, 6))
 
     def test_has_valid_moves_with_not_valid(self):
         self.game.board = np.full((8, 8), int(Player.BLACK))
@@ -81,12 +83,11 @@ class TestGame(unittest.TestCase):
         self.assertTrue(self.game.has_valid_move(Player.BLACK))
 
     def test_get_valid_moves_BLACK(self):
-        self.assertEqual(self.game.get_valid_moves(), [(2,3), (3,2), (4,5), (5,4)])
+        self.assertEqual(self.game.get_valid_moves(), [(2, 3), (3, 2), (4, 5), (5, 4)])
 
     def test_get_valid_moves_WHITE(self):
         self.game.switch_player_turn()
-        self.assertEqual(self.game.get_valid_moves(), [(2,4), (3,5), (4,2), (5,3)])
-
+        self.assertEqual(self.game.get_valid_moves(), [(2, 4), (3, 5), (4, 2), (5, 3)])
 
     def test_is_game_terminated_not_over(self):
         self.assertFalse(self.game.is_game_terminated())
@@ -102,7 +103,7 @@ class TestGame(unittest.TestCase):
 
     def test_has_player_captured_full_with_different_players_tiles(self):
         self.game.board = np.full((self.game.board_size, self.game.board_size), int(Player.BLACK))
-        self.game.board[3,3] = int(Player.WHITE)
+        self.game.board[3, 3] = int(Player.WHITE)
         self.assertFalse(self.game.has_player_captured_all())
 
     def test_has_player_captured_empty_tiles_left(self):

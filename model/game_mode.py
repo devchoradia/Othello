@@ -9,7 +9,9 @@ class GameMode(Enum):
         return getattr(cls, str.upper(), None)
 
     LOCAL = "local"
-    AI = "AI"
+    AI = "AI"    
+    AI2 = "AI2"
+    AI3 = "AI3"
     REMOTE = "remote"
 
 class REMOTE_GAME_REQUEST_STATUS(Enum):

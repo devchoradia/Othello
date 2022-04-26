@@ -20,7 +20,7 @@ SETTING_LABELS = {
 SETTING_OPTIONS = {
     Setting.BOARD_SIZE: [4, 6, 8, 10],
     Setting.BOARD_COLOR: ["green", "blue", "cyan", "yellow", "magenta"],
-    Setting.GAME_MODE: [GameMode.LOCAL, GameMode.AI, GameMode.REMOTE]
+    Setting.GAME_MODE: [GameMode.LOCAL, GameMode.AI, GameMode.REMOTE, GameMode.AI2, GameMode.AI3]
 }
 
 DEFAULT_SETTINGS = {

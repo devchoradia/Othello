@@ -4,6 +4,7 @@ TILE_WIDTH = 4
 EMPTY_TILE = ' ' * TILE_WIDTH
 EMPTY_SPACE = ' ' * (TILE_WIDTH - 1)
 
+
 class BoardConsoleView:
     def __init__(self, board):
         self.board = board
@@ -11,7 +12,8 @@ class BoardConsoleView:
     # Renders the board in the console
     def display(self):
         # Label the column numbers
-        column_labels = EMPTY_TILE + ' ' + EMPTY_SPACE.join(list(map(lambda x: str(x), range(1, len(self.board) + 1)))) + '  '
+        column_labels = EMPTY_TILE + ' ' + EMPTY_SPACE.join(
+            list(map(lambda x: str(x), range(1, len(self.board) + 1)))) + '  '
         # Board border
         border = EMPTY_SPACE + ("-" * (len(self.board) * TILE_WIDTH + 1))
         # String representation of tiles; each string renders one row

@@ -1,6 +1,8 @@
 # test session
 import unittest
+
 from session import Session
+
 
 class TestSession(unittest.TestCase):
     def setUp(self):
@@ -21,7 +23,3 @@ class TestSession(unittest.TestCase):
         new_rating = self.session.get_ELORating() + 1
         self.session.update_ELORating(new_rating)
         self.assertEqual(self.session.get_ELORating(), 5)
-
-
-
-

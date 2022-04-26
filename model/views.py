@@ -1,5 +1,6 @@
 from enum import IntEnum
 
+
 class Views(IntEnum):
     LOGIN = 1
     REGISTER = 2
@@ -8,6 +9,7 @@ class Views(IntEnum):
     SETTINGS = 5
     HOME = 6
     ONLINE_PLAYERS = 7
+
 
 VIEW_TITLES = {
     Views.LOGIN: "Log in",
