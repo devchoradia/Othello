@@ -4,7 +4,7 @@ import unittest
 
 import numpy as np
 
-from game import Game
+from model.game import Game
 from model.player.player import Player
 
 
