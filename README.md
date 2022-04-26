@@ -19,6 +19,10 @@ or manually download here: https://dev.mysql.com/downloads/connector/python/
 * password: password123
 * database: reversi
 
+## Server Info
+* Online server was set on IP: 144.202.8.233 PORT: 1234
+* To play online, change the host and port in client.py to above
+
 ## Run the game
 ### Run server
 `python3 sever_main.py`
