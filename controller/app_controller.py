@@ -1,28 +1,29 @@
-import tkinter as tk
-from tkinter import messagebox
-
-from client.client import Client
-from controller.game_controller import GameController
-from model.ai.minimax_ai import MinimaxAI
 from model.game import Game
-from model.game_mode import GameMode, REMOTE_GAME_REQUEST_STATUS
-from model.observer import Observer
+from model.views import Views
+from view.home_view import HomeView
+from view.game_view import GameView
+from view.settings_view import SettingsView
+from view.leaderboard_view import LeaderboardView
+from view.online_players_view import OnlinePlayersView
+from view.register import Register
+from view.login import AccountInfoView
+from controller.game_controller import GameController
+from server.database_client import DatabaseClient, LOGIN_RESULT, REGISTER_RESULT, REGISTER_RESULT_MESSAGE
+from model.player.player import Player
 from model.player.AIPlayer import AIPlayer
 from model.player.LocalPlayer import LocalPlayer
 from model.player.RemotePlayer import RemotePlayer
-from model.player.player import Player
-from model.session import Session
 from model.settings import Settings, Setting
-from model.views import Views
-from server.database_client import LOGIN_RESULT, REGISTER_RESULT, REGISTER_RESULT_MESSAGE
+from model.game_mode import GameMode, REMOTE_GAME_REQUEST_STATUS
+from model.ai.minimax_ai import MinimaxAI
+from model.ai.minimax_ai import MinimaxAI2
+from model.ai.minimax_ai import MinimaxAI3
+from model.observer import Observer
+from model.session import Session
+from client.client import Client
 from server.server import Request
-from view.game_view import GameView
-from view.home_view import HomeView
-from view.leaderboard_view import LeaderboardView
-from view.login import AccountInfoView
-from view.online_players_view import OnlinePlayersView
-from view.settings_view import SettingsView
-
+import tkinter as tk
+from tkinter import messagebox
 
 class AppController(Observer):
     def __init__(self):
@@ -39,7 +40,7 @@ class AppController(Observer):
         self.root.mainloop()
 
     def start_game(self):
-        game = Game(board_size=Settings().get_board_size())
+        game = Game(board_size = Settings().get_board_size())
         player_color = Player.BLACK
         # Resume previous game if it was interrupted
         if Session().is_logged_in() and Settings().get_game_mode() == GameMode.REMOTE:
@@ -50,31 +51,38 @@ class AppController(Observer):
             game = Game(board_size=board_size)
         elif Session().is_logged_in():
             board, game_mode, current_player = self.game_state
-            if all(item is not None for item in
-                   (board, game_mode, current_player)) and Settings().get_board_size() == len(
-                    board) and game_mode == Settings().get_game_mode():
+            if all(item is not None for item in (board, game_mode, current_player)) and Settings().get_board_size() == len(board) and game_mode == Settings().get_game_mode():
                 game = Game(board_size=len(board), board=board, curr_player=current_player)
         self.current_view.destroy()
         self.game = game
         game.add_observer(self)
         on_restart = self.restart_game if Settings().get_game_mode() != GameMode.REMOTE else None
-        view = GameView(master=self.root, board=game.board, on_home=self.on_exit_game,
-                        board_color=Settings().get_board_color(), main_player=player_color, on_restart=on_restart)
+        view = GameView(master=self.root, board=game.board, on_home=self.on_exit_game, board_color = Settings().get_board_color(), main_player=player_color, on_restart=on_restart)
         self.current_view = view
         view.display()
         game_mode = Settings().get_game_mode()
         players = [LocalPlayer(view)]
         if game_mode == GameMode.LOCAL:
             players.append(LocalPlayer(view, player_color=Player.WHITE))
+
+
         elif game_mode == GameMode.AI:
             players.append(AIPlayer(ai=MinimaxAI(), view=view))
+
+        elif game_mode == GameMode.AI2:
+            players.append(AIPlayer(ai=MinimaxAI2(), view=view))
+
+        elif game_mode == GameMode.AI3:
+            players.append(AIPlayer(ai=MinimaxAI3(), view=view))
+
+
         elif game_mode == GameMode.REMOTE:
             local_player = LocalPlayer(view, player_color=player_color)
-            remote_player = RemotePlayer(player_color=Player(len(Player) + 1 - player_color), local_player=local_player,
-                                         client=self.client, on_opponent_disconnect=self.on_opponent_disconnect,
-                                         on_game_request=self.handle_game_request_notification)
+            remote_player = RemotePlayer(player_color=Player(len(Player) + 1 - player_color), local_player=local_player, client=self.client, on_opponent_disconnect=self.on_opponent_disconnect, on_game_request=self.handle_game_request_notification)
             players = [local_player, remote_player]
             players.sort(key=lambda p: p.player_color)
+
+
         else:
             raise ValueError("Received invalid game mode: " + str(game_mode))
         controller = GameController(game, view, players=players)
@@ -82,7 +90,7 @@ class AppController(Observer):
         for player in players:
             player.observers.reverse()
         controller.run_game()
-
+    
     def restart_game(self):
         self.game_state = None, None, None
         self.start_game()
@@ -97,7 +105,7 @@ class AppController(Observer):
         self.on_home()
         if Settings().get_game_mode() == GameMode.REMOTE and None not in self.remote_game_state:
             self.end_remote_game(player_disrupted_game)
-
+    
     def end_remote_game(self, player_disrupted_game):
         self.client.set_observer(self)
         self.client.end_remote_game(Session().get_username(), player_disrupted_game)
@@ -108,15 +116,12 @@ class AppController(Observer):
         self.current_view.display()
 
     def display_login(self):
-        self.current_view = AccountInfoView(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER),
-                                            on_home=self.on_home)
+        self.current_view = AccountInfoView(self.root, self.on_login, lambda: self.on_select_page(Views.REGISTER), on_home=self.on_home)
         self.current_view.display()
 
     def display_register(self):
-        self.current_view = AccountInfoView(self.root, self.on_register, lambda: self.on_select_page(Views.LOGIN),
-                                            self.on_home, view=Views.REGISTER, \
-                                            submit_results=REGISTER_RESULT, result_messages=REGISTER_RESULT_MESSAGE,
-                                            submit_label="REGISTER", switch_view_label="Log in")
+        self.current_view = AccountInfoView(self.root, self.on_register, lambda: self.on_select_page(Views.LOGIN), self.on_home, view=Views.REGISTER, \
+            submit_results=REGISTER_RESULT, result_messages=REGISTER_RESULT_MESSAGE, submit_label="REGISTER", switch_view_label="Log in")
         self.current_view.display()
 
     def on_select_page(self, view):
@@ -146,7 +151,7 @@ class AppController(Observer):
 
     def request_leaderboard(self):
         self.client.get_leaderboard()
-
+        
     def display_leaderboard(self, players):
         self.current_view = LeaderboardView(self.root, players=players, on_home=self.on_home)
         self.current_view.display()
@@ -156,13 +161,12 @@ class AppController(Observer):
 
     def display_online_players(self, players):
         self.current_view.destroy()
-        self.current_view = OnlinePlayersView(self.root, players=players, on_home=self.on_home,
-                                              request_game=self.request_game)
+        self.current_view = OnlinePlayersView(self.root, players=players, on_home=self.on_home, request_game=self.request_game)
         self.current_view.display()
 
     def request_game(self, opponent):
         self.client.request_game(Session().get_username(), opponent, Settings().get_board_size())
-
+    
     def display_settings(self):
         self.current_view = SettingsView(master=self.root, on_home=self.on_home)
         self.current_view.display()
@@ -195,8 +199,7 @@ class AppController(Observer):
             self.start_game()
 
     def handle_game_request_notification(self, username, board_size, player_color):
-        answer = messagebox.askyesno(title="Game notification",
-                                     message=f"{username} has requested to play with you. Do you accept?")
+        answer = messagebox.askyesno(title="Game notification", message=f"{username} has requested to play with you. Do you accept?")
         if answer and Settings().get_game_mode() == GameMode.REMOTE and self.current_view.page_view == Views.GAME and not self.game.is_game_terminated():
             self.end_remote_game(True)
         if answer:
@@ -204,7 +207,7 @@ class AppController(Observer):
             Settings().update_setting(Setting.GAME_MODE, GameMode.REMOTE)
             self.start_game()
         response = REMOTE_GAME_REQUEST_STATUS.ACCEPTED if answer else REMOTE_GAME_REQUEST_STATUS.DECLINED
-        self.client.answer_game_request(Session().get_username(), username, response)
+        self.client.answer_game_request(Session().get_username(), username, response)        
 
     def handle_message(self, message):
         message_type = message.message_type
@@ -233,7 +236,7 @@ class AppController(Observer):
             self.handle_game_request_notification(username, board_size, player_color)
         else:
             print(f"Unknown message: {message_type}, {body}")
-
+    
     def login_result(self, result, username, rating, board_size, board_color, game_mode):
         if result == LOGIN_RESULT.SUCCESS:
             Session().log_in(username, rating)
@@ -259,8 +262,8 @@ class AppController(Observer):
         elif subject == self.game and self.game.is_game_terminated():
             self.client.remove_game_state(Session().get_username())
         elif subject == self.game and not is_remote:
-            self.client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player,
-                                          Session().get_username())
+            self.client.update_game_state(subject.board, Settings().get_game_mode(), subject.curr_player, Session().get_username())
 
     def on_win(self):
         pass
+        
